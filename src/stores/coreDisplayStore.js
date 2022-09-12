@@ -5,6 +5,13 @@ export const useCoreDisplayStore = defineStore("coreDisplayStore", {
     return {
       openTabs: [],
       activeTab: "",
+      modals: {
+        agents: {
+          showDeploy: false,
+          showConfig: false,
+          showDetails: false,
+        }
+      }
     };
   },
 

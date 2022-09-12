@@ -17,6 +17,10 @@ html, body, #app {
   background-color: #ddd !important;
 }
 
+footer.modal-card-foot {
+  padding: 10px;
+}
+
 .tab.is-active {
   background-color: #8b00ff;
 }
@@ -27,6 +31,14 @@ html, body, #app {
 
 .menu-label {
   border-bottom: 2px solid #8b00ff;
+}
+
+hr {
+  background-color: #8b00ff !important;
+}
+
+button.button {
+  font-weight: 600;
 }
 
 /*! bulma.io v0.9.3 | MIT License | github.com/jgthms/bulma */
@@ -40,10 +52,10 @@ html, body, #app {
   -webkit-appearance: none;
   align-items: center;
   border: 1px solid transparent;
-  border-radius: 4px;
+  border-radius: 8px;
   box-shadow: none;
   display: inline-flex;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   height: 2.5em;
   justify-content: flex-start;
   line-height: 1.5;
@@ -365,7 +377,7 @@ pre {
 
 body {
   color: white;
-  font-size: 0.85em;
+  font-size: 1em;
   font-weight: 400;
   line-height: 1.5;
 }
@@ -466,8 +478,8 @@ table th {
 /* Bulma Elements */
 .box {
   background-color: hsl(0deg, 0%, 14%);
-  border-radius: 6px;
-  box-shadow: 0 0.5em 1em -0.125em rgba(235, 235, 235, 0.1), 0 0px 0 1px rgba(235, 235, 235, 0.02);
+  border-radius: 8px;
+  box-shadow: 0 0.5em 1em -0.125em rgba(10, 10, 10, 0.1), 0 0px 0 1px rgba(10, 10, 10, 0.02);
   color: white;
   display: block;
   padding: 1.25rem;
@@ -1472,13 +1484,13 @@ a.box:active {
   color: #dd3712;
 }
 .button.is-small {
-  font-size: 0.6rem;
+  font-size: 0.7rem;
 }
 .button.is-small:not(.is-rounded) {
-  border-radius: 2px;
+  border-radius: 6px;
 }
 .button.is-normal {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }
 .button.is-medium {
   font-size: 1rem;
@@ -1538,10 +1550,10 @@ a.box:active {
   margin-bottom: 1rem;
 }
 .buttons.are-small .button:not(.is-normal):not(.is-medium):not(.is-large) {
-  font-size: 0.6rem;
+  font-size: 0.7rem;
 }
 .buttons.are-small .button:not(.is-normal):not(.is-medium):not(.is-large):not(.is-rounded) {
-  border-radius: 2px;
+  border-radius: 6px;
 }
 .buttons.are-medium .button:not(.is-small):not(.is-normal):not(.is-large) {
   font-size: 1rem;
@@ -1784,10 +1796,10 @@ a.box:active {
   margin-top: 0;
 }
 .content.is-small {
-  font-size: 0.6rem;
+  font-size: 0.7rem;
 }
 .content.is-normal {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }
 .content.is-medium {
   font-size: 1rem;
@@ -1950,7 +1962,7 @@ div.icon-text {
 
 .notification {
   background-color: #171717;
-  border-radius: 4px;
+  border-radius: 8px;
   position: relative;
   padding: 1.25rem 2.5rem 1.25rem 1.5rem;
 }
@@ -2049,7 +2061,7 @@ div.icon-text {
   border: none;
   border-radius: 9999px;
   display: block;
-  height: 0.9rem;
+  height: 0.8rem;
   overflow: hidden;
   padding: 0;
   width: 100%;
@@ -2208,7 +2220,7 @@ div.icon-text {
   animation-name: none;
 }
 .progress.is-small {
-  height: 0.6rem;
+  height: 0.7rem;
 }
 .progress.is-medium {
   height: 1rem;
@@ -2370,10 +2382,10 @@ div.icon-text {
   width: 100%;
 }
 .table.is-hoverable tbody tr:not(.is-selected):hover {
-  background-color: hsl(0deg, 0%, 25%);
+  background-color: hsl(0deg, 0%, 22%);
 }
 .table.is-hoverable.is-striped tbody tr:not(.is-selected):hover {
-  background-color: hsl(0deg, 0%, 25%);
+  background-color: hsl(0deg, 0%, 22%);
 }
 .table.is-hoverable.is-striped tbody tr:not(.is-selected):hover:nth-child(even) {
   background-color: hsl(0deg, 0%, 30%);
@@ -2383,7 +2395,7 @@ div.icon-text {
   padding: 0.25em 0.5em;
 }
 .table.is-striped tbody tr:not(.is-selected):nth-child(even) {
-  background-color: hsl(0deg, 0%, 25%);
+  background-color: hsl(0deg, 0%, 22%);
 }
 
 .table-container {
@@ -2412,7 +2424,7 @@ div.icon-text {
   margin-bottom: 1rem;
 }
 .tags.are-medium .tag:not(.is-normal):not(.is-large) {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }
 .tags.are-large .tag:not(.is-normal):not(.is-medium) {
   font-size: 1rem;
@@ -2449,10 +2461,10 @@ div.icon-text {
 .tag:not(body) {
   align-items: center;
   background-color: #171717;
-  border-radius: 4px;
+  border-radius: 8px;
   color: white;
   display: inline-flex;
-  font-size: 0.6rem;
+  font-size: 0.7rem;
   height: 2em;
   justify-content: center;
   line-height: 1.5;
@@ -2529,10 +2541,10 @@ div.icon-text {
   color: #dd3712;
 }
 .tag:not(body).is-normal {
-  font-size: 0.6rem;
+  font-size: 0.7rem;
 }
 .tag:not(body).is-medium {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }
 .tag:not(body).is-large {
   font-size: 1rem;
@@ -2707,7 +2719,7 @@ a.tag:hover {
 .select select, .textarea, .input {
   background-color: hsl(0deg, 0%, 14%);
   border-color: hsl(0deg, 0%, 30%);
-  border-radius: 4px;
+  border-radius: 8px;
   color: white;
 }
 .select select::-moz-placeholder, .textarea::-moz-placeholder, .input::-moz-placeholder {
@@ -2817,8 +2829,8 @@ a.tag:hover {
   box-shadow: 0 0 0 0.125em rgba(204, 51, 17, 0.25);
 }
 .is-small.textarea, .is-small.input {
-  border-radius: 2px;
-  font-size: 0.6rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
 }
 .is-medium.textarea, .is-medium.input {
   font-size: 1rem;
@@ -3054,8 +3066,8 @@ a.tag:hover {
   box-shadow: 0 0 0 0.125em rgba(204, 51, 17, 0.25);
 }
 .select.is-small {
-  border-radius: 2px;
-  font-size: 0.6rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
 }
 .select.is-medium {
   font-size: 1rem;
@@ -3080,7 +3092,7 @@ a.tag:hover {
   transform: none;
 }
 .select.is-loading.is-small:after {
-  font-size: 0.6rem;
+  font-size: 0.7rem;
 }
 .select.is-loading.is-medium:after {
   font-size: 1rem;
@@ -3296,10 +3308,10 @@ a.tag:hover {
   color: #fff;
 }
 .file.is-small {
-  font-size: 0.6rem;
+  font-size: 0.7rem;
 }
 .file.is-normal {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }
 .file.is-medium {
   font-size: 1rem;
@@ -3322,7 +3334,7 @@ a.tag:hover {
   border-top-left-radius: 0;
 }
 .file.has-name.is-empty .file-cta {
-  border-radius: 4px;
+  border-radius: 8px;
 }
 .file.has-name.is-empty .file-name {
   display: none;
@@ -3355,10 +3367,10 @@ a.tag:hover {
   font-size: 35px;
 }
 .file.is-boxed.has-name .file-cta {
-  border-radius: 4px 4px 0 0;
+  border-radius: 8px 8px 0 0;
 }
 .file.is-boxed.has-name .file-name {
-  border-radius: 0 0 4px 4px;
+  border-radius: 0 0 8px 8px;
   border-width: 0 1px 1px;
 }
 .file.is-centered {
@@ -3375,10 +3387,10 @@ a.tag:hover {
   justify-content: flex-end;
 }
 .file.is-right .file-cta {
-  border-radius: 0 4px 4px 0;
+  border-radius: 0 8px 8px 0;
 }
 .file.is-right .file-name {
-  border-radius: 4px 0 0 4px;
+  border-radius: 8px 0 0 8px;
   border-width: 1px 0 1px 1px;
   order: -1;
 }
@@ -3419,7 +3431,7 @@ a.tag:hover {
 .file-cta,
 .file-name {
   border-color: hsl(0deg, 0%, 30%);
-  border-radius: 4px;
+  border-radius: 8px;
   font-size: 1em;
   padding-left: 1em;
   padding-right: 1em;
@@ -3457,14 +3469,14 @@ a.tag:hover {
 .label {
   color: white;
   display: block;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-weight: 700;
 }
 .label:not(:last-child) {
   margin-bottom: 0.5em;
 }
 .label.is-small {
-  font-size: 0.6rem;
+  font-size: 0.7rem;
 }
 .label.is-medium {
   font-size: 1rem;
@@ -3475,7 +3487,7 @@ a.tag:hover {
 
 .help {
   display: block;
-  font-size: 0.6rem;
+  font-size: 0.7rem;
   margin-top: 0.25rem;
 }
 .help.is-white {
@@ -3635,7 +3647,7 @@ a.tag:hover {
     text-align: right;
   }
   .field-label.is-small {
-    font-size: 0.6rem;
+    font-size: 0.7rem;
     padding-top: 0.375em;
   }
   .field-label.is-normal {
@@ -3678,7 +3690,7 @@ a.tag:hover {
 .control {
   box-sizing: border-box;
   clear: both;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   position: relative;
   text-align: inherit;
 }
@@ -3690,7 +3702,7 @@ a.tag:hover {
 .control.has-icons-left .input.is-small ~ .icon,
 .control.has-icons-left .select.is-small ~ .icon, .control.has-icons-right .input.is-small ~ .icon,
 .control.has-icons-right .select.is-small ~ .icon {
-  font-size: 0.6rem;
+  font-size: 0.7rem;
 }
 .control.has-icons-left .input.is-medium ~ .icon,
 .control.has-icons-left .select.is-medium ~ .icon, .control.has-icons-right .input.is-medium ~ .icon,
@@ -3732,7 +3744,7 @@ a.tag:hover {
   z-index: 4;
 }
 .control.is-loading.is-small:after {
-  font-size: 0.6rem;
+  font-size: 0.7rem;
 }
 .control.is-loading.is-medium:after {
   font-size: 1rem;
@@ -3743,7 +3755,7 @@ a.tag:hover {
 
 /* Bulma Components */
 .breadcrumb {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   white-space: nowrap;
 }
 .breadcrumb a {
@@ -3794,7 +3806,7 @@ a.tag:hover {
   justify-content: flex-end;
 }
 .breadcrumb.is-small {
-  font-size: 0.6rem;
+  font-size: 0.7rem;
 }
 .breadcrumb.is-medium {
   font-size: 1rem;
@@ -3818,7 +3830,7 @@ a.tag:hover {
 .card {
   background-color: hsl(0deg, 0%, 14%);
   border-radius: 0.25rem;
-  box-shadow: 0 0.5em 1em -0.125em rgba(235, 235, 235, 0.1), 0 0px 0 1px rgba(235, 235, 235, 0.02);
+  box-shadow: 0 0.5em 1em -0.125em rgba(10, 10, 10, 0.1), 0 0px 0 1px rgba(10, 10, 10, 0.02);
   color: white;
   max-width: 100%;
   position: relative;
@@ -3943,8 +3955,8 @@ a.tag:hover {
 
 .dropdown-content {
   background-color: hsl(0deg, 0%, 14%);
-  border-radius: 4px;
-  box-shadow: 0 0.5em 1em -0.125em rgba(235, 235, 235, 0.1), 0 0px 0 1px rgba(235, 235, 235, 0.02);
+  border-radius: 8px;
+  box-shadow: 0 0.5em 1em -0.125em rgba(10, 10, 10, 0.1), 0 0px 0 1px rgba(10, 10, 10, 0.02);
   padding-bottom: 0.5rem;
   padding-top: 0.5rem;
 }
@@ -3989,7 +4001,7 @@ button.dropdown-item.is-active {
   justify-content: space-between;
 }
 .level code {
-  border-radius: 4px;
+  border-radius: 8px;
 }
 .level img {
   display: inline-block;
@@ -4142,10 +4154,10 @@ button.dropdown-item.is-active {
   }
 }
 .menu {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }
 .menu.is-small {
-  font-size: 0.6rem;
+  font-size: 0.7rem;
 }
 .menu.is-medium {
   font-size: 1rem;
@@ -4158,7 +4170,7 @@ button.dropdown-item.is-active {
   line-height: 1.25;
 }
 .menu-list a {
-  border-radius: 2px;
+  border-radius: 6px;
   color: white;
   display: block;
   padding: 0.5em 0.75em;
@@ -4191,9 +4203,9 @@ button.dropdown-item.is-active {
 }
 
 .message {
-  background-color: hsl(0deg, 0%, 25%);
-  border-radius: 4px;
-  font-size: 0.9rem;
+  background-color: hsl(0deg, 0%, 22%);
+  border-radius: 8px;
+  font-size: 0.8rem;
 }
 .message strong {
   color: currentColor;
@@ -4203,7 +4215,7 @@ button.dropdown-item.is-active {
   text-decoration: underline;
 }
 .message.is-small {
-  font-size: 0.6rem;
+  font-size: 0.7rem;
 }
 .message.is-medium {
   font-size: 1rem;
@@ -4321,7 +4333,7 @@ button.dropdown-item.is-active {
 .message-header {
   align-items: center;
   background-color: hsl(0deg, 0%, 14%);
-  border-radius: 4px 4px 0 0;
+  border-radius: 8px 8px 0 0;
   color: white;
   display: flex;
   font-weight: 700;
@@ -4343,7 +4355,7 @@ button.dropdown-item.is-active {
 
 .message-body {
   border-color: hsl(0deg, 0%, 30%);
-  border-radius: 4px;
+  border-radius: 8px;
   border-style: solid;
   border-width: 0 0 0 4px;
   color: white;
@@ -4415,14 +4427,14 @@ button.dropdown-item.is-active {
   display: flex;
   flex-shrink: 0;
   justify-content: flex-start;
-  padding: 15px;
+  padding: 20px;
   position: relative;
 }
 
 .modal-card-head {
   border-bottom: 1px solid hsl(0deg, 0%, 30%);
-  border-top-left-radius: 6px;
-  border-top-right-radius: 6px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
 }
 
 .modal-card-title {
@@ -4434,8 +4446,8 @@ button.dropdown-item.is-active {
 }
 
 .modal-card-foot {
-  border-bottom-left-radius: 6px;
-  border-bottom-right-radius: 6px;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
   border-top: 1px solid hsl(0deg, 0%, 30%);
 }
 .modal-card-foot .button:not(:last-child) {
@@ -4444,7 +4456,7 @@ button.dropdown-item.is-active {
 
 .modal-card-body {
   -webkit-overflow-scrolling: touch;
-  background-color: hsl(0deg, 0%, 25%);
+  background-color: hsl(0deg, 0%, 22%);
   flex-grow: 1;
   flex-shrink: 1;
   overflow: auto;
@@ -5140,7 +5152,7 @@ a.navbar-item:focus, a.navbar-item:focus-within, a.navbar-item:hover, a.navbar-i
 .navbar-link:focus-within,
 .navbar-link:hover,
 .navbar-link.is-active {
-  background-color: hsl(0deg, 0%, 25%);
+  background-color: hsl(0deg, 0%, 22%);
   color: white;
 }
 
@@ -5277,7 +5289,7 @@ body.has-navbar-fixed-bottom-touch {
   }
   .navbar.is-spaced a.navbar-item,
 .navbar.is-spaced .navbar-link {
-    border-radius: 4px;
+    border-radius: 8px;
   }
   .navbar.is-transparent a.navbar-item:focus, .navbar.is-transparent a.navbar-item:hover, .navbar.is-transparent a.navbar-item.is-active,
 .navbar.is-transparent .navbar-link:focus,
@@ -5312,7 +5324,7 @@ body.has-navbar-fixed-bottom-touch {
   }
   .navbar-item.has-dropdown-up .navbar-dropdown {
     border-bottom: 2px solid hsl(0deg, 0%, 30%);
-    border-radius: 6px 6px 0 0;
+    border-radius: 8px 8px 0 0;
     border-top: none;
     bottom: 100%;
     box-shadow: 0 -8px 8px rgba(10, 10, 10, 0.1);
@@ -5340,8 +5352,8 @@ body.has-navbar-fixed-bottom-touch {
   }
   .navbar-dropdown {
     background-color: hsl(0deg, 0%, 14%);
-    border-bottom-left-radius: 6px;
-    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
     border-top: 2px solid hsl(0deg, 0%, 30%);
     box-shadow: 0 8px 8px rgba(10, 10, 10, 0.1);
     display: none;
@@ -5368,7 +5380,7 @@ body.has-navbar-fixed-bottom-touch {
     color: white;
   }
   .navbar.is-spaced .navbar-dropdown, .navbar-dropdown.is-boxed {
-    border-radius: 6px;
+    border-radius: 8px;
     border-top: none;
     box-shadow: 0 8px 8px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
     display: block;
@@ -5434,7 +5446,7 @@ body.has-spaced-navbar-fixed-bottom {
     background-color: transparent;
   }
   .navbar-item.has-dropdown:focus .navbar-link, .navbar-item.has-dropdown:hover .navbar-link, .navbar-item.has-dropdown.is-active .navbar-link {
-    background-color: hsl(0deg, 0%, 25%);
+    background-color: hsl(0deg, 0%, 22%);
   }
 }
 .hero.is-fullheight-with-navbar {
@@ -5442,11 +5454,11 @@ body.has-spaced-navbar-fixed-bottom {
 }
 
 .pagination {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   margin: -0.25rem;
 }
 .pagination.is-small {
-  font-size: 0.6rem;
+  font-size: 0.7rem;
 }
 .pagination.is-medium {
   font-size: 1rem;
@@ -5603,9 +5615,9 @@ body.has-spaced-navbar-fixed-bottom {
   }
 }
 .panel {
-  border-radius: 6px;
-  box-shadow: 0 0.5em 1em -0.125em rgba(235, 235, 235, 0.1), 0 0px 0 1px rgba(235, 235, 235, 0.02);
-  font-size: 0.9rem;
+  border-radius: 8px;
+  box-shadow: 0 0.5em 1em -0.125em rgba(10, 10, 10, 0.1), 0 0px 0 1px rgba(10, 10, 10, 0.02);
+  font-size: 0.8rem;
 }
 .panel:not(:last-child) {
   margin-bottom: 1.5rem;
@@ -5718,7 +5730,7 @@ body.has-spaced-navbar-fixed-bottom {
 
 .panel-heading {
   background-color: hsl(0deg, 0%, 14%);
-  border-radius: 6px 6px 0 0;
+  border-radius: 8px 8px 0 0;
   color: white;
   font-size: 1.25em;
   font-weight: 700;
@@ -5775,8 +5787,8 @@ body.has-spaced-navbar-fixed-bottom {
   color: #8b00ff;
 }
 .panel-block:last-child {
-  border-bottom-left-radius: 6px;
-  border-bottom-right-radius: 6px;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
 }
 
 a.panel-block,
@@ -5808,7 +5820,7 @@ label.panel-block:hover {
   -webkit-overflow-scrolling: touch;
   align-items: stretch;
   display: flex;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   justify-content: space-between;
   overflow: hidden;
   overflow-x: auto;
@@ -5874,7 +5886,7 @@ label.panel-block:hover {
 }
 .tabs.is-boxed a {
   border: 1px solid transparent;
-  border-radius: 4px 4px 0 0;
+  border-radius: 8px 8px 0 0;
 }
 .tabs.is-boxed a:hover {
   background-color: #171717;
@@ -5905,12 +5917,12 @@ label.panel-block:hover {
   margin-left: -1px;
 }
 .tabs.is-toggle li:first-child a {
-  border-top-left-radius: 4px;
-  border-bottom-left-radius: 4px;
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
 }
 .tabs.is-toggle li:last-child a {
-  border-top-right-radius: 4px;
-  border-bottom-right-radius: 4px;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
 }
 .tabs.is-toggle li.is-active a {
   background-color: white;
@@ -5932,7 +5944,7 @@ label.panel-block:hover {
   padding-right: 1.25em;
 }
 .tabs.is-small {
-  font-size: 0.6rem;
+  font-size: 0.7rem;
 }
 .tabs.is-medium {
   font-size: 1rem;
@@ -10269,7 +10281,7 @@ a.has-text-danger-dark:hover, a.has-text-danger-dark:focus {
 }
 
 .footer {
-  background-color: hsl(0deg, 0%, 25%);
+  background-color: hsl(0deg, 0%, 22%);
   padding: 3rem 1.5rem 6rem;
 }
 

@@ -1,22 +1,22 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { useAuthStore } from "../stores/authStore.js";
+import { useAuthStore } from "./stores/authStore.js";
 import axios from "axios";
 
-import HomeView from "../views/HomeView.vue";
-import LoginView from "../views/LoginView.vue";
-import AgentsView from "../views/AgentsView.vue";
-import AbilitiesView from "../views/AbilitiesView.vue";
-import AdversariesView from "../views/AdversariesView.vue";
-import OperationsView from "../views/OperationsView.vue";
-import FactSourcesView from "../views/FactSourcesView.vue";
-import ObjectivesView from "../views/ObjectivesView.vue";
-import PlannersView from "../views/PlannersView.vue";
-import ContactsView from "../views/ContactsView.vue";
-import ObfuscatorsView from "../views/ObfuscatorsView.vue";
-import ConfigurationView from "../views/ConfigurationView.vue";
-import ExfilledFilesView from "../views/ExfilledFilesView.vue";
-import BulmaTestView from "../views/BulmaTestView.vue";
-import PluginView from "../views/PluginView.vue";
+import HomeView from "./views/HomeView.vue";
+import LoginView from "./views/LoginView.vue";
+import AgentsView from "./views/AgentsView.vue";
+import AbilitiesView from "./views/AbilitiesView.vue";
+import AdversariesView from "./views/AdversariesView.vue";
+import OperationsView from "./views/OperationsView.vue";
+import FactSourcesView from "./views/FactSourcesView.vue";
+import ObjectivesView from "./views/ObjectivesView.vue";
+import PlannersView from "./views/PlannersView.vue";
+import ContactsView from "./views/ContactsView.vue";
+import ObfuscatorsView from "./views/ObfuscatorsView.vue";
+import ConfigurationView from "./views/ConfigurationView.vue";
+import ExfilledFilesView from "./views/ExfilledFilesView.vue";
+import BulmaTestView from "./views/BulmaTestView.vue";
+import PluginView from "./views/PluginView.vue";
 
 // Cant use global API variable because we aren't in a component
 const $api = axios.create({
