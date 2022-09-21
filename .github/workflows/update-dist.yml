@@ -1,9 +1,9 @@
 name: Update dist
 
 on:
-  push:
-    branches: [ "random_branch_change_to_master" ]
-
+  pull_request:
+    branches: [ "master" ]
+  
 jobs:
   build:
 
@@ -15,6 +15,9 @@ jobs:
         
     steps:
     - uses: actions/checkout@v3
+      with:
+        fetch-depth: '0'
+        ref: ${{ github.event.pull_request.head.ref }}
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
