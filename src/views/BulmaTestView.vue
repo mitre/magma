@@ -34,6 +34,8 @@ h1.title.my-60 Buttons
 .buttons
     button.button Testing button element
     button.button.is-primary Testing button element with primary color
+    button.button.is-small small 
+    button.button.is-large large
 // notification
 h1.title.my-60 Notification
 .notification.is-warning
@@ -61,7 +63,7 @@ table.table(:class="{'is-striped': isTableStriped}")
         tr(v-for="index in 5" :key="index")
             td 3/12/2022 11:08:18
             td
-                span.tag.is-success.is-medium Success
+                span.tag.is-success Success
             td Collect ARP details
             td nxdqkh 
             td VAN-DST-10

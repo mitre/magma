@@ -12,43 +12,52 @@ const route = useRoute();
 const router = useRouter();
 
 watch(route, (route, prevRoute) => {
-  if (route.params.pluginName) {
-    activeTab = route.params.pluginName;
-    coreDisplayStore.addTab(
-      route.params.pluginName,
-      `/plugins/${route.params.pluginName}`
-    );
-  } else {
-    activeTab = route.name;
-    coreDisplayStore.addTab(route.name, `/${route.name}`);
-  }
+    if (route.params.pluginName) {
+        activeTab = route.params.pluginName;
+        coreDisplayStore.addTab(
+            route.params.pluginName,
+            `/plugins/${route.params.pluginName}`
+        );
+    } else {
+        activeTab = route.name;
+        coreDisplayStore.addTab(route.name, `/${route.name}`);
+    }
 });
+
 watch(activeTab, (tab, prevTab) => {
-  if (!tab) router.push("/");
+    if (!tab) router.push("/");
 });
+
+function closeTab(index, isActive) {
+    coreDisplayStore.removeTab(index)
+    if (openTabs.value.length && isActive) {
+        let nextTab = (index - 1 < openTabs.value.length && index > 0) ? openTabs.value[index - 1] : openTabs.value[0];
+        router.push(nextTab.path);
+    }
+}
 </script>
 
 <template lang="pug">
 #tabs.is-flex.is-flex-direction-row
-  .tab.is-flex.is-align-items-center(v-for="(tab, index) in openTabs" :class="{ 'is-active': tab.name === activeTab }" @click.self="router.push(tab.path)")
-    span.mr-2(:to="tab.path") {{ tab.name }}
-    button.delete(@click="coreDisplayStore.removeTab(index)")
+    .tab.is-flex.is-align-items-center(v-for="(tab, index) in openTabs" :class="{ 'is-active': tab.name === activeTab }" @click="router.push(tab.path)")
+        span.mr-2(:to="tab.path") {{ tab.name }}
+        button.delete(@click.stop="closeTab(index, tab.name === activeTab)")
 </template>
 
 <style scoped>
 #tabs {
-  width: 100%;
-  height: 50px;
-  padding: 10px;
-  background-color: #111;
+    width: 100%;
+    height: 50px;
+    padding: 10px;
+    background-color: #111;
 }
 
 .tab {
-  background-color: #2c2c2c;
-  border-radius: 4px;
-  padding: 10px;
-  margin-right: 10px;
-  cursor: pointer;
-  user-select: none;
+    background-color: #2c2c2c;
+    border-radius: 8px;
+    padding: 15px;
+    margin-right: 10px;
+    cursor: pointer;
+    user-select: none;
 }
 </style>
