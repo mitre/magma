@@ -184,31 +184,4 @@ table {
     border-collapse: separate;
     border-spacing: 10px;
 }
-
-.auto-complete:active .search-results, .auto-complete:focus-within .search-results {
-    border-top: 1px solid #363636 !important;
-    border: 1px solid var(--primary-color);
-}
-
-.search-results {
-    overflow-y: scroll;
-    max-height: 400%;
-    background-color: #262626;
-    position: absolute;
-    z-index: 5;
-    width: 100%;
-    border-top: none;
-    margin-top: -2px;
-    border-radius: 0;
-}
-
-.search-results p {
-    margin-bottom: 0 !important;
-    padding: 5px;
-    cursor: pointer !important;
-}
-
-.search-results p:hover {
-    background-color: #484848;
-}
 </style>

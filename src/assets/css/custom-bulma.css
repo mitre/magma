@@ -29,6 +29,10 @@ footer.modal-card-foot {
   background-color: #4c0089;
 }
 
+.menu {
+  font-size: 0.9rem !important;
+}
+
 .menu-label {
   border-bottom: 2px solid #8b00ff;
 }

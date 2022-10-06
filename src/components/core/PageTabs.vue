@@ -39,25 +39,30 @@ function closeTab(index, isActive) {
 
 <template lang="pug">
 #tabs.is-flex.is-flex-direction-row
-    .tab.is-flex.is-align-items-center(v-for="(tab, index) in openTabs" :class="{ 'is-active': tab.name === activeTab }" @click="router.push(tab.path)")
-        span.mr-2(:to="tab.path") {{ tab.name }}
-        button.delete(@click.stop="closeTab(index, tab.name === activeTab)")
+    .tags.has-addons.mr-2.mb-0(v-for="(tab, index) in openTabs" @click="router.push(tab.path)")
+        p.tag.is-large(:to="tab.path" :class="{ 'is-primary': tab.name === activeTab }") {{ tab.name }}
+        p.tag.is-large.is-delete(@click.stop="closeTab(index, tab.name === activeTab)" :class="{ 'is-primary': tab.name === activeTab }")
 </template>
 
 <style scoped>
 #tabs {
     width: 100%;
-    height: 50px;
+    height: 55px;
     padding: 10px;
     background-color: #111;
 }
 
-.tab {
+.tag {
     background-color: #2c2c2c;
-    border-radius: 8px;
     padding: 15px;
-    margin-right: 10px;
     cursor: pointer;
     user-select: none;
+}
+
+.tag.is-delete:hover {
+    background-color: #3f3f3f;
+}
+.tag.is-delete.is-primary:hover {
+    background-color: #7400d2;
 }
 </style>

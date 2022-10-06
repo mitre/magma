@@ -9,7 +9,15 @@ export const useCoreDisplayStore = defineStore("coreDisplayStore", {
         agents: {
           showDeploy: false,
           showConfig: false,
-          showDetails: false,
+          showDetails: false
+        },
+        abilities: {
+          showAbilitySelection: false
+        },
+        adversaries: {
+          showFactBreakdown: false,
+          showAddFromAdversary: false,
+          showImport: false
         }
       }
     };
