@@ -59,7 +59,7 @@ function createAbility() {
                     .control.has-icons-left
                         input.input(v-model="filters.searchQuery" type="text" placeholder="Search for an ability...")
                         span.icon.is-left
-                            em.fas.fa-search
+                            font-awesome-icon(icon="fas fa-search")
                 .field(v-if="showFilters")
                     label.label Tactic
                     .control
@@ -85,7 +85,7 @@ function createAbility() {
         footer.modal-card-foot.is-flex.is-justify-content-space-between
             button.button(@click="createAbility()")
                 span.icon
-                    em.fas.fa-plus
+                    font-awesome-icon(icon="fas fa-plus")
                 span Create an Ability
             button.button(@click="modals.abilities.showAbilitySelection = false") Close
 

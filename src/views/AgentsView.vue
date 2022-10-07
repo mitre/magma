@@ -71,11 +71,11 @@ hr
     .column.is-4.is-flex.buttons.mb-0
         button.button.is-primary.level-item(@click="modals.agents.showDeploy = true")
             span.icon
-                em.fas.fa-plus 
+                font-awesome-icon(icon="fas fa-plus") 
             span Deploy an agent
         button.button.is-primary.level-item(@click="modals.agents.showConfig = true")
             span.icon
-                em.fas.fa-cog
+                font-awesome-icon(icon="fas fa-cog")
             span Configuration
     .column.is-4.is-flex.is-justify-content-center
         span.tag.is-medium.m-0
@@ -92,7 +92,7 @@ hr
                 button.button.is-primary(aria-haspopup="true" aria-controls="bulk-actions")
                     span Bulk Actions 
                     span.icon 
-                        em.fas.fa-angle-down(aria-hidden="true")
+                        font-awesome-icon(icon="fas fa-angle-down")(aria-hidden="true")
             .dropdown-menu(role="menu")
                 .dropdown-content 
                     a.dropdown-item(@click="removeDeadAgents()") Remove dead agents

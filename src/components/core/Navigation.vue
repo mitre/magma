@@ -30,7 +30,7 @@ function handleLogout() {
     img(src="/src/assets/img/caldera-logo.png" alt="Caldera Logo" @click="openCalderaHomepage()")
   aside.menu
     p.menu-label
-      em.fas.fa-flag.pr-2
+      font-awesome-icon(icon="fas fa-flag").pr-2
       | Campaigns
     ul.menu-list
       li
@@ -42,13 +42,13 @@ function handleLogout() {
       li
         router-link.menu-item(to="/operations") operations
     p.menu-label
-      em.fas.fa-puzzle-piece.pr-2
+      font-awesome-icon(icon="fas fa-puzzle-piece").pr-2
       | Plugins
     ul.menu-list
       li(v-for="plugin in pluginStore.plugins")
         router-link.menu-item(:to="`/plugins/${plugin.name}`") {{plugin.name}}
     p.menu-label
-      em.fas.fa-cog.pr-2
+      font-awesome-icon(icon="fas fa-cog").pr-2
       | Configuration
     ul.menu-list
       li
@@ -68,15 +68,15 @@ function handleLogout() {
       li
         router-link.menu-item(to="/bulmatest") bulma style testing
       li
-        a.menu-item(href="./api/docs" target="_blank") 
+        a.menu-item(href="/api/docs" target="_blank") 
           | api docs
           sup
-            em.fas.fa-external-link-alt.pl-1.is-size-7
+            font-awesome-icon(icon="fas fa-external-link-alt").pl-1.is-size-7
     ul.menu-list.has-text-centered.mt-2
       li
         .menu-item.is-clickable(@click="handleLogout()")
           span.icon
-            em.fas.fa-sign-out-alt
+            font-awesome-icon(icon="fas fa-sign-out-alt")
           span Log out
 </template>
 

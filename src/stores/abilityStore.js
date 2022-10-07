@@ -21,13 +21,19 @@ export const useAbilityStore = defineStore("abilityStore", {
             return platforms;
         },
         tactics: (state) => (
-            [...new Set(state.abilities.map((ability) => ability.tactic))]
+            [...new Set(state.abilities.map((ability) => ability.tactic))].sort()
+        ),
+        techniques: (state) => (
+            [...new Set(state.abilities.map((ability) => `${ability.technique_id} | ${ability.technique_name}`))].sort()
         ),
         techniqueIds: (state) => (
-            [...new Set(state.abilities.map((ability) => ability.technique_id))]
+            [...new Set(state.abilities.map((ability) => ability.technique_id))].sort()
         ),
         techniqueNames: (state) => (
-            [...new Set(state.abilities.map((ability) => ability.technique_name))]
+            [...new Set(state.abilities.map((ability) => ability.technique_name))].sort()
+        ),
+        plugins: (state) => (
+            [...new Set(state.abilities.map((ability) => ability.plugin))].sort()
         )
     },
     actions: {

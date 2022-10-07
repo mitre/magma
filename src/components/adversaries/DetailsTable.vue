@@ -313,15 +313,15 @@ form.mb-4(v-else)
 .is-flex.is-align-items-center
     button.button.mr-2(@click="modals.abilities.showAbilitySelection = true")
         span.icon 
-            em.fas.fa-plus 
+            font-awesome-icon(icon="fas fa-plus") 
         span Add Ability 
     button.button.mr-2(@click="modals.adversaries.showAddFromAdversary = true")
         span.icon 
-            em.fas.fa-plus 
+            font-awesome-icon(icon="fas fa-plus") 
         span Add Adversary 
     button.button.mr-2(@click="modals.adversaries.showFactBreakdown = true")
         span.icon 
-            em.fas.fa-unlock-alt 
+            font-awesome-icon(icon="fas fa-unlock-alt") 
         span Fact Breakdown
     .vr
     span.mr-2 Objective: 
@@ -333,15 +333,15 @@ form.mb-4(v-else)
     .vr 
     button.button.mr-2(@click="exportAdversary()")
         span.icon 
-            em.fas.fa-file-export 
+            font-awesome-icon(icon="fas fa-file-export") 
         span Export 
     button.button.is-success.mr-2(@click="validateAndSaveAdversary()") 
         span.icon
-            em.fas.fa-save
+            font-awesome-icon(icon="fas fa-save")
         span Save 
     button.button.is-danger.is-outlined.mr-2(@click="deleteAdversary()") 
         span.icon
-            em.fas.fa-trash
+            font-awesome-icon(icon="fas fa-trash")
         span Delete
 
 //- Tactic breakdown
@@ -378,9 +378,9 @@ table.table.is-striped.is-fullwidth.is-narrow
                 .icon-text 
                     span {{ index + 1 }}
                     span.icon.has-text-danger(v-if="!ability.ability_id")
-                        em.fas.fa-ban
+                        font-awesome-icon(icon="fas fa-ban")
                     span.icon.has-text-warning(v-if="needsParser.indexOf(ability.name) > -1")
-                        em.fas.fa-exclamation-triangle 
+                        font-awesome-icon(icon="fas fa-exclamation-triangle") 
             td {{ ability.ability_id ? ability.name : "Undefined Ability" }}
             td 
                 span(:style="`border-bottom: 2px ridge ${hashStringToColor(ability.tactic)}`") {{ ability.tactic }}
@@ -388,23 +388,25 @@ table.table.is-striped.is-fullwidth.is-narrow
             td 
                 span(v-for="platform in getExecutorDetail('platforms', ability)" v-tooltip="platform")
                     span.icon.is-small.mr-2
-                        em.fab(:class="{ 'fa-linux': platform.includes('linux'), 'fa-apple': platform.includes('darwin'), 'fa-windows': platform.includes('windows') }")
+                        font-awesome-icon(v-if="platform.includes('windows')" icon="fab fa-windows")
+                        font-awesome-icon(v-if="platform.includes('darwin')" icon="fab fa-darwin")
+                        font-awesome-icon(v-if="platform.includes('linux')" icon="fab fa-linux")
             td.has-text-centered(:class="{ 'unlock': onHoverUnlocks.indexOf(ability.ability_id) > -1 }")
                 span(v-if="abilityDependencies[ability.ability_id] && getExecutorDetail('requirements', ability)" v-tooltip="`This ability has requirements: (${abilityDependencies[ability.ability_id].requireTypes})`")
                     span.icon.is-small
-                        em.fas.fa-lock 
+                        font-awesome-icon(icon="fas fa-lock") 
             td.has-text-centered(:class="{ 'lock': onHoverLocks.indexOf(ability.ability_id) > -1 }")
                 span(v-if="abilityDependencies[ability.ability_id] && getExecutorDetail('parser', ability)" v-tooltip="`This ability unlocks other abilities: (${abilityDependencies[ability.ability_id].enableTypes})`")
                     span.icon.is-small
-                        em.fas.fa-key
+                        font-awesome-icon(icon="fas fa-key")
             td.has-text-centered 
                 span(v-if="getExecutorDetail('payload', ability)" v-tooltip="'This ability uses a payload'")
                     span.icon.is-small
-                        em.fas.fa-weight-hanging
+                        font-awesome-icon(icon="fas fa-weight-hanging")
             td.has-text-centered
                 span(v-if="getExecutorDetail('cleanup', ability)" v-tooltip="'This ability can clean itself up'")
                     span.icon.is-small
-                        em.fas.fa-trash
+                        font-awesome-icon(icon="fas fa-trash")
             td.has-text-centered
                 button.delete(@click.stop="selectedAdversaryAbilities.splice(index, 1)")
 
@@ -412,11 +414,11 @@ table.table.is-striped.is-fullwidth.is-narrow
     p This profile has no abilities
 .icon-text(v-if="needsParser.length")
     span.icon.has-text-warning
-        em.fas.fa-exclamation-triangle
+        font-awesome-icon(icon="fas fa-exclamation-triangle")
     span One or more of the abilities have unmet requirements, which may result in a failed operation if ran sequentially.
 .icon-text.mt-2(v-if="undefinedAbilities.length")
     span.icon.has-text-danger 
-        em.fas.fa-ban 
+        font-awesome-icon(icon="fas fa-ban") 
     span One or more of the referenced abilities are not defined
 
 //- Modals

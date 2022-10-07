@@ -23,7 +23,9 @@ const props = defineProps(['breakdown']);
             .tags(v-if="breakdown.length")
                 span.tag(v-for="fact in breakdown" :class="{ 'is-warning': fact.type === 'unmet', 'is-success': fact.type === 'met' }")
                     span.icon
-                        em.fas(:class="{ 'fa-exclamation-triangle': fact.type === 'unmet', 'fa-check': fact.type === 'met', 'fa-minus': fact.type === 'extra' }")
+                        font-awesome-icon(v-if="fact.type === 'unmet'" icon="fas fa-exclamation-triangle")
+                        font-awesome-icon(v-if="fact.type === 'met'" icon="fas fa-check")
+                        font-awesome-icon(v-if="fact.type === 'extra'" icon="fas fa-minus")
                     span {{ fact.fact }}
             p(v-else) No facts to show
         footer.modal-card-foot.is-flex.is-justify-content-flex-end 

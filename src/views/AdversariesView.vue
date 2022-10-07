@@ -52,7 +52,7 @@ hr
             button.button.is-fullwidth(type="button" aria-haspopup="true" aria-controls="dropdown-menu")
                 span {{ selectedAdversary.name || 'Select an adversary' }} 
                 span.icon.is-small
-                    em.fas.fa-angle-down(aria-hidden="true")
+                    font-awesome-icon(icon="fas fa-angle-down")(aria-hidden="true")
         .dropdown-menu.is-fullwidth(role="menu")
             .dropdown-content
                 .dropdown-item 
@@ -61,11 +61,11 @@ hr
                 a.dropdown-item(v-for="adversary in filteredAdversaries" @click="selectAdversary(adversary)" :class="{ 'is-active': adversary.adversary_id === selectedAdversary.adversary_id }") {{ adversary.name }}
     button.button.is-primary.mr-2(type="button" @click="adversaryStore.createAdversary($api)")
         span.icon 
-            em.fas.fa-plus 
+            font-awesome-icon(icon="fas fa-plus") 
         span New Profile
     button.button.mr-2(type="button" @click="modals.adversaries.showImport = true")
         span.icon
-            em.fas.fa-file-import 
+            font-awesome-icon(icon="fas fa-file-import") 
         span Import
 
 //- Adversary details table

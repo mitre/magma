@@ -62,7 +62,7 @@ function addAbilities() {
             button.button(@click="modals.adversaries.showAddFromAdversary = false") Close
             button.button.is-primary(@click="addAbilities()")
                 span.icon
-                    em.fas.fa-plus
+                    font-awesome-icon(icon="fas fa-plus")
                 span Add {{ abilitiesToAdd.length }} Abilities
 </template>
     

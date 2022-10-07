@@ -64,13 +64,13 @@ function importAdversary() {
                     input.file-input(accept=".yml,.yaml" type="file" @change="uploadImportFile")
                     span.file-cta
                         span.file-icon 
-                            em.fas.fa-upload
+                            font-awesome-icon(icon="fas fa-upload")
                         span.file-label Choose a file...
                     span.file-name {{ importFile ? importFile.name : '' }}
         footer.modal-card-foot.is-flex.is-justify-content-flex-end 
             button.button(@click="modals.adversaries.showImport = false") Close
             button.button.is-primary(@click="importAdversary()")
                 span.icon 
-                    em.fas.fa-save 
+                    font-awesome-icon(icon="fas fa-save") 
                 span Import
 </template>

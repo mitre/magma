@@ -8,29 +8,30 @@ const route = useRoute();
 
 <template lang="pug">
 //- Login page
-.fullwh(v-if="route.name === 'login'")
+.is-fullwidth(v-if="route.name === 'login'")
     router-view
 
 //- All other pages
-.is-flex.is-flex-direction-row.fullwh(v-else)
+.is-flex.is-flex-direction-row(v-else style="min-height: 100vh;")
     Suspense
-        navigation
+        Navigation
 
-    main.fullwh
-        page-tabs
+    main.is-fullwidth
+        PageTabs
 
-        .p-4.fullwh
+        .p-4#router
             router-view
 </template>
+
+<style scoped>
+#router {
+    height: calc(100% - 55px);
+}
+</style>
 
 <style>
 /* GLOBAL STYLES */
 @import "/src/assets/css/custom-bulma.css";
-
-.auto-complete:active .search-results, .auto-complete:focus-within .search-results {
-    border-top: 1px solid #363636 !important;
-    border: 1px solid var(--primary-color);
-}
 
 .code {
     font-family: monospace;
@@ -47,28 +48,12 @@ const route = useRoute();
     width: 100%;
 }
 
-.pointer {
-    cursor: pointer;
+.is-fullwidth {
+    width: 100%;
 }
 
-.search-results {
-    overflow-y: scroll;
-    max-height: 400%;
-    background-color: #262626;
-    position: absolute;
-    z-index: 5;
-    width: 100%;
-    border-top: none;
-    margin-top: -2px;
-    border-radius: 0;
-}
-.search-results p {
-    margin-bottom: 0 !important;
-    padding: 5px;
-    cursor: pointer !important;
-}
-.search-results p:hover {
-    background-color: #484848;
+.pointer {
+    cursor: pointer;
 }
 
 .vr {

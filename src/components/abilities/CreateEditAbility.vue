@@ -113,12 +113,12 @@ function validateAndSave() {
             .has-text-centered
                 button.button.is-primary.mb-4(@click="addExecutor()")
                     span.icon
-                        em.fas.fa-plus
+                        font-awesome-icon(icon="fas fa-plus")
                     span Add Executor
             .box(v-for="(executor, index) in abilityToEdit.executors")
                 button.button.delete-btn(@click="abilityToEdit.executors.splice(index, 1)")
                     span.icon
-                        em.fas.fa-times
+                        font-awesome-icon(icon="fas fa-times")
                 form
                     .field
                         label.label Platform
@@ -151,28 +151,28 @@ function validateAndSave() {
                         .control
                             a.button(@click="executor.cleanup.splice(index, 1)")
                                 span.icon
-                                    em.fas.fa-times
+                                    font-awesome-icon(icon="fas fa-times")
                     button.button(type="button" @click="executor.cleanup.push('')")
                         span.icon
-                            em.fas.fa-plus
+                            font-awesome-icon(icon="fas fa-plus")
                         span Add Cleanup Command
             p.has-text-danger(v-if="abilityToEdit.executors && abilityToEdit.executors.length") {{ validation.executors }}
             .has-text-centered
                 button.button.is-primary.mb-4(v-if="abilityToEdit.executors && abilityToEdit.executors.length" @click="addExecutor()")
                     span.icon
-                        em.fas.fa-plus
+                        font-awesome-icon(icon="fas fa-plus")
                     span Add Executor
         footer.modal-card-foot.is-flex.is-justify-content-space-between
             .is-flex
                 button.button(@click="setAbilityToEdit()") 
                     span.icon
-                        em.fas.fa-undo
+                        font-awesome-icon(icon="fas fa-undo")
                     span Reset
             .is-flex
                 button.button(@click="emit('close')") Cancel 
                 button.button.is-primary(@click="validateAndSave()")
                     span.icon
-                        em.fas.fa-save 
+                        font-awesome-icon(icon="fas fa-save") 
                     span {{ props.creating ? "Create" : "Save" }} 
 </template>
 
