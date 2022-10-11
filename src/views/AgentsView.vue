@@ -92,7 +92,7 @@ hr
                 button.button.is-primary(aria-haspopup="true" aria-controls="bulk-actions")
                     span Bulk Actions 
                     span.icon 
-                        font-awesome-icon(icon="fas fa-angle-down")(aria-hidden="true")
+                        font-awesome-icon(icon="fas fa-angle-down" aria-hidden="true")
             .dropdown-menu(role="menu")
                 .dropdown-content 
                     a.dropdown-item(@click="removeDeadAgents()") Remove dead agents

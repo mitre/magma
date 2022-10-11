@@ -29,12 +29,12 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { 
   faAngleDown, faBan, faBook, faCheck, faCog, faExclamationTriangle, faExternalLinkAlt, faFileExport, faFileImport, faFlag, 
   faKey, faLock, faMinus, faPlus, faPuzzlePiece, faSave, faSearch, faSkullCrossbones, faSignOutAlt, faTimes, faTrash, 
-  faUndo, faUnlockAlt, faUser, faWeightHanging 
+  faUndo, faUnlockAlt, faUpload, faUser, faWeightHanging 
 } from '@fortawesome/free-solid-svg-icons';
 library.add(
   faAngleDown, faBan, faBook, faCheck, faCog, faExclamationTriangle, faExternalLinkAlt, faFileExport, faFileImport, faFlag, 
   faKey, faLock, faMinus, faPlus, faPuzzlePiece, faSave, faSearch, faSkullCrossbones, faSignOutAlt, faTimes, faTrash, 
-  faUndo, faUnlockAlt, faUser, faWeightHanging 
+  faUndo, faUnlockAlt, faUpload, faUser, faWeightHanging 
 );
 import { 
   faCircle, faCircleQuestion, faCopy 

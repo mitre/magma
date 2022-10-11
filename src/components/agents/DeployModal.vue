@@ -151,7 +151,7 @@ function copyCommandToClipboard(command) {
                     span.tag.is-black
                         span.icon 
                             font-awesome-icon(v-if="command.platform === 'windows'" icon="fab fa-windows")
-                            font-awesome-icon(v-if="command.platform === 'darwin'" icon="fab fa-darwin")
+                            font-awesome-icon(v-if="command.platform === 'darwin'" icon="fab fa-apple")
                             font-awesome-icon(v-if="command.platform === 'linux'" icon="fab fa-linux")
                         span {{ command.platform }}
                     span.tag {{ command.executor }}
@@ -169,7 +169,7 @@ function copyCommandToClipboard(command) {
                         span.tag.is-black
                             span.icon 
                                 font-awesome-icon(v-if="command.platform === 'windows'" icon="fab fa-windows")
-                                font-awesome-icon(v-if="command.platform === 'darwin'" icon="fab fa-darwin")
+                                font-awesome-icon(v-if="command.platform === 'darwin'" icon="fab fa-apple")
                                 font-awesome-icon(v-if="command.platform === 'linux'" icon="fab fa-linux")
                             span {{ command.platform }}
                         span.tag {{ command.executor }}
