@@ -13,9 +13,8 @@ import ObjectivesView from "./views/ObjectivesView.vue";
 import PlannersView from "./views/PlannersView.vue";
 import ContactsView from "./views/ContactsView.vue";
 import ObfuscatorsView from "./views/ObfuscatorsView.vue";
-import ConfigurationView from "./views/ConfigurationView.vue";
+import SettingsView from "./views/SettingsView.vue";
 import ExfilledFilesView from "./views/ExfilledFilesView.vue";
-import BulmaTestView from "./views/BulmaTestView.vue";
 import PluginView from "./views/PluginView.vue";
 
 // Cant use global API variable because we aren't in a component
@@ -83,19 +82,14 @@ const router = createRouter({
       component: ObfuscatorsView,
     },
     {
-      path: "/configuration",
-      name: "configuration",
-      component: ConfigurationView,
+      path: "/settings",
+      name: "settings",
+      component: SettingsView,
     },
     {
       path: "/exfilled files",
       name: "exfilled files",
       component: ExfilledFilesView,
-    },
-    {
-      path: "/bulmatest",
-      name: "bulmatest",
-      component: BulmaTestView,
     },
     {
       path: "/plugins/:pluginName",
