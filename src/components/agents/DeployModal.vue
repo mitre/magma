@@ -114,22 +114,22 @@ function copyCommandToClipboard(command) {
                     .control.is-flex.is-justify-content-center
                         .has-text-centered.platform(v-if="selectedPlatform" :class="{ 'selected': selectedPlatform === 'all' }" @click="changePlatform('all')")
                             span.icon.is-large
-                                em.far.fa-2x.fa-circle
+                                font-awesome-icon(icon="far fa-circle").fa-2x
                             br
                             span all
                         .has-text-centered.platform(v-if="platforms.includes('linux')" :class="{ 'selected': selectedPlatform === 'linux' }" @click="changePlatform('linux')")
                             span.icon.is-large
-                                em.fab.fa-2x.fa-linux
+                                font-awesome-icon(icon="fab fa-linux").fa-2x
                             br
                             span linux
                         .has-text-centered.platform(v-if="platforms.includes('windows')" :class="{ 'selected': selectedPlatform === 'windows' }" @click="changePlatform('windows')")
                             span.icon.is-large
-                                em.fab.fa-2x.fa-windows
+                                font-awesome-icon(icon="fab fa-windows").fa-2x
                             br
                             span windows
                         .has-text-centered.platform(v-if="platforms.includes('darwin')" :class="{ 'selected': selectedPlatform === 'darwin' }" @click="changePlatform('darwin')")
                             span.icon.is-large
-                                em.fab.fa-2x.fa-apple
+                                font-awesome-icon(icon="fab fa-apple").fa-2x
                             br
                             span darwin
             form.mt-4
@@ -144,13 +144,15 @@ function copyCommandToClipboard(command) {
                                 .control 
                                     a.button.has-tooltip-arrow(title="Reset to default" @click="field.value = agentFieldConfig[field.name]")
                                         span.icon
-                                            em.fas.fa-undo
+                                            font-awesome-icon(icon="fas fa-undo")
             hr(v-if="filteredCommands.length")
             .command-container.container(v-for="command in filteredCommands" :key="command.command")
                 .tags.are-medium.has-addons.mb-0
                     span.tag.is-black
                         span.icon 
-                            em.fab(:class="{ 'fa-windows': command.platform === 'windows', 'fa-linux': command.platform === 'linux', 'fa-apple': command.platform === 'darwin' }")
+                            font-awesome-icon(v-if="command.platform === 'windows'" icon="fab fa-windows")
+                            font-awesome-icon(v-if="command.platform === 'darwin'" icon="fab fa-darwin")
+                            font-awesome-icon(v-if="command.platform === 'linux'" icon="fab fa-linux")
                         span {{ command.platform }}
                     span.tag {{ command.executor }}
                 p.mb-3 {{ command.description }}
@@ -158,7 +160,7 @@ function copyCommandToClipboard(command) {
                     pre.m-0.pt-2.pb-0 {{ getCommandField(command.command) }}
                     a.button.is-outlined.is-fullwidth.cmd-copy-button(v-if="isSecureContext()" @click="copyCommandToClipboard(getCommandField(command.command))")
                         span.icon 
-                            em.far.fa-lg.fa-copy
+                            font-awesome-icon(icon="far fa-copy").fa-lg
                         span Copy
                 p.has-text-centered.mb-4(v-if="command.variations.length") 
                     strong Variations
@@ -166,7 +168,9 @@ function copyCommandToClipboard(command) {
                     .tags.are-medium.has-addons.mb-0
                         span.tag.is-black
                             span.icon 
-                                em.fab(:class="{ 'fa-windows': command.platform === 'windows', 'fa-linux': command.platform === 'linux', 'fa-apple': command.platform === 'darwin' }")
+                                font-awesome-icon(v-if="command.platform === 'windows'" icon="fab fa-windows")
+                                font-awesome-icon(v-if="command.platform === 'darwin'" icon="fab fa-darwin")
+                                font-awesome-icon(v-if="command.platform === 'linux'" icon="fab fa-linux")
                             span {{ command.platform }}
                         span.tag {{ command.executor }}
                     p {{ variation.description }}
@@ -174,7 +178,7 @@ function copyCommandToClipboard(command) {
                         pre.m-0.pt-2.pb-0 {{ getCommandField(variation.command) }}
                         a.button.is-outlined.is-fullwidth.cmd-copy-button(v-if="isSecureContext()" @click="copyCommandToClipboard(getCommandField(variation.command))")
                             span.icon 
-                                em.far.fa-lg.fa-copy
+                                font-awesome-icon(icon="far fa-copy").fa-lg
                             span Copy
         footer.modal-card-foot.is-flex.is-justify-content-flex-end 
             button.button(@click="modals.agents.showDeploy = false") Close

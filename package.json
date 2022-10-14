@@ -11,15 +11,22 @@
     "test-accessibility": "jest -t=accessibility --config jest.config.js"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^6.1.1",
+    "@fortawesome/fontawesome-svg-core": "^6.2.0",
+    "@fortawesome/free-brands-svg-icons": "^6.2.0",
+    "@fortawesome/free-regular-svg-icons": "^6.2.0",
+    "@fortawesome/free-solid-svg-icons": "^6.2.0",
+    "@fortawesome/vue-fontawesome": "^3.0.1",
     "@vitejs/plugin-vue": "^2.2.2",
     "axios": "^0.26.1",
     "bulma": "^0.9.3",
     "echarts": "^5.3.1",
+    "floating-vue": "^2.0.0-beta.20",
     "pinia": "^2.0.13",
+    "prismjs": "^1.29.0",
     "pug": "^3.0.2",
     "vite": "^2.8.4",
     "vue": "^3.2.31",
+    "vue-prism-editor": "^2.0.0-alpha.2",
     "vue-router": "^4.0.12",
     "vue-scrollto": "^2.20.0"
   },

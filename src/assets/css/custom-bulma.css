@@ -1,7 +1,8 @@
 @charset "UTF-8";
 html, body, #app {
   width: 100%;
-  height: 100%;
+  min-height: 100vh;
+  height: auto;
 }
 
 .fullwh {
@@ -27,6 +28,10 @@ footer.modal-card-foot {
 
 .tab:hover {
   background-color: #4c0089;
+}
+
+.menu {
+  font-size: 0.9rem !important;
 }
 
 .menu-label {

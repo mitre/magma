@@ -155,10 +155,10 @@ function saveAgent() {
                         td {{ selectedAgent.location }}
                     tr
                         th.has-text-right Executors
-                        td {{ selectedAgent.executors }}
+                        td {{ selectedAgent.executors ? selectedAgent.executors.join(", ") : '' }}
                     tr
                         th.has-text-right Host IP Addresses
-                        td {{ selectedAgent.host_ip_addrs }}
+                        td {{ selectedAgent.host_ip_addrs ? selectedAgent.host_ip_addrs.join(", ") : '' }}
                     tr
                         th.has-text-right Peer-to-Peer Proxy Receivers
                         td {{ (selectedAgent.proxy_receivers && Object.keys(selectedAgent.proxy_receivers).length) ? Object.keys(selectedAgent.proxy_receivers) : 'No local P2P proxy receivers active.' }}
@@ -169,7 +169,7 @@ function saveAgent() {
             button.button(@click="modals.agents.showDetails = false") Close
             button.button.is-danger.is-outlined(@click="agentStore.killAgent($api, selectedAgent.paw); modals.agents.showDetails = false;")
                 span.icon 
-                    em.fas.fa-skull-crossbones 
+                    font-awesome-icon(icon="fas fa-skull-crossbones") 
                 span Kill Agent
 </template>
 

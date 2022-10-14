@@ -26,13 +26,13 @@ async function handleLogin() {
         .control.has-icons-left
           input.input(v-model="username" type="text" placeholder="username")
           span.icon.is-small.is-left
-            em.fas.fa-user
+            font-awesome-icon(icon="fas fa-user")
       .field
         label.label Password
         .control.has-icons-left
           input.input(v-model="password" type="password" placeholder="password")
           span.icon.is-small.is-left
-            em.fas.fa-lock
+            font-awesome-icon(icon="fas fa-lock")
       button.button.fancy-button.is-fullwidth(type="button" @click="handleLogin()") Log In
     .has-text-danger
       p {{ loginError }}

@@ -5,7 +5,7 @@
     a.has-text-underlined(href="docs/Getting-started.html" target="blank") 
       | Getting Started Guide
       sup
-        em.fas.fa-external-link-alt.pl-1.is-size-7
+        font-awesome-icon(icon="fas fa-external-link-alt").pl-1.is-size-7
 </template>
 
 <style scoped>

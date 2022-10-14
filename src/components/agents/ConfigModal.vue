@@ -142,7 +142,7 @@ function addDeadmanAbility(id) {
                                     .tag.p-0
                                         a.tag.is-primary(v-if="!isAddingBootstrapAbility" @click="isAddingBootstrapAbility = true; isAddingDeadmanAbility = false;")
                                             span.icon 
-                                                em.fas.fa-plus
+                                                font-awesome-icon(icon="fas fa-plus")
                             .field.has-addons(v-if="isAddingBootstrapAbility")
                                 .control.is-expanded.auto-complete()
                                     input.input(v-model="abilitySearchQuery" placeholder="Search for an ability..." @keyup="abilitySearchResults = searchAbilitiesByName(abilitySearchQuery)")
@@ -162,7 +162,7 @@ function addDeadmanAbility(id) {
                                     .tag.p-0
                                         a.tag.is-primary(v-if="!isAddingDeadmanAbility" @click="isAddingDeadmanAbility = true; isAddingBootstrapAbility = false;")
                                             span.icon 
-                                                em.fas.fa-plus
+                                                font-awesome-icon(icon="fas fa-plus")
                             .field.has-addons(v-if="isAddingDeadmanAbility")
                                 .control.is-expanded.auto-complete()
                                     input.input(v-model="abilitySearchQuery" placeholder="Search for an ability..." @keyup="abilitySearchResults = searchAbilitiesByName(abilitySearchQuery)")
@@ -175,7 +175,7 @@ function addDeadmanAbility(id) {
             button.button(@click="modals.agents.showConfig = false") Close
             button.button.is-primary(@click="validateAndSave()")
                 span.icon 
-                    em.fas.fa-save 
+                    font-awesome-icon(icon="fas fa-save") 
                 span Save
 </template>
 
@@ -201,13 +201,11 @@ table {
     margin-top: -2px;
     border-radius: 0;
 }
-
 .search-results p {
     margin-bottom: 0 !important;
     padding: 5px;
     cursor: pointer !important;
 }
-
 .search-results p:hover {
     background-color: #484848;
 }
