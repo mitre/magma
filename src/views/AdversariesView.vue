@@ -52,7 +52,7 @@ hr
             button.button.is-fullwidth(type="button" aria-haspopup="true" aria-controls="dropdown-menu")
                 span {{ selectedAdversary.name || 'Select an adversary' }} 
                 span.icon.is-small
-                    font-awesome-icon(icon="fas fa-angle-down")(aria-hidden="true")
+                    font-awesome-icon(icon="fas fa-angle-down" aria-hidden="true")
         .dropdown-menu.is-fullwidth(role="menu")
             .dropdown-content
                 .dropdown-item 
