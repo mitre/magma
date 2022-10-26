@@ -17,7 +17,11 @@ export const useCoreDisplayStore = defineStore("coreDisplayStore", {
         adversaries: {
           showFactBreakdown: false,
           showAddFromAdversary: false,
-          showImport: false
+          showImport: false,
+          showDetails: false,
+        },
+        operations: {
+          showCreate: false,
         }
       }
     };
