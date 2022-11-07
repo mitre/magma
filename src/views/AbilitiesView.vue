@@ -1,10 +1,12 @@
 <script setup>
 import { storeToRefs } from "pinia";
 import { reactive, ref, inject, onMounted, computed } from "vue";
+import { useRoute } from "vue-router";
 import { useAbilityStore } from "../stores/abilityStore";
 import CreateEditAbility from "../components/abilities/CreateEditAbility.vue";
 
 const $api = inject("$api");
+const route = useRoute();
 
 const abilityStore = useAbilityStore();
 const { abilities, tactics, techniques, plugins, platforms } = storeToRefs(abilityStore);
@@ -32,6 +34,7 @@ const filteredAbilities = computed(() => {
 });
 
 onMounted(() => {
+    filters.plugin = route.query.plugin || "";
     abilityStore.getAbilities($api);
 });
 
