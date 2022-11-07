@@ -30,12 +30,12 @@ jobs:
     - name: Build dist folder
       run: npm run build --if-present
       
-    - name: Commit dist if it has changed
-      run: |
-          git config --global user.name 'github-actions'
-          git config --global user.email 'github-actions@github.com'
-          git add dist
-          if ! git diff-index --quiet --cached HEAD; then
-            git commit -m "Build dist"
-            git push
-          fi
+#     - name: Commit dist if it has changed
+#       run: |
+#           git config --global user.name 'github-actions'
+#           git config --global user.email 'github-actions@github.com'
+#           git add dist
+#           if ! git diff-index --quiet --cached HEAD; then
+#             git commit -m "Build dist"
+#             git push
+#           fi
