@@ -8,12 +8,19 @@ export default defineConfig({
   plugins: [vue()],
   server: {
     fs: {
-      allow: ["../../.."],
+      allow: ["../"],
     },
+  },
+  build: {
+    rollupOptions: {
+      external: [
+        /gui/
+      ]
+    }
   },
   resolve: {
     alias: {
-      "@": fileURLToPath(new URL("./src", import.meta.url)),
+      "@": fileURLToPath(new URL("./src", import.meta.url))
     },
-  },
+  }
 });

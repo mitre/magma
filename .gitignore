@@ -12,3 +12,5 @@
 data/uploads/*
 .env
 node_modules/
+src/plugins/*
+dist

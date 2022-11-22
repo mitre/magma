@@ -2,44 +2,43 @@
 import { defineAsyncComponent, shallowRef, watch } from "vue";
 import PluginErrorView from "./PluginErrorView.vue";
 import PluginLoadingView from "./PluginLoadingView.vue";
+
+const isProduction = import.meta.env.PROD;
+
 const props = defineProps(["pluginName"]);
+
 const pluginComponent = shallowRef();
-const plugins = import.meta.glob("../../../plugins/**/views/*.vue");
+const plugins = isProduction ? 
+  import.meta.glob("../plugins/**/views/*.vue") : 
+  import.meta.glob("../../../**/gui/views/*.vue");
+
+watch(() => props.pluginName, loadComp);
 
 function loadComp() {
-  if (
-    plugins[
-      `../../../plugins/${props.pluginName}/views/${props.pluginName}.vue`
-    ]
-  ) {
-    pluginComponent.value = defineAsyncComponent({
-      //Source: https://vuejs.org/guide/components/async.html
-      // the loader function
-      loader:
-        plugins[
-          `../../../plugins/${props.pluginName}/views/${props.pluginName}.vue`
-        ],
+    const requestedPluginLoader = plugins[
+        isProduction ? 
+          `../plugins/${props.pluginName}/views/${props.pluginName}.vue` : 
+          `../../../${props.pluginName}/gui/views/${props.pluginName}.vue`
+      ];
+    
+    if (!requestedPluginLoader) {
+      pluginComponent.value = PluginErrorView;
+      return;
+    }
 
-      // A component to use while the async component is loading
+    pluginComponent.value = defineAsyncComponent({
+      // Source: https://vuejs.org/guide/components/async.html
+      loader: requestedPluginLoader,
       loadingComponent: PluginLoadingView,
-      // Delay before showing the loading component. Default: 200ms.
-      delay: 200,
-      // A component to use if the load fails
       errorComponent: PluginErrorView,
-      // The error component will be displayed if a timeout is
-      // provided and exceeded. Default: Infinity.
-      timeout: 3000,
+      // The error component will be displayed if a timeout is provided and exceeded. Default: Infinity.
+      timeout: 4000,
     });
-  } else {
-    pluginComponent.value = PluginErrorView;
-  }
 }
+
 loadComp();
-watch(() => props.pluginName, loadComp);
 </script>
 
 <template lang="pug">
 component(:is="pluginComponent")
 </template>
-
-<style scoped></style>
