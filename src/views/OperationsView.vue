@@ -1,20 +1,98 @@
 <script setup>
-import { inject, ref, onMounted } from "vue";
+import { inject, ref, onMounted, onBeforeUnmount } from "vue";
 import { useOperationStore } from '../stores/operationStore';
+import { useAgentStore } from "../stores/agentStore";
 import { useCoreDisplayStore } from "../stores/coreDisplayStore";
-import createModal from '../components/operations/createModal.vue';
+import { useCoreStore } from "../stores/coreStore";
+import { getHumanFriendlyTimeISO8601, b64DecodeUnicode, getReadableTime } from "../utils/utils";
 import { storeToRefs } from "pinia";
-
+import CreateModal from '../components/operations/CreateModal.vue';
+import DeleteModal from '../components/operations/DeleteModal.vue';
+import DetailsModal from '../components/operations/DetailsModal.vue';
+import DownloadModal from '../components/operations/DownloadModal.vue';
+import CommandModal from '../components/operations/CommandModal.vue';
+import OutputModal from '../components/operations/OutputModal.vue';
+import AddPotentialLinkModal from "../components/operations/AddPotentialLinkModal.vue";
+import ManualCommand from "../components/operations/ManualCommand.vue";
 const $api = inject("$api");
 const coreDisplayStore = useCoreDisplayStore();
-const { modals } = storeToRefs(coreDisplayStore);
 const operationStore = useOperationStore();
-let isCreateOperationActive = ref(false);
-let adversaries = ref([{name: "Test", id: 0}]);
+const agentStore = useAgentStore();
+const coreStore = useCoreStore();
+const { modals } = storeToRefs(coreDisplayStore);
+let updateInterval = ref();
+let isControlPanelActive = ref(true);
+const LINK_STATUSES = {
+    0: "success",
+    '-1': "paused",
+    1: "failed",
+    '-2': "discarded",
+    '-3': "collect",
+    '-4': "untrusted",
+    '-5': "visible",
+    124: "timeout",
+};
+const LINK_COLORS = {
+    0: "#4a9",
+    '-1': "#ffc500",
+    1: "#c31",
+    '-2': "#a05195",
+    '-3': "#ffb000",
+    '-4': "white",
+    '-5': "#f012be",
+    124: "cornflowerblue",
+};
+
 onMounted(async () => {
     await operationStore.getOperations($api);
-    operationStore.operations.push({id: 0, name: "Test Operations"});
+    await coreStore.getObfuscators($api);
+    await agentStore.getAgents($api);
+    agentStore.updateAgentGroups();
 });
+
+onBeforeUnmount(() => {
+    if(updateInterval) clearInterval(updateInterval);
+});
+
+function selectOperation() {
+    if(updateInterval || !operationStore.selectedOperation) clearInterval(updateInterval);
+    updateInterval = setInterval(async () => {
+        if(operationStore.selectedOperation){
+            await operationStore.updateOperationChain($api);
+        } else {
+            clearInterval(updateInterval);
+        }
+    }, "3000");
+}
+
+async function handleViewCommand(link) {
+    await operationStore.setSelectedLinkByID($api, link.id, link.output);
+    modals.value.operations.showCommand = true;
+}
+
+async function handleViewOutput(link) {
+    await operationStore.setSelectedLinkByID($api, link.id, link.output);
+    modals.value.operations.showOutput = true;
+}
+
+async function updateAuto(event) {
+    operationStore.selectedOperation.autonomous = event.target.checked ? 1 : 0;
+    await operationStore.updateOperation($api, 'autonomous', operationStore.selectedOperation.autonomous);
+}
+
+function isRerun() {
+    return operationStore.selectedOperation.state === 'cleanup' || operationStore.selectedOperation.state === 'finished';
+}
+
+function displayManualCommand() {
+    modals.value.operations.showAddManualCommand = true;
+    setTimeout(() => {
+        document.getElementById("input-command").scrollIntoView({
+            behavior: "smooth"
+        });
+    }, 2);
+
+}
 
 </script>
 
@@ -22,29 +100,170 @@ onMounted(async () => {
 .content
     h2 Operations
 hr
-form.has-text-centered
-    .field 
-        .control 
-            .select 
-                select(v-model="operationStore.selectedOperation.id" @change="selectOperation()")
-                    option(disabled selected value="") Choose an operation 
-                    option(v-for="operation in operationStore.operations" :key="operation.id" :value="operation.id") {{ `${operation.name}` }}
-            .button.is-primary(@click="modals.operations.showCreate = true") Create an operation
+#select-operation.has-text-centered.is-align-items-center.is-flex
+    .select.is-flex-grow-1.mr-2
+        select.is-fullwidth.mx-1.has-text-centered(v-model="operationStore.selectedOperation" @change="selectOperation()")
+            option.is-fullwidth(disabled selected value="") Select an operation 
+            option.is-fullwidth(v-for="operation in operationStore.operations" :key="operation.id" :value="operation") {{ `${operation.name} - ${operation.chain.length} decisions | ${getHumanFriendlyTimeISO8601(operation.start)}` }}
+    button.button.is-primary.mx-1(@click="modals.operations.showCreate = true" type="button") 
+        span.icon
+            font-awesome-icon(icon="fas fa-plus") 
+        span Create Operation
+.is-align-items-center.is-flex.is-justify-content-center.my-3(v-if="operationStore.selectedOperation")
+    .has-text-centered.mx-2
+        button.button(@click="modals.operations.showDetails = true" type="button") Operation Details
+    .has-text-centered.mx-2
+        button.button.is-success(@click="modals.operations.showDownload = true" type="button")
+            span.icon
+                font-awesome-icon(icon="fas fa-save")
+            span Download
+    .has-text-centered.mx-2
+        button.button.is-danger.is-outlined(@click="modals.operations.showDelete = true" type="button")
+            span.icon
+                font-awesome-icon(icon="fas fa-trash")
+            span Delete Operation
+//- Table
+table.table.is-fullwidth.is-bordered.mb-8(v-if="operationStore.selectedOperation" id="link-table")
+    thead
+        tr
+            th Time Ran
+            th Status
+            th Ability Name 
+            th Agent 
+            th Host 
+            th pid 
+            th Link Command 
+            th Link Output
+    tbody
+        tr(v-for="(link, idx) in operationStore.selectedOperation.chain" :key="link.id")
+            td {{ getReadableTime(link.decide) }}
+            td(style="border-bottom-width: 0px !important")
+                .link-status(:style="{ color: LINK_COLORS[link.status]}") {{ LINK_STATUSES[link.status] }}
+                .status-line
+            td {{ link.ability.name }}
+            td {{ link.paw }}
+            td {{ link.host }}
+            td {{ link.pid ? link.pid : "N/A" }}
+            td
+                button.button(v-tooltip="b64DecodeUnicode(link.command)" @click="handleViewCommand(link)") View Command
+            td.has-text-centered
+                button.button(v-if="link.output === 'True'" @click="handleViewOutput(link)") View Output
+                span(v-else) No output
+        ManualCommand(v-if="modals.operations.showAddManualCommand")
 
-
-.message.control-panel
-    p.message-header Control Panel
-    p.message-body Stop run run 1 link manual command potential link
-
-
+//- Control Panel
+.message.control-panel(v-if="operationStore.selectedOperation")
+    p.message-header(@click="isControlPanelActive = !isControlPanelActive")
+        span Control Panel
+        a.icon
+            font-awesome-icon.fa-xl(:icon='isControlPanelActive ? "fas fa-angle-down": "fas fa-angle-up"')
+    p.message-body(v-if="isControlPanelActive")
+        .columns.is-vcentered
+            .column.is-flex.is-align-items-center.has-text-centered
+                span.is-size-6 State: &nbsp;
+                button.button.has-text-success.ml-1
+                    span {{ operationStore.selectedOperation.state }}
+            .column.has-text-centered
+                button.button(@click="displayManualCommand()")
+                    span.icon
+                        font-awesome-icon.fa(icon="fas fa-plus")
+                    span Manual Command
+            .column.has-text-centered
+                button.button(@click="modals.operations.showAddPotentialLink = true")
+                    span.icon
+                        font-awesome-icon.fa(icon="fas fa-plus")
+                    span Potential Link
+            .column.has-text-centered(v-if="!isRerun()" @click="operationStore.updateOperation($api, 'state', 'cleanup')")
+                a.icon
+                    font-awesome-icon.fa-3x(icon="fas fa-stop")
+                p Stop
+            .column.has-text-centered(v-if="!isRerun() && operationStore.selectedOperation.state === 'paused' || operationStore.selectedOperation.state === 'run_one_link'" @click="operationStore.updateOperation($api, 'state', 'running')")
+                a.icon.ml-1
+                    font-awesome-icon.fa-3x(icon="fas fa-play")
+                p Run
+            .column.has-text-centered(v-else v-if="!isRerun()" @click="operationStore.updateOperation($api, 'state', 'paused')")
+                a.icon
+                    font-awesome-icon.fa-3x(icon="fas fa-pause")
+                p Pause
+            .column.has-text-centered(v-if ="!isRerun()" @click="operationStore.updateOperation($api, 'state', 'run_one_link')")
+                a.icon.ml-1
+                    font-awesome-icon.fa-3x(icon="fas fa-play")
+                    span.mt-5 1
+                p Run 1 Link
+            .column.has-text-centered(v-if ="isRerun()" @click="operationStore.rerunOperation($api)")
+                a.icon.ml-1
+                    font-awesome-icon.fa-3x(icon="fas fa-redo")
+                p Re-run operation
+            .column.is-flex.is-align-items-center.has-text-centered
+                span.is-size-6 Obfuscator: 
+                .select.ml-1
+                    select(v-model="operationStore.selectedOperation.obfuscator" @change="operationStore.updateOperation($api, 'obfuscator', operationStore.selectedOperation.obfuscator)")
+                        option(v-for="(obf, idx) in coreStore.obfuscators" :key="idx" :value="obf.name") {{ `${obf.name}` }}
+            .column.has-text-centered
+                form.my-2
+                    .field
+                        input.switch(
+                            :checked="operationStore.selectedOperation.autonomous === 1" 
+                            id="switchManual" 
+                            type="checkbox" 
+                            @change="updateAuto($event)"
+                        )
+                        label.label(for="switchManual" style) Autonomous 
 //- Modals
-createModal
+CreateModal
+DeleteModal
+DetailsModal
+DownloadModal
+CommandModal
+OutputModal
+AddPotentialLinkModal
 </template>
 
 <style>
-    .control-panel{
+    .control-panel {
         position: fixed;
         bottom: 10px;
-        width: 81%;
+        width: 86%;
+        z-index: 10;
     }
+    .control-panel .message-header{
+        outline: 1px solid rgb(202, 187, 187);
+    }
+    .link-status {
+        display: flex;
+        position: relative;
+        background-color: #242424;
+        border: 0.2em solid;
+        border-radius: 50%;
+        height: 60px;
+        width: 60px;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7em;
+        z-index: 1;
+    }
+    .status-line {
+        z-index: 0;
+        display: inline-block;
+        position: absolute;
+        margin-left: 1.82em;
+        width: 2px;
+        height: 50px;
+        background-color: white;
+
+    }
+    a.icon{
+      text-decoration: none !important;  
+    }
+    #link-table td{
+        border-width: 0px 1px 0px 1px !important;
+        padding-bottom: 2em !important;
+    }
+    #link-table {
+        margin-bottom: 7rem;
+    }
+    #select-operation {
+    max-width: 800px;
+    margin: 0 auto;
+}
 </style>

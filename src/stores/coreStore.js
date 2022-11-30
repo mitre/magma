@@ -6,7 +6,8 @@ export const useCoreStore = defineStore("coreStore", {
             mainConfig: {},
             availablePlugins: [],
             planners: [],
-            obfuscators: []
+            obfuscators: [],
+            sources: []
         };
     },
     getters: {
@@ -54,6 +55,14 @@ export const useCoreStore = defineStore("coreStore", {
                 this.obfuscators = response.data;
             } catch(error) {
                 console.error("Error getting obfuscators", error);
+            }
+        },
+        async getSources($api) {
+            try {
+                const response = await $api.get("/api/v2/sources");
+                this.sources = response.data;
+            } catch(error) {
+                console.error("Error getting sources", error);
             }
         }
     },

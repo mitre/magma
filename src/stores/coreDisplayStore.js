@@ -22,6 +22,13 @@ export const useCoreDisplayStore = defineStore("coreDisplayStore", {
         },
         operations: {
           showCreate: false,
+          showDelete: false,
+          showDetails: false,
+          showDownload: false,
+          showCommand: false,
+          showOutput: false,
+          showAddPotentialLink: false,
+          showAddManualCommand: false,
         }
       }
     };
