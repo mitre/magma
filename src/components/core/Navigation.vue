@@ -1,14 +1,15 @@
 <script setup>
-import { useCoreDisplayStore } from "../../stores/coreDisplayStore.js";
-import { useAuthStore } from "../../stores/authStore.js";
 import { inject } from "vue";
-import { useCoreStore } from "../../stores/coreStore";
 import { storeToRefs } from "pinia";
+
+import { useCoreStore } from "@/stores/coreStore";
+import { useCoreDisplayStore } from "@/stores/coreDisplayStore.js";
+import { useAuthStore } from "@/stores/authStore.js";
 
 const authStore = useAuthStore();
 const coreDisplayStore = useCoreDisplayStore();
 const coreStore = useCoreStore();
-const { enabledPlugins, availablePlugins } = storeToRefs(coreStore);
+const { enabledPlugins, availablePlugins, userSettings } = storeToRefs(coreStore);
 
 const $api = inject("$api");
 
@@ -47,10 +48,11 @@ async function enablePlugin(pluginName) {
 </script>
 
 <template lang="pug">
-#navigation
+#navigation(:class="{ 'collapsed': userSettings.collapseNavigation }")
     #logo
         img(src="/src/assets/img/caldera-logo.png" alt="Caldera Logo" @click="openCalderaHomepage()")
-    aside.menu
+    aside.menu(v-if="!userSettings.collapseNavigation")
+        button.button(@click="coreStore.modifyUserSettings('collapseNavigation', true)") C
         p.menu-label
             font-awesome-icon(icon="fas fa-flag").pr-2
             | Campaigns
@@ -102,6 +104,54 @@ async function enablePlugin(pluginName) {
                     span.icon
                         font-awesome-icon(icon="fas fa-sign-out-alt")
                     span Log out
+
+    .is-flex.is-flex-direction-column.is-align-items-center(v-else)
+        button.button.mb-2(@click="coreStore.modifyUserSettings('collapseNavigation', false)") E
+        .dropdown.is-hoverable.mb-2
+            .dropdown-trigger
+                button.button(aria-haspopup="true" aria-controls="dropdown-menu")
+                    span.icon.is-small
+                        font-awesome-icon(icon="fas fa-flag")
+            .dropdown-menu(role="menu")
+                .dropdown-content
+                    router-link.dropdown-item(to="/agents") agents
+                    router-link.dropdown-item(to="/abilities") abilities
+                    router-link.dropdown-item(to="/adversaries") adversaries
+                    router-link.dropdown-item(to="/operations") operations
+        .dropdown.is-hoverable.mb-2
+            .dropdown-trigger
+                button.button(aria-haspopup="true" aria-controls="dropdown-menu")
+                    span.icon.is-small
+                        font-awesome-icon(icon="fas fa-puzzle-piece")
+            .dropdown-menu(role="menu")
+                .dropdown-content
+                    div(v-for="plugin in availablePlugins")
+                        router-link.menu-item(v-if="enabledPlugins.includes(plugin.name)" :to="`/plugins/${plugin.name}`") {{ plugin.name }}
+                        p.menu-item(v-else @click="promptToEnablePlugin(plugin.name)") {{ plugin.name }}
+        .dropdown.is-hoverable.mb-2
+            .dropdown-trigger
+                button.button(aria-haspopup="true" aria-controls="dropdown-menu")
+                    span.icon.is-small
+                        font-awesome-icon(icon="fas fa-cog")
+            .dropdown-menu(role="menu")
+                .dropdown-content
+                    router-link.dropdown-item(to="/settings") settings
+                    router-link.dropdown-item(to="/fact sources") fact sources
+                    router-link.dropdown-item(to="/objectives") objectives
+                    router-link.dropdown-item(to="/contacts") contacts
+                    router-link.dropdown-item(to="/exfilled files") exfilled files
+        .dropdown.is-hoverable.mb-2
+            .dropdown-trigger
+                button.button(aria-haspopup="true" aria-controls="dropdown-menu")
+                    span.icon.is-small
+                        font-awesome-icon(icon="fas fa-book")
+            .dropdown-menu(role="menu")
+                .dropdown-content
+                    router-link.dropdown-item(to="/planners") planners
+                    router-link.dropdown-item(to="/obfuscators") obfuscators
+                    a.dropdown-item(href="/api/docs" target="_blank") 
+                        | api docs
+                        font-awesome-icon(icon="fas fa-external-link-alt").pl-1.is-size-7
 </template>
 
 <style scoped>
@@ -113,6 +163,9 @@ async function enablePlugin(pluginName) {
 #navigation {
     background-color: #060606;
     width: 250px;
+}
+#navigation.collapsed {
+    width: 50px;
 }
 
 #navigation img {
@@ -149,5 +202,11 @@ p.menu-item {
 p.menu-item:hover {
     cursor: pointer;
     border: 1px solid grey;
+}
+
+.dropdown-menu {
+    top: 0;
+    left: 100%;
+    padding-top: 0;
 }
 </style>

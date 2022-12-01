@@ -1,5 +1,9 @@
 import { defineStore } from "pinia";
 
+const DEFAULT_USER_SETTINGS = {
+    collapseNavigation: false,
+};
+
 export const useCoreStore = defineStore("coreStore", {
     state: () => {
         return {
@@ -7,7 +11,8 @@ export const useCoreStore = defineStore("coreStore", {
             availablePlugins: [],
             planners: [],
             obfuscators: [],
-            sources: []
+            sources: [],
+            userSettings: {}
         };
     },
     getters: {
@@ -64,6 +69,15 @@ export const useCoreStore = defineStore("coreStore", {
             } catch(error) {
                 console.error("Error getting sources", error);
             }
+        },
+        getUserSettings() {
+            const settings = localStorage.getItem('calderaUserSettings');
+            this.userSettings = JSON.parse(settings) || DEFAULT_USER_SETTINGS;
+        },
+        modifyUserSettings(setting, value) {
+            if (!Object.keys(DEFAULT_USER_SETTINGS).includes(setting)) return;
+            this.userSettings[setting] = value;
+            localStorage.setItem('calderaUserSettings', JSON.stringify(this.userSettings));
         }
     },
 });

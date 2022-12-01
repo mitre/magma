@@ -27,14 +27,14 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 import { 
-  faAngleDown, faAngleRight, faBan, faBook, faCheck, faCog, faExclamationTriangle, faExternalLinkAlt, faFileExport, faFileImport, faFlag, 
-  faKey, faLock, faMinus, faPlus, faPuzzlePiece, faSave, faSearch, faSkullCrossbones, faSignOutAlt, faTimes, faTrash, 
-  faUndo, faUnlockAlt, faUpload, faUser, faWeightHanging, faStop, faPlay, faPause, faAngleUp, faRedo
+  faAngleDown, faAngleRight, faArrowRight, faBan, faBook, faCheck, faCog, faExclamationTriangle, faExternalLinkAlt, faFileExport, 
+  faFileImport, faFlag, faKey, faLock, faMinus, faPlus, faPuzzlePiece, faSave, faSearch, faSkullCrossbones, faSignOutAlt, faTimes, faTrash, 
+  faUndo, faUnlockAlt, faUpload, faUser, faWeightHanging 
 } from '@fortawesome/free-solid-svg-icons';
 library.add(
-  faAngleDown, faAngleRight, faBan, faBook, faCheck, faCog, faExclamationTriangle, faExternalLinkAlt, faFileExport, faFileImport, faFlag, 
-  faKey, faLock, faMinus, faPlus, faPuzzlePiece, faSave, faSearch, faSkullCrossbones, faSignOutAlt, faTimes, faTrash, 
-  faUndo, faUnlockAlt, faUpload, faUser, faWeightHanging, faStop, faPlay, faPause, faAngleUp, faRedo
+  faAngleDown, faAngleRight, faArrowRight, faBan, faBook, faCheck, faCog, faExclamationTriangle, faExternalLinkAlt, faFileExport, 
+  faFileImport, faFlag, faKey, faLock, faMinus, faPlus, faPuzzlePiece, faSave, faSearch, faSkullCrossbones, faSignOutAlt, faTimes, faTrash, 
+  faUndo, faUnlockAlt, faUpload, faUser, faWeightHanging 
 );
 import { 
   faCircle, faCircleQuestion, faCopy 

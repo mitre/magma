@@ -1,9 +1,17 @@
 <script setup>
+import { onMounted } from "vue";
 import { useRoute } from "vue-router";
 
-import Navigation from "./components/core/Navigation.vue";
-import PageTabs from "./components/core/PageTabs.vue";
+import { useCoreStore } from "@/stores/coreStore";
+import Navigation from "@/components/core/Navigation.vue";
+import PageTabs from "@/components/core/PageTabs.vue";
+
 const route = useRoute();
+const coreStore = useCoreStore();
+
+onMounted(() => {
+    coreStore.getUserSettings();
+})
 </script>
 
 <template lang="pug">
@@ -26,6 +34,7 @@ const route = useRoute();
 <style scoped>
 #router {
     height: calc(100% - 55px);
+    margin-top: 55px;
 }
 </style>
 

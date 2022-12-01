@@ -102,18 +102,20 @@ async function createOperation() {
                 .field-label.is-normal 
                     label.label Adversary
                 .field-body
-                    .select
-                        select(v-model="selectedAdversary")
-                            option(selected value="") No Adversary (manual)
-                            option(v-for="adversary in adversaryStore.adversaries" :key="adversary.id" :value="adversary") {{ `${adversary.name}` }}
+                    .control
+                        .select
+                            select(v-model="selectedAdversary")
+                                option(selected value="") No Adversary (manual)
+                                option(v-for="adversary in adversaryStore.adversaries" :key="adversary.id" :value="adversary") {{ `${adversary.name}` }}
             .field.is-horizontal
                 .field-label.is-normal 
                     label.label Fact Source
                 .field-body
-                    .select
-                        select(v-model="selectedSource")
-                            option(disabled selected value="") Choose a Fact Source 
-                            option(v-for="source in coreStore.sources" :key="source.id" :value="source") {{ `${source.name}` }}
+                    .control
+                        .select
+                            select(v-model="selectedSource")
+                                option(disabled selected value="") Choose a Fact Source 
+                                option(v-for="source in coreStore.sources" :key="source.id" :value="source") {{ `${source.name}` }}
             .field.is-horizontal 
                 .field-label.is-normal 
                     label.label Group
@@ -124,9 +126,10 @@ async function createOperation() {
                 .field-label.is-normal 
                     label.label Planner 
                 .field-body
-                    .select 
-                        select(v-model="selectedPlanner")
-                            option(v-for="planner in coreStore.planners" :key="planner.id" :value="planner") {{ `${planner.name}` }}
+                    .control
+                        .select 
+                            select(v-model="selectedPlanner")
+                                option(v-for="planner in coreStore.planners" :key="planner.id" :value="planner") {{ `${planner.name}` }}
             .field.is-horizontal
                 .field-label
                     label.label Obfuscators 

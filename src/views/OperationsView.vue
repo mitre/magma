@@ -101,10 +101,11 @@ function displayManualCommand() {
     h2 Operations
 hr
 #select-operation.has-text-centered.is-align-items-center.is-flex
-    .select.is-flex-grow-1.mr-2
-        select.is-fullwidth.mx-1.has-text-centered(v-model="operationStore.selectedOperation" @change="selectOperation()")
-            option.is-fullwidth(disabled selected value="") Select an operation 
-            option.is-fullwidth(v-for="operation in operationStore.operations" :key="operation.id" :value="operation") {{ `${operation.name} - ${operation.chain.length} decisions | ${getHumanFriendlyTimeISO8601(operation.start)}` }}
+    .control.is-fullwidth
+        .select.is-flex-grow-1.mr-2.pr-2.is-fullwidth
+            select.is-fullwidth.mx-1.has-text-centered(v-model="operationStore.selectedOperation" @change="selectOperation()")
+                option.is-fullwidth(disabled selected value="") Select an operation 
+                option.is-fullwidth(v-for="operation in operationStore.operations" :key="operation.id" :value="operation") {{ `${operation.name} - ${operation.chain.length} decisions | ${getHumanFriendlyTimeISO8601(operation.start)}` }}
     button.button.is-primary.mx-1(@click="modals.operations.showCreate = true" type="button") 
         span.icon
             font-awesome-icon(icon="fas fa-plus") 
@@ -123,7 +124,7 @@ hr
                 font-awesome-icon(icon="fas fa-trash")
             span Delete Operation
 //- Table
-table.table.is-fullwidth.is-bordered.mb-8(v-if="operationStore.selectedOperation" id="link-table")
+table.table.is-fullwidth.is-narrow.is-striped.mb-8(v-if="operationStore.selectedOperation" id="link-table")
     thead
         tr
             th Time Ran
@@ -137,16 +138,17 @@ table.table.is-fullwidth.is-bordered.mb-8(v-if="operationStore.selectedOperation
     tbody
         tr(v-for="(link, idx) in operationStore.selectedOperation.chain" :key="link.id")
             td {{ getReadableTime(link.decide) }}
-            td(style="border-bottom-width: 0px !important")
-                .link-status(:style="{ color: LINK_COLORS[link.status]}") {{ LINK_STATUSES[link.status] }}
-                .status-line
+            td
+                .is-flex.is-align-items-center(style="border-bottom-width: 0px !important")
+                    .link-status.mr-2(:style="{ color: LINK_COLORS[link.status]}") 
+                    span(:style="{ color: LINK_COLORS[link.status]}") {{ LINK_STATUSES[link.status] }}
             td {{ link.ability.name }}
             td {{ link.paw }}
             td {{ link.host }}
             td {{ link.pid ? link.pid : "N/A" }}
             td
                 button.button(v-tooltip="b64DecodeUnicode(link.command)" @click="handleViewCommand(link)") View Command
-            td.has-text-centered
+            td
                 button.button(v-if="link.output === 'True'" @click="handleViewOutput(link)") View Output
                 span(v-else) No output
         ManualCommand(v-if="modals.operations.showAddManualCommand")
@@ -220,49 +222,41 @@ AddPotentialLinkModal
 </template>
 
 <style>
-    .control-panel {
-        position: fixed;
-        bottom: 10px;
-        width: 86%;
-        z-index: 10;
-    }
-    .control-panel .message-header{
-        outline: 1px solid rgb(202, 187, 187);
-    }
-    .link-status {
-        display: flex;
-        position: relative;
-        background-color: #242424;
-        border: 0.2em solid;
-        border-radius: 50%;
-        height: 60px;
-        width: 60px;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.7em;
-        z-index: 1;
-    }
-    .status-line {
-        z-index: 0;
-        display: inline-block;
-        position: absolute;
-        margin-left: 1.82em;
-        width: 2px;
-        height: 50px;
-        background-color: white;
+.control-panel {
+    position: fixed;
+    bottom: 10px;
+    width: 86%;
+    z-index: 10;
+}
+.control-panel .message-header{
+    outline: 1px solid rgb(202, 187, 187);
+}
+.link-status {
+    background-color: #242424;
+    border: 0.2em solid;
+    border-radius: 50%;
+    height: 1em;
+    width: 1em;
+    z-index: 1;
+}
+.status-line {
+    z-index: 0;
+    display: inline-block;
+    position: absolute;
+    margin-left: 1.82em;
+    width: 2px;
+    height: 50px;
+    background-color: white;
 
-    }
-    a.icon{
-      text-decoration: none !important;  
-    }
-    #link-table td{
-        border-width: 0px 1px 0px 1px !important;
-        padding-bottom: 2em !important;
-    }
-    #link-table {
-        margin-bottom: 7rem;
-    }
-    #select-operation {
+}
+a.icon{
+    text-decoration: none !important;  
+}
+
+#link-table {
+    margin-bottom: 7rem;
+}
+#select-operation {
     max-width: 800px;
     margin: 0 auto;
 }
