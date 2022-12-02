@@ -97,32 +97,75 @@ function displayManualCommand() {
 </script>
 
 <template lang="pug">
-.content
-    h2 Operations
-hr
-#select-operation.has-text-centered.is-align-items-center.is-flex
-    .control.is-fullwidth
-        .select.is-flex-grow-1.mr-2.pr-2.is-fullwidth
-            select.is-fullwidth.mx-1.has-text-centered(v-model="operationStore.selectedOperation" @change="selectOperation()")
-                option.is-fullwidth(disabled selected value="") Select an operation 
-                option.is-fullwidth(v-for="operation in operationStore.operations" :key="operation.id" :value="operation") {{ `${operation.name} - ${operation.chain.length} decisions | ${getHumanFriendlyTimeISO8601(operation.start)}` }}
-    button.button.is-primary.mx-1(@click="modals.operations.showCreate = true" type="button") 
-        span.icon
-            font-awesome-icon(icon="fas fa-plus") 
-        span Create Operation
-.is-align-items-center.is-flex.is-justify-content-center.my-3(v-if="operationStore.selectedOperation")
-    .has-text-centered.mx-2
-        button.button(@click="modals.operations.showDetails = true" type="button") Operation Details
-    .has-text-centered.mx-2
-        button.button.is-success(@click="modals.operations.showDownload = true" type="button")
-            span.icon
-                font-awesome-icon(icon="fas fa-save")
-            span Download
-    .has-text-centered.mx-2
-        button.button.is-danger.is-outlined(@click="modals.operations.showDelete = true" type="button")
-            span.icon
-                font-awesome-icon(icon="fas fa-trash")
-            span Delete Operation
+.columns.mb-0
+    .column.is-4.m-0.content
+        h2.m-0 Operations
+    .column.is-4.m-0
+        .is-flex.is-justify-content-center.is-flex-wrap-wrap
+            .control.mr-2
+                .select
+                    select.has-text-centered(v-model="operationStore.selectedOperation" @change="selectOperation()")
+                        option(disabled selected value="") Select an operation 
+                        option(v-for="operation in operationStore.operations" :key="operation.id" :value="operation") {{ `${operation.name} - ${operation.chain.length} decisions | ${getHumanFriendlyTimeISO8601(operation.start)}` }}
+            button.button.is-primary.mr-2(@click="modals.operations.showCreate = true" type="button") 
+                span.icon
+                    font-awesome-icon(icon="fas fa-plus") 
+                span New Operation
+    .column.is-4.m-0
+        .buttons.is-justify-content-right
+            button.button.mr-2(v-if="operationStore.selectedOperation" @click="modals.operations.showDownload = true" type="button")
+                span.icon
+                    font-awesome-icon(icon="fas fa-save")
+                span Download Report
+            button.button.is-danger.is-outlined(v-if="operationStore.selectedOperation" @click="modals.operations.showDelete = true" type="button")
+                span.icon
+                    font-awesome-icon(icon="fas fa-trash")
+                span Delete Operation
+hr.mt-2
+
+//- Control Panel
+.control-panel.p-0.mb-4(v-if="operationStore.selectedOperation")
+    .columns.m-0.p-1
+        .column.is-4.pt-0.pb-0.is-flex
+            .buttons
+                button.button(@click="displayManualCommand()")
+                    span.icon
+                        font-awesome-icon.fa(icon="fas fa-plus")
+                    span Manual Command
+                button.button(@click="modals.operations.showAddPotentialLink = true")
+                    span.icon
+                        font-awesome-icon.fa(icon="fas fa-plus")
+                    span Potential Link
+                button.button(@click="modals.operations.showDetails = true" type="button") Operation Details
+        .column.is-4.pt-0.pb-0
+            span.has-text-success.is-flex.is-justify-content-center {{ operationStore.selectedOperation.state }}
+            .is-flex.is-justify-content-center.is-align-items-center.pb-2
+                a.icon.is-medium.ml-3.mr-3(v-if="!isRerun()" @click="operationStore.updateOperation($api, 'state', 'cleanup')" v-tooltip="'Stop'")
+                    font-awesome-icon.fa-2x(icon="fas fa-stop")
+                a.icon.is-medium.ml-3.mr-3(v-if="!isRerun() && operationStore.selectedOperation.state === 'paused' || operationStore.selectedOperation.state === 'run_one_link'" @click="operationStore.updateOperation($api, 'state', 'running')" v-tooltip="'Play'")
+                    font-awesome-icon.fa-2x(icon="fas fa-play")
+                a.icon.is-medium.ml-3.mr-3(v-else v-if="!isRerun()" @click="operationStore.updateOperation($api, 'state', 'paused')" v-tooltip="'Pause'")
+                    font-awesome-icon.fa-2x(icon="fas fa-pause")
+                a.icon.is-medium.ml-3.mr-3(v-if ="!isRerun()" @click="operationStore.updateOperation($api, 'state', 'run_one_link')" v-tooltip="'Run one link'")
+                    font-awesome-icon.fa-2x(icon="fas fa-play")
+                    span.mt-5 1
+                a.icon.is-medium.ml-3.mr-3(v-if ="isRerun()" @click="operationStore.rerunOperation($api)" v-tooltip="'Re-run Operation'")
+                    font-awesome-icon.fa-2x(icon="fas fa-redo")
+        .column.is-4.is-flex.is-justify-content-right.is-align-items-center.is-flex-wrap-wrap.pt-0.pb-0
+            span.is-size-6 Obfuscator: 
+            .control
+                .select.ml-1.mr-4
+                    select(v-model="operationStore.selectedOperation.obfuscator" @change="operationStore.updateOperation($api, 'obfuscator', operationStore.selectedOperation.obfuscator)")
+                        option(v-for="(obf, idx) in coreStore.obfuscators" :key="idx" :value="obf.name") {{ `${obf.name}` }}
+            .control
+                input.switch(
+                    :checked="operationStore.selectedOperation.autonomous === 1" 
+                    id="switchManual" 
+                    type="checkbox" 
+                    @change="updateAuto($event)"
+                )
+                label.label(for="switchManual") {{ operationStore.selectedOperation.autonomous ? 'Autonomous' : 'Manual' }} 
+        
 //- Table
 table.table.is-fullwidth.is-narrow.is-striped.mb-8(v-if="operationStore.selectedOperation" id="link-table")
     thead
@@ -152,65 +195,7 @@ table.table.is-fullwidth.is-narrow.is-striped.mb-8(v-if="operationStore.selected
                 button.button(v-if="link.output === 'True'" @click="handleViewOutput(link)") View Output
                 span(v-else) No output
         ManualCommand(v-if="modals.operations.showAddManualCommand")
-
-//- Control Panel
-.message.control-panel(v-if="operationStore.selectedOperation")
-    p.message-header(@click="isControlPanelActive = !isControlPanelActive")
-        span Control Panel
-        a.icon
-            font-awesome-icon.fa-xl(:icon='isControlPanelActive ? "fas fa-angle-down": "fas fa-angle-up"')
-    p.message-body(v-if="isControlPanelActive")
-        .columns.is-vcentered
-            .column.is-flex.is-align-items-center.has-text-centered
-                span.is-size-6 State: &nbsp;
-                button.button.has-text-success.ml-1
-                    span {{ operationStore.selectedOperation.state }}
-            .column.has-text-centered
-                button.button(@click="displayManualCommand()")
-                    span.icon
-                        font-awesome-icon.fa(icon="fas fa-plus")
-                    span Manual Command
-            .column.has-text-centered
-                button.button(@click="modals.operations.showAddPotentialLink = true")
-                    span.icon
-                        font-awesome-icon.fa(icon="fas fa-plus")
-                    span Potential Link
-            .column.has-text-centered(v-if="!isRerun()" @click="operationStore.updateOperation($api, 'state', 'cleanup')")
-                a.icon
-                    font-awesome-icon.fa-3x(icon="fas fa-stop")
-                p Stop
-            .column.has-text-centered(v-if="!isRerun() && operationStore.selectedOperation.state === 'paused' || operationStore.selectedOperation.state === 'run_one_link'" @click="operationStore.updateOperation($api, 'state', 'running')")
-                a.icon.ml-1
-                    font-awesome-icon.fa-3x(icon="fas fa-play")
-                p Run
-            .column.has-text-centered(v-else v-if="!isRerun()" @click="operationStore.updateOperation($api, 'state', 'paused')")
-                a.icon
-                    font-awesome-icon.fa-3x(icon="fas fa-pause")
-                p Pause
-            .column.has-text-centered(v-if ="!isRerun()" @click="operationStore.updateOperation($api, 'state', 'run_one_link')")
-                a.icon.ml-1
-                    font-awesome-icon.fa-3x(icon="fas fa-play")
-                    span.mt-5 1
-                p Run 1 Link
-            .column.has-text-centered(v-if ="isRerun()" @click="operationStore.rerunOperation($api)")
-                a.icon.ml-1
-                    font-awesome-icon.fa-3x(icon="fas fa-redo")
-                p Re-run operation
-            .column.is-flex.is-align-items-center.has-text-centered
-                span.is-size-6 Obfuscator: 
-                .select.ml-1
-                    select(v-model="operationStore.selectedOperation.obfuscator" @change="operationStore.updateOperation($api, 'obfuscator', operationStore.selectedOperation.obfuscator)")
-                        option(v-for="(obf, idx) in coreStore.obfuscators" :key="idx" :value="obf.name") {{ `${obf.name}` }}
-            .column.has-text-centered
-                form.my-2
-                    .field
-                        input.switch(
-                            :checked="operationStore.selectedOperation.autonomous === 1" 
-                            id="switchManual" 
-                            type="checkbox" 
-                            @change="updateAuto($event)"
-                        )
-                        label.label(for="switchManual" style) Autonomous 
+                
 //- Modals
 CreateModal
 DeleteModal
@@ -223,14 +208,14 @@ AddPotentialLinkModal
 
 <style>
 .control-panel {
-    position: fixed;
-    bottom: 10px;
-    width: 86%;
+    position: sticky;
+    top: 70px;
     z-index: 10;
+    border-radius: 8px;
+    background-color: #383838;
+    border: 1px solid #121212;
 }
-.control-panel .message-header{
-    outline: 1px solid rgb(202, 187, 187);
-}
+
 .link-status {
     background-color: #242424;
     border: 0.2em solid;
@@ -239,25 +224,12 @@ AddPotentialLinkModal
     width: 1em;
     z-index: 1;
 }
-.status-line {
-    z-index: 0;
-    display: inline-block;
-    position: absolute;
-    margin-left: 1.82em;
-    width: 2px;
-    height: 50px;
-    background-color: white;
 
-}
 a.icon{
     text-decoration: none !important;  
 }
 
-#link-table {
-    margin-bottom: 7rem;
-}
-#select-operation {
-    max-width: 800px;
-    margin: 0 auto;
+.table td {
+    vertical-align: middle !important;
 }
 </style>
