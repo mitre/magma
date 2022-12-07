@@ -4,7 +4,7 @@ import * as echarts from "echarts";
 import { storeToRefs } from "pinia";
 
 import { useAgentStore } from '@/stores/agentStore';
-import { getAgentStatus } from "@/util/agentUtil.js";
+import { getAgentStatus } from "@/utils/agentUtil.js";
 
 const $api = inject("$api");
 

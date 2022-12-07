@@ -389,7 +389,7 @@ table.table.is-striped.is-fullwidth.is-narrow
                 span(v-for="platform in getExecutorDetail('platforms', ability)" v-tooltip="platform")
                     span.icon.is-small.mr-2
                         font-awesome-icon(v-if="platform.includes('windows')" icon="fab fa-windows")
-                        font-awesome-icon(v-if="platform.includes('darwin')" icon="fab fa-darwin")
+                        font-awesome-icon(v-if="platform.includes('darwin')" icon="fab fa-apple")
                         font-awesome-icon(v-if="platform.includes('linux')" icon="fab fa-linux")
             td.has-text-centered(:class="{ 'unlock': onHoverUnlocks.indexOf(ability.ability_id) > -1 }")
                 span(v-if="abilityDependencies[ability.ability_id] && getExecutorDetail('requirements', ability)" v-tooltip="`This ability has requirements: (${abilityDependencies[ability.ability_id].requireTypes})`")

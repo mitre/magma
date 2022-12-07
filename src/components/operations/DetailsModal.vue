@@ -14,11 +14,11 @@ const operationStore = useOperationStore();
     .modal-card
         header.modal-card-head 
             p.modal-card-title Operation Details
-        .modal-card-body(v-if="operationStore.selectedOperation")
-            table.table
+        .modal-card-body(v-if="operationStore.selectedOperation.id")
+            table.table.is-fullwidth.is-striped
                 tbody
                     tr
-                        th Operation Details
+                        th Name
                         td {{`${operationStore.selectedOperation.name}`}}
                     tr
                         th Adversary
@@ -47,17 +47,7 @@ const operationStore = useOperationStore();
                     tr
                         th Jitter
                         td {{`${operationStore.selectedOperation.jitter}`}}
-        footer.modal-card-foot 
+        footer.modal-card-foot.is-justify-content-right
             button.button(@click="modals.operations.showDetails = false") Close 
             
 </template>
-
-<style scoped>
-.modal-card {
-    width: 600px;
-}
-.table{
-    background-color: inherit !important;
-}
-
-</style>

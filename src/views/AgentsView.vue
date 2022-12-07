@@ -7,7 +7,7 @@ import { useCoreDisplayStore } from "@/stores/coreDisplayStore";
 import DeployModal from '@/components/agents/DeployModal.vue';
 import ConfigModal from '@/components/agents/ConfigModal.vue';
 import DetailsModal from "@/components/agents/DetailsModal.vue";
-import { getAgentStatus } from "@/util/agentUtil.js";
+import { getAgentStatus } from "@/utils/agentUtil.js";
 
 const $api = inject("$api");
 

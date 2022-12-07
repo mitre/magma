@@ -1,27 +1,32 @@
 <script setup>
 import { inject, ref, onMounted, onBeforeUnmount } from "vue";
+import { storeToRefs } from "pinia";
+
+import CreateModal from '../components/operations/CreateModal.vue';
+import DeleteModal from '../components/operations/DeleteModal.vue';
+import DetailsModal from '../components/operations/DetailsModal.vue';
+import DownloadModal from '../components/operations/DownloadModal.vue';
+import CommandPopup from '../components/operations/CommandPopup.vue';
+import OutputPopup from '../components/operations/OutputPopup.vue';
+import AddPotentialLinkModal from "../components/operations/AddPotentialLinkModal.vue";
+import ManualCommand from "../components/operations/ManualCommand.vue";
 import { useOperationStore } from '../stores/operationStore';
 import { useAgentStore } from "../stores/agentStore";
 import { useCoreDisplayStore } from "../stores/coreDisplayStore";
 import { useCoreStore } from "../stores/coreStore";
 import { getHumanFriendlyTimeISO8601, b64DecodeUnicode, getReadableTime } from "../utils/utils";
-import { storeToRefs } from "pinia";
-import CreateModal from '../components/operations/CreateModal.vue';
-import DeleteModal from '../components/operations/DeleteModal.vue';
-import DetailsModal from '../components/operations/DetailsModal.vue';
-import DownloadModal from '../components/operations/DownloadModal.vue';
-import CommandModal from '../components/operations/CommandModal.vue';
-import OutputModal from '../components/operations/OutputModal.vue';
-import AddPotentialLinkModal from "../components/operations/AddPotentialLinkModal.vue";
-import ManualCommand from "../components/operations/ManualCommand.vue";
+
 const $api = inject("$api");
+
 const coreDisplayStore = useCoreDisplayStore();
 const operationStore = useOperationStore();
 const agentStore = useAgentStore();
 const coreStore = useCoreStore();
 const { modals } = storeToRefs(coreDisplayStore);
+
 let updateInterval = ref();
 let isControlPanelActive = ref(true);
+
 const LINK_STATUSES = {
     0: "success",
     '-1': "paused",
@@ -65,16 +70,6 @@ function selectOperation() {
     }, "3000");
 }
 
-async function handleViewCommand(link) {
-    await operationStore.setSelectedLinkByID($api, link.id, link.output);
-    modals.value.operations.showCommand = true;
-}
-
-async function handleViewOutput(link) {
-    await operationStore.setSelectedLinkByID($api, link.id, link.output);
-    modals.value.operations.showOutput = true;
-}
-
 async function updateAuto(event) {
     operationStore.selectedOperation.autonomous = event.target.checked ? 1 : 0;
     await operationStore.updateOperation($api, 'autonomous', operationStore.selectedOperation.autonomous);
@@ -87,7 +82,7 @@ function isRerun() {
 function displayManualCommand() {
     modals.value.operations.showAddManualCommand = true;
     setTimeout(() => {
-        document.getElementById("input-command").scrollIntoView({
+        document.getElementById("manual-input-command").scrollIntoView({
             behavior: "smooth"
         });
     }, 2);
@@ -190,9 +185,21 @@ table.table.is-fullwidth.is-narrow.is-striped.mb-8(v-if="operationStore.selected
             td {{ link.host }}
             td {{ link.pid ? link.pid : "N/A" }}
             td
-                button.button(v-tooltip="b64DecodeUnicode(link.command)" @click="handleViewCommand(link)") View Command
+                //- button.button(v-tooltip="b64DecodeUnicode(link.command)" @click="handleViewCommand(link)") View Command
+                .dropdown.is-hoverable
+                    .dropdown-trigger
+                        button.button(aria-haspopup="true" aria-controls="dropdown-menu") View Command
+                    .dropdown-menu.command-popup(role="menu")
+                        .dropdown-content
+                            CommandPopup(:link="link")
             td
-                button.button(v-if="link.output === 'True'" @click="handleViewOutput(link)") View Output
+                //- button.button(v-if="link.output === 'True'" @click="handleViewOutput(link)") View Output
+                .dropdown.is-hoverable(v-if="link.output === 'True'")
+                    .dropdown-trigger
+                        button.button(aria-haspopup="true" aria-controls="dropdown-menu") View Output
+                    .dropdown-menu.command-popup(role="menu")
+                        .dropdown-content
+                            OutputPopup(:link="link")
                 span(v-else) No output
         ManualCommand(v-if="modals.operations.showAddManualCommand")
                 
@@ -201,8 +208,6 @@ CreateModal
 DeleteModal
 DetailsModal
 DownloadModal
-CommandModal
-OutputModal
 AddPotentialLinkModal
 </template>
 
@@ -225,7 +230,23 @@ AddPotentialLinkModal
     z-index: 1;
 }
 
-a.icon{
+.dropdown-menu.command-popup {
+    top: 0;
+    left: initial;
+    right: 100%;
+    max-height: 300px;
+    border-radius: 8px;
+    padding: 0;
+}
+.dropdown-menu.command-popup > .dropdown-content {
+    padding: 10px;
+    margin-right: 10px;
+    border: 1px solid hsl(0deg, 0%, 71%);
+    overflow-y: scroll;
+    max-height: 300px;
+}
+
+a.icon {
     text-decoration: none !important;  
 }
 

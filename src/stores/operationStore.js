@@ -5,9 +5,8 @@ export const useOperationStore = defineStore("operationStore", {
     state: () => {
         return {
             operations: [],
-            selectedOperation: "",
-            selectedLink: "",
-            selectedLinkAttrs: {},
+            selectedOperation: {},
+            selectedLink: {},
             facts: {}
         };
     },
@@ -76,28 +75,6 @@ export const useOperationStore = defineStore("operationStore", {
                 console.error("Error rerunning operation", error);
             }
         },
-        async setSelectedLinkByID($api, linkId, output) {
-            try {
-                const response = await $api.get(`/api/v2/operations/${this.selectedOperation.id}/links/${linkId}`);
-                this.selectedLink = response.data;
-                if(response.data.facts.length > 0) this.selectedLinkAttrs.facts = Array.from(new Set(response.data.facts)).sort((a, b) => b.score - a.score);
-                this.selectedLinkAttrs.command = b64DecodeUnicode(response.data.command);
-                this.selectedLinkAttrs.plainTextCommand = b64DecodeUnicode(response.data.plaintext_command);
-                this.selectedLinkAttrs.editableCommand = b64DecodeUnicode(response.data.command);
-                this.selectedLinkAttrs.results = await this.getLinkResults($api, linkId, output);
-            } catch (error) {
-                console.error("Error getting link", error);
-            }
-        },
-        async getLinkResults($api, linkId, output) {
-            if (output !== "True") return null;
-            try {
-                const response = await $api.get(`/api/v2/operations/${this.selectedOperation.id}/links/${linkId}/result`);
-                return b64DecodeUnicode(response.data.result);
-            } catch (error) {
-                console.error("Error getting link results", error);
-            }
-        },
         isOperationRunning() {
             if (!this.selectedOperation) return false;
             return !(this.selectedOperation.state === 'finished' || this.selectedOperation.state === 'cleanup' || this.selectedOperation.state === 'out_of_time');
@@ -127,11 +104,10 @@ export const useOperationStore = defineStore("operationStore", {
             }
         },
         async addPotentialLinks($api, potentialLink) {
-            // if (this.selectedOperation.state === "paused") {
-            //     throw "Operation is currently paused. New links might not be added.";
-            // }
             try {
-                await $api.post(`/api/v2/operations/${this.selectedOperation.id}/potential-links`, potentialLink);
+                for (let link of potentialLink) {
+                    await $api.post(`/api/v2/operations/${this.selectedOperation.id}/potential-links`, link);
+                }
                 await this.updateOperationChain($api);
             } catch (error) {
                 console.error("Error adding potential links", error);

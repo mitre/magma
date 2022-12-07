@@ -1,21 +1,26 @@
 <script setup>
-import { inject, ref, onMounted, reactive, computed, toRaw } from "vue";
+import { inject, ref, onMounted, reactive, computed } from "vue";
 import { storeToRefs } from "pinia";
+
 import { useCoreDisplayStore } from "../../stores/coreDisplayStore";
 import { useOperationStore } from '../../stores/operationStore';
 import { useAgentStore } from "../../stores/agentStore";
 import { useAbilityStore } from "../../stores/abilityStore";
 import { useCoreStore } from "../../stores/coreStore";
+import CodeEditor from "../core/CodeEditor.vue";
+
 const $api = inject("$api");
+
 const coreDisplayStore = useCoreDisplayStore();
 const { modals } = storeToRefs(coreDisplayStore);
 const operationStore = useOperationStore();
 const agentStore = useAgentStore();
 const abilityStore = useAbilityStore();
 const coreStore = useCoreStore();
-let selectedPotentialLink = ref();
-let potentialLinkCommand = ref();
-let potentialLinkToAdd = ref();
+
+let selectedPotentialLink = ref({});
+let selectedPotentialLinkFacts = ref({});
+let potentialLinkCommand = ref("");
 let filters = reactive({
     searchQuery: "",
     tactic: "",
@@ -33,36 +38,8 @@ const filteredAbilities = computed(() => {
     ));
 });
 
-function closeModal() {
-    modals.value.operations.showAddPotentialLink = false;
-    selectedPotentialLink.value = "";
-}
-function selectPotentialLink(link) {
-    selectedPotentialLink.value = link;
-    let selectedPotentialLinkFacts = {};
-    potentialLinkToAdd.value = {};
-    if (!selectedPotentialLink.value.ability_id) return;
-    let executor = link.executors.find((e) => filters.executor === e.name);
-    const fields = [...new Set([...executor.command.matchAll(/#{(.*?)}/gm)].map((field) => field[1]))];
-    const opSource = coreStore.sources.find((s) => s.id === operationStore.selectedOperation.source.id);
-    const opSourceCollected = coreStore.sources.find((source) => source.name === operationStore.selectedOperation.name);
-    const facts = (opSource.facts.concat(opSourceCollected ? opSourceCollected.facts : [])).concat(operationStore.facts);
-    potentialLinkCommand.value = executor.command;
-
-    fields.filter((field) => facts.find((fact) => fact.name === field)).forEach((field) => {
-        selectedPotentialLinkFacts[field] = []
-        facts.filter((fact) => fact.name === field).forEach((fact) => {
-            selectedPotentialLinkFacts[field].push({
-                value: fact.value,
-                origin: fact.origin_type,
-                selected: false
-            });
-        });
-    });
-
-    if (operationStore.selectedOperation.state === "paused") {
-        // TODO: let user know operation is paused and new link might not be added
-    }
+const potentialLinksToAdd = computed(() => {
+    let links = [];    
     function cartesian(args) {
         if (!args.length) return [];
         let r = [], max = args.length - 1;
@@ -78,24 +55,26 @@ function selectPotentialLink(link) {
     }
 
     let combinations = [];
-    Object.keys(selectedPotentialLinkFacts).forEach((factName) => {
-        combinations.push(selectedPotentialLinkFacts[factName].filter((fact) => fact.selected).map((fact) => `${factName}|${fact.value}`));
+    Object.keys(selectedPotentialLinkFacts.value).forEach((factName) => {
+        combinations.push(selectedPotentialLinkFacts.value[factName].filter((fact) => fact.selected).map((fact) => `${factName}|${fact.value}`));
     });
     combinations = cartesian(combinations);
+
+    let executor;
     if (selectedPotentialLink.value.executors) {
         executor = selectedPotentialLink.value.executors.find((e) => filters.executor === e.name);
     }
 
     if (!combinations.length) {
-        potentialLinkToAdd.value = {
+        links.push({
             ability: selectedPotentialLink.value,
             paw: filters.agent.paw,
             executor: {
                 ...executor,
                 command: potentialLinkCommand.value
             }
-        };
-        return;
+        });
+        return links;
     }
 
     combinations.forEach((factGroup) => {
@@ -105,18 +84,54 @@ function selectPotentialLink(link) {
             command = command.replaceAll(`#{${split[0]}}`, split[1])
         });
 
-        potentialLinkToAdd.value = {
+        links.push({
             ability: selectedPotentialLink.value,
             paw: filters.agent.paw,
             executor: {
                 ...executor,
                 command: command
             }
-        };
+        });
     });
+
+    return links;
+});
+
+function closeModal() {
+    modals.value.operations.showAddPotentialLink = false;
+    selectedPotentialLink.value = {};
 }
+
+function selectPotentialLink(link) {
+    selectedPotentialLink.value = link;
+    selectedPotentialLinkFacts.value = {};
+    if (!selectedPotentialLink.value.ability_id) return;
+
+    let executor = link.executors.find((e) => filters.executor === e.name);
+    const fields = [...new Set([...executor.command.matchAll(/#{(.*?)}/gm)].map((field) => field[1]))];
+    const opSource = coreStore.sources.find((s) => s.id === operationStore.selectedOperation.source.id);
+    const opSourceCollected = coreStore.sources.find((source) => source.name === operationStore.selectedOperation.name);
+    const facts = (opSource.facts.concat(opSourceCollected ? opSourceCollected.facts : [])).concat(operationStore.facts);
+    potentialLinkCommand.value = executor.command;
+
+    fields.filter((field) => facts.find((fact) => fact.name === field)).forEach((field) => {
+        selectedPotentialLinkFacts.value[field] = []
+        facts.filter((fact) => fact.name === field).forEach((fact) => {
+            selectedPotentialLinkFacts.value[field].push({
+                value: fact.value,
+                origin: fact.origin_type,
+                selected: false
+            });
+        });
+    });
+
+    if (operationStore.selectedOperation.state === "paused") {
+        // TODO: let user know operation is paused and new link might not be added
+    }
+}
+
 async function addPotentialLink() {
-    await operationStore.addPotentialLinks($api, toRaw(potentialLinkToAdd.value));
+    await operationStore.addPotentialLinks($api, JSON.parse(JSON.stringify(potentialLinksToAdd.value)));
     closeModal();
 }
 
@@ -139,7 +154,7 @@ onMounted(async () => {
     .modal-card
         header.modal-card-head 
             p.modal-card-title Add Potential Links
-        .modal-card-body(v-if="!selectedPotentialLink")
+        .modal-card-body(v-if="!selectedPotentialLink.name")
             .field.is-horizontal
                 .field-label.is-normal 
                     label.label Agent
@@ -148,6 +163,7 @@ onMounted(async () => {
                         .control
                             .select.is-fullwidth
                                 select(v-model="filters.agent")
+                                    option(disabled default value="") Select an agent
                                     option(v-for="agent in agentStore.agents" :key="agent.paw" :value="agent") {{ `${agent.display_name} - ${agent.paw}` }}
             .field.is-horizontal
                 .field-label.is-normal 
@@ -157,6 +173,7 @@ onMounted(async () => {
                         .control
                             .select.is-fullwidth
                                 select(v-model="filters.executor")
+                                    option(disabled default value="") Select an executor
                                     option(v-if="filters.agent" v-for="executor in filters.agent.executors" :key="executor" :value="executor") {{ executor }}
             .field.is-horizontal
                 .field-label.is-normal 
@@ -186,9 +203,9 @@ onMounted(async () => {
                                     option(default value="") All techniques
                                     option(v-for="technique in abilityStore.techniques" :key="technique" :value="technique") {{ technique }}
             hr
-            .is-flex
-                h1.is-size-4 Select a potential link
-                h1.is-size-4.ml-auto.mr-5 {{ `${filteredAbilities.length} potential links`}}
+            .is-flex.is-justify-content-space-between.content
+                h3 Select a potential link
+                h3.m-0 {{ `${filteredAbilities.length} available links` }}
             .is-flex.is-flex-wrap-wrap.is-align-content-flex-start
                 .box.mb-2.mr-2.p-3.ability(v-for="ability in filteredAbilities" @click="selectPotentialLink(ability)")
                     .is-flex.is-justify-content-space-between.is-align-items-center.mb-1
@@ -198,33 +215,51 @@ onMounted(async () => {
                     strong {{ ability.name }}
                     p.help.mb-0 {{ ability.description }}
         .modal-card-body(v-else)
-            span.is-size-3 {{ `${selectedPotentialLink.name}` }}
-            span.is-size-5 {{ ` (${selectedPotentialLink.technique_id})` }}
-            p.is-size-5 {{ `${selectedPotentialLink.description}` }}
+            .content
+                .is-flex.is-align-items-end.mb-2
+                    h1.m-0 {{ `${selectedPotentialLink.name}` }}
+                    p.ml-4 {{ ` ${selectedPotentialLink.technique_id} - ${selectedPotentialLink.technique_name}` }}
+                p {{ `${selectedPotentialLink.description}` }}
             hr
-            h1.is-size-5.has-text-centered.has-text-weight-bold Fact Templates
-            p(v-if="Object.keys(selectedPotentialLink).length") This link needs facts in order to run properly. Select one value for each fact to add one potential link, otherwise, select multiple values and a potential link will be added for each possible combination.
+
+            label.label.has-text-centered Fact Templates
+            div(v-if="Object.keys(selectedPotentialLinkFacts).length") 
+                p.block This link needs facts in order to run properly. Select one value for each fact to add one potential link, otherwise, select multiple values and a potential link will be added for each possible combination.
+                .block(v-for="factName in Object.keys(selectedPotentialLinkFacts)")
+                    span.icon-text 
+                        label.label.mb-0 {{ factName }}
+                        span.icon.has-text-warning(
+                            v-if="selectedPotentialLinkFacts[factName] ? selectedPotentialLinkFacts[factName].every((fact) => !fact.selected) : false"
+                            v-tooltip="`There are currently empty fact templates. You can still add this link but it may not run properly.`"
+                            )
+                            font-awesome-icon(icon="fa-exclamation-triangle")
+                    div(v-for="fact in selectedPotentialLinkFacts[factName]")
+                        label.checkbox
+                            input.mr-2(type="checkbox" v-model="fact.selected")
+                            span.mr-2 {{ fact.value }}
+                            span.tag.mr-2 {{ fact.origin }}
             p(v-else) This link has no fact templates.
-            h1.is-size-5.has-text-centered.has-text-weight-bold Link Command 
-            p You can edit the link's command here. Editing the fact templates (<code>\#{...}</code>) may result in unexpected behavior.
-            textarea.input.is-family-monospace(v-model="potentialLinkCommand")
+            
+            label.label.has-text-centered.mt-3 Link Command 
+            p.block You can edit the link's command here. Editing the fact templates (<code>\#{...}</code>) may result in unexpected behavior.
+            CodeEditor(v-model="potentialLinkCommand" language="bash" line-numbers)
         footer.modal-card-foot
             button.button(@click="closeModal()") Cancel 
             button.button(v-if="selectedPotentialLink" @click="selectedPotentialLink = ''") Back
-            button.button.is-primary.ml-auto(@click="addPotentialLink()") Add Potential Link
+            button.button.is-primary.ml-auto(@click="addPotentialLink()") Add {{ potentialLinksToAdd.length }} Potential Link{{ potentialLinksToAdd.length > 1 ? 's' : '' }}
             
 </template>
 
 <style scoped>
 .modal-card {
-    width: 80%;
+    width: 60%;
 }
-@media(max-width: 1200px) {
+@media(max-width: 1500px) {
     .box.ability {
         width: 98%;
     }
 }
-@media(min-width: 1200px) {
+@media(min-width: 1500px) {
     .box.ability {
         width: 49%;
     }

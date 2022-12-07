@@ -1,12 +1,17 @@
 <script setup>
-import {reactive, inject } from "vue";
+import { reactive, inject } from "vue";
+import { storeToRefs } from "pinia";
+
 import { useOperationStore } from "../../stores/operationStore";
 import { useCoreDisplayStore } from "../../stores/coreDisplayStore";
-import { storeToRefs } from "pinia";
+import CodeEditor from "../core/CodeEditor.vue";
+
 const operationStore = useOperationStore();
 const coreDisplayStore = useCoreDisplayStore();
 const { modals } = storeToRefs(coreDisplayStore);
+
 const $api = inject("$api");
+
 const manualCommand = reactive({
     agent: operationStore.selectedOperation.host_group[0],
     executor: {
@@ -17,8 +22,8 @@ const manualCommand = reactive({
     paw: "",
 });
 
-function addManualCommand(){
-    if(manualCommand.executor.command.length <= 0) {
+function addManualCommand() {
+    if (manualCommand.executor.command.length <= 0) {
         //TODO tell user to enter manual command
         return;
     }
@@ -34,25 +39,24 @@ function addManualCommand(){
 </script>
 
 <template lang="pug">
-tr(id="input-command")
-    td
-    td
+tr(id="manual-input-command")
     td New Manual Command
-    td
-        .select
-            select(v-model="manualCommand.agent")
-                option(v-for="(agent, idx) in operationStore.selectedOperation.host_group" :key="agent.paw" :value="agent") {{ `${agent.display_name} - ${agent.paw}` }}
-    td
-        .select 
-            select(v-model="manualCommand.executor.name")
-                option(v-for="(executor) in manualCommand.agent.executors" :key="executor" :value="executor") {{`${executor}`}}
     td(colspan="2")
-        textarea.textarea(v-model="manualCommand.executor.command")
-    td.is-flex.is-flex-direction-column
-        button.button.is-primary(@click="addManualCommand()") Add Command 
-        button.button.mt-2(@click="modals.operations.showAddManualCommand = false") Cancel
-        
+        .control
+            .select
+                select(v-model="manualCommand.agent")
+                    option(disabled default value="") Select an agent
+                    option(v-for="(agent, idx) in operationStore.selectedOperation.host_group" :key="agent.paw" :value="agent") {{ `${agent.display_name} - ${agent.paw}` }}
+    td
+        .control
+            .select 
+                select(v-model="manualCommand.executor.name")
+                    option(disabled default value="") Select an executor
+                    option(v-for="(executor) in manualCommand.agent.executors" :key="executor" :value="executor") {{`${executor}`}}
+    td(colspan="3")
+        CodeEditor(v-model="manualCommand.executor.command" language="bash" line-numbers)
+    td
+        .is-flex.is-flex-direction-column.is-justify-content-center
+            button.button.is-primary(@click="addManualCommand()" :disabled="!manualCommand.agent || !manualCommand.executor.command || !manualCommand.executor.name") Add Command 
+            button.button.mt-2(@click="modals.operations.showAddManualCommand = false") Cancel 
 </template>
-
-<style scoped>
-</style>

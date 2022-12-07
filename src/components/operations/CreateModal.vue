@@ -1,23 +1,27 @@
 <script setup>
 import { ref, inject, onMounted } from "vue";
 import { storeToRefs } from "pinia";
+
 import { useCoreDisplayStore } from "../../stores/coreDisplayStore";
 import { useOperationStore } from '../../stores/operationStore';
 import { useAdversaryStore } from "../../stores/adversaryStore";
 import { useCoreStore } from "../../stores/coreStore";
 import { useAgentStore } from "../../stores/agentStore";
+
 const $api = inject("$api");
+
 const coreDisplayStore = useCoreDisplayStore();
 const adversaryStore = useAdversaryStore();
 const operationStore = useOperationStore();
 const coreStore = useCoreStore();
 const agentStore = useAgentStore();
 const { modals } = storeToRefs(coreDisplayStore);
+
 let operationName = ref("");
 let selectedAdversary = ref("");
 let selectedSource = ref("")
 let selectedGroup = ref("");
-let selectedObfuscator = ref({name: "plain-text"});
+let selectedObfuscator = ref({ name: "plain-text" });
 let selectedPlanner = ref();
 let isAuto = ref(true);
 let isDefParser = ref(true);
@@ -29,6 +33,7 @@ let visibility = ref(51);
 let validation = ref({
     name: "",
 });
+
 onMounted(async () => {
     await agentStore.getAgents($api);
     agentStore.updateAgentGroups();
@@ -183,15 +188,16 @@ async function createOperation() {
                 .field-body
                     input(type="range" min="0" max="100" v-model="visibility")
                     label.label.ml-2 {{ `${visibility}` }}
-        footer.modal-card-foot 
-            button.button.is-primary(@click="createOperation()") Start 
+        footer.modal-card-foot.is-justify-content-right
             button.button(@click="modals.operations.showCreate = false") Cancel
+            button.button.is-primary(@click="createOperation()") Start 
 </template>
 
 <style scoped>
 .modal-card {
     width: 800px;
 }
+
 .field-label label{
     font-size: 0.9rem;
 }
