@@ -11,12 +11,8 @@ export const useCoreDisplayStore = defineStore("coreDisplayStore", {
           showConfig: false,
           showDetails: false
         },
-        abilities: {
-          showAbilitySelection: false
-        },
         adversaries: {
           showFactBreakdown: false,
-          showAddFromAdversary: false,
           showImport: false,
           showDetails: false,
         },

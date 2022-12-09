@@ -2,8 +2,8 @@
 import { storeToRefs } from "pinia";
 import { reactive, ref, inject, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
-import { useAbilityStore } from "../stores/abilityStore";
-import CreateEditAbility from "../components/abilities/CreateEditAbility.vue";
+import { useAbilityStore } from "@/stores/abilityStore";
+import CreateEditAbility from "@/components/abilities/CreateEditAbility.vue";
 
 const $api = inject("$api");
 const route = useRoute();

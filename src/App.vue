@@ -24,7 +24,7 @@ onMounted(() => {
     Suspense
         Navigation
 
-    main.is-fullwidth
+    main
         PageTabs
 
         .p-4#router
@@ -41,6 +41,10 @@ onMounted(() => {
 <style>
 /* GLOBAL STYLES */
 @import "/src/assets/css/custom-bulma.css";
+
+main {
+    width: calc(100% - 220px);
+}
 
 .code {
     font-family: monospace;

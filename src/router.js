@@ -57,8 +57,8 @@ const router = createRouter({
       component: OperationsView,
     },
     {
-      path: "/fact sources",
-      name: "fact sources",
+      path: "/factsources",
+      name: "factsources",
       component: FactSourcesView,
     },
     {
@@ -87,8 +87,8 @@ const router = createRouter({
       component: SettingsView,
     },
     {
-      path: "/exfilled files",
-      name: "exfilled files",
+      path: "/exfilledfiles",
+      name: "exfilledfiles",
       component: ExfilledFilesView,
     },
     {

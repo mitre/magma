@@ -1,21 +1,25 @@
 <script setup>
 import { ref, computed } from "vue";
-import { useCoreDisplayStore } from "../../stores/coreDisplayStore";
-import { useAdversaryStore } from "../../stores/adversaryStore";
-import { useAbilityStore } from "../../stores/abilityStore";
 import { storeToRefs } from "pinia";
 
+import { useCoreDisplayStore } from "@/stores/coreDisplayStore";
+import { useAdversaryStore } from "@/stores/adversaryStore";
+import { useAbilityStore } from "@/stores/abilityStore";
+
+const props = defineProps({ 
+    active: Boolean,
+});
+const emit = defineEmits(['select', 'close']);
+
 const adversaryStore = useAdversaryStore();
-const { adversaries, selectedAdversaryAbilities } = storeToRefs(adversaryStore);
+const { adversaries } = storeToRefs(adversaryStore);
 const abilityStore = useAbilityStore();
 const { abilities } = storeToRefs(abilityStore);
-const coreDisplayStore = useCoreDisplayStore();
-const { modals } = storeToRefs(coreDisplayStore);
 
 const adversaryId = ref("");
 const adversaryAbilities = ref([]);
 
-const abilitiesToAdd = computed(() => adversaryAbilities.value.filter((ability) => ability.selected));
+const selectedAbilities = computed(() => adversaryAbilities.value.filter((ability) => ability.selected));
 
 function getAdversaryAbilities() {
     adversaryAbilities.value = adversaries.value
@@ -27,15 +31,14 @@ function getAdversaryAbilities() {
         }));
 }
 
-function addAbilities() {
-    selectedAdversaryAbilities.value = selectedAdversaryAbilities.value.concat(abilitiesToAdd.value);
-    modals.value.adversaries.showAddFromAdversary = false;
+function selectAbilities() {
+    emit('select', selectedAbilities.value);
 }
 </script>
 
 <template lang="pug">
-.modal(:class="{ 'is-active': modals.adversaries.showAddFromAdversary }")
-    .modal-background(@click="modals.adversaries.showAddFromAdversary = false")
+.modal(:class="{ 'is-active': props.active }")
+    .modal-background(@click="emit('close')")
     .modal-card 
         header.modal-card-head 
             p.modal-card-title Add Abilities from Adversary
@@ -59,10 +62,10 @@ function addAbilities() {
                         strong.mr-3 {{ ability.name }}
                         span.mr-3 {{ ability.tactic }}
         footer.modal-card-foot.is-flex.is-justify-content-flex-end 
-            button.button(@click="modals.adversaries.showAddFromAdversary = false") Close
-            button.button.is-primary(@click="addAbilities()")
+            button.button(@click="emit('close')") Close
+            button.button.is-primary(@click="selectAbilities()")
                 span.icon
                     font-awesome-icon(icon="fas fa-plus")
-                span Add {{ abilitiesToAdd.length }} Abilities
+                span Select {{ selectedAbilities.length }} Abilities
 </template>
     

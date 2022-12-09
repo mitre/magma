@@ -2,21 +2,23 @@
 import { inject, ref, onMounted, reactive, computed } from "vue";
 import { storeToRefs } from "pinia";
 
-import { useCoreDisplayStore } from "../../stores/coreDisplayStore";
-import { useOperationStore } from '../../stores/operationStore';
-import { useAgentStore } from "../../stores/agentStore";
-import { useAbilityStore } from "../../stores/abilityStore";
-import { useCoreStore } from "../../stores/coreStore";
-import CodeEditor from "../core/CodeEditor.vue";
+import { useCoreDisplayStore } from "@/stores/coreDisplayStore";
+import { useOperationStore } from '@/stores/operationStore';
+import { useAgentStore } from "@/stores/agentStore";
+import { useAbilityStore } from "@/stores/abilityStore";
+import { useSourceStore } from "@/stores/sourceStore";
+import CodeEditor from "@/components/core/CodeEditor.vue";
 
 const $api = inject("$api");
 
 const coreDisplayStore = useCoreDisplayStore();
 const { modals } = storeToRefs(coreDisplayStore);
 const operationStore = useOperationStore();
+const { selectedOperation } = storeToRefs(operationStore);
 const agentStore = useAgentStore();
 const abilityStore = useAbilityStore();
-const coreStore = useCoreStore();
+const sourceStore = useSourceStore();
+const { sources } = storeToRefs(sourceStore);
 
 let selectedPotentialLink = ref({});
 let selectedPotentialLinkFacts = ref({});
@@ -109,8 +111,8 @@ function selectPotentialLink(link) {
 
     let executor = link.executors.find((e) => filters.executor === e.name);
     const fields = [...new Set([...executor.command.matchAll(/#{(.*?)}/gm)].map((field) => field[1]))];
-    const opSource = coreStore.sources.find((s) => s.id === operationStore.selectedOperation.source.id);
-    const opSourceCollected = coreStore.sources.find((source) => source.name === operationStore.selectedOperation.name);
+    const opSource = sources.find((s) => s.id === selectedOperation.source.id);
+    const opSourceCollected = sources.find((source) => source.name === selectedOperation.name);
     const facts = (opSource.facts.concat(opSourceCollected ? opSourceCollected.facts : [])).concat(operationStore.facts);
     potentialLinkCommand.value = executor.command;
 
@@ -125,7 +127,7 @@ function selectPotentialLink(link) {
         });
     });
 
-    if (operationStore.selectedOperation.state === "paused") {
+    if (selectedOperation.state === "paused") {
         // TODO: let user know operation is paused and new link might not be added
     }
 }
@@ -142,7 +144,7 @@ onMounted(async () => {
         filters.executor = filters.agent.executors[0];
     }
     await abilityStore.getAbilities($api);
-    await coreStore.getSources($api);
+    await sourceStore.getSources($api);
     await operationStore.getFacts($api);
 });
 

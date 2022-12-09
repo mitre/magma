@@ -1,15 +1,19 @@
 <script setup>
-import { ref, reactive, computed } from 'vue';
-import { useCoreDisplayStore } from "../../stores/coreDisplayStore";
-import { useAbilityStore } from "../../stores/abilityStore";
+import { ref, reactive, computed, inject, onMounted } from 'vue';
 import { storeToRefs } from "pinia";
-import CreateEditAbility from "../abilities/CreateEditAbility.vue";
-import AutoSuggest from "../core/AutoSuggest.vue";
 
-const emit = defineEmits(['select']);
+import { useAbilityStore } from "@/stores/abilityStore";
+import CreateEditAbility from "@/components/abilities/CreateEditAbility.vue";
+import AutoSuggest from "@/components/core/AutoSuggest.vue";
 
-const coreDisplayStore = useCoreDisplayStore();
-const { modals } = storeToRefs(coreDisplayStore);
+const props = defineProps({ 
+    active: Boolean,
+    canCreate: Boolean
+});
+const emit = defineEmits(['select', 'close']);
+
+const $api = inject("$api");
+
 const abilityStore = useAbilityStore();
 const { abilities, tactics, techniqueIds, techniqueNames } = storeToRefs(abilityStore);
 
@@ -35,6 +39,10 @@ const hasFiltersApplied = computed(() => {
     return filters.searchQuery || filters.tactic || filters.techniqueId || filters.techniqueName;
 });
 
+onMounted(async () => {
+    await abilityStore.getAbilities($api);
+});
+
 function clearFilters() {
     filters.searchQuery = "";
     filters.tactic = "";
@@ -48,8 +56,8 @@ function createAbility() {
 </script>
 
 <template lang="pug">
-.modal(:class="{ 'is-active': modals.abilities.showAbilitySelection }")
-    .modal-background(@click="modals.abilities.showAbilitySelection = false")
+.modal(:class="{ 'is-active': props.active }")
+    .modal-background(@click="emit('close')")
     .modal-card 
         header.modal-card-head 
             p.modal-card-title Select Ability
@@ -83,14 +91,14 @@ function createAbility() {
                 p.mt-1 {{ ability.name }}
                 p.help {{ ability.description }}
         footer.modal-card-foot.is-flex.is-justify-content-space-between
-            button.button(@click="createAbility()")
+            button.button(v-if="props.canCreate" @click="createAbility()")
                 span.icon
                     font-awesome-icon(icon="fas fa-plus")
                 span Create an Ability
-            button.button(@click="modals.abilities.showAbilitySelection = false") Close
+            button.button(@click="emit('close')") Close
 
 //- Modals
-CreateEditAbility(:ability="{}" :active="showCreateAbilityModal" :creating="true" @close="showCreateAbilityModal = false")
+CreateEditAbility(v-if="props.canCreate" :ability="{}" :active="showCreateAbilityModal" :creating="true" @close="showCreateAbilityModal = false")
 </template>
 
 <style scoped>

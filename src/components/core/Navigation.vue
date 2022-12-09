@@ -83,13 +83,13 @@ async function enablePlugin(pluginName) {
             li
                 router-link.menu-item(to="/settings") settings
             li
-                router-link.menu-item(to="/fact sources") fact sources
+                router-link.menu-item(to="/factsources") fact sources
             li
                 router-link.menu-item(to="/objectives") objectives
             li
                 router-link.menu-item(to="/contacts") contacts
             li
-                router-link.menu-item(to="/exfilled files") exfilled files
+                router-link.menu-item(to="/exfilledfiles") exfilled files
         p.menu-label
             font-awesome-icon(icon="fas fa-book").pr-2
             | Resources
@@ -139,10 +139,10 @@ async function enablePlugin(pluginName) {
             .dropdown-menu(role="menu")
                 .dropdown-content.ml-2
                     router-link.dropdown-item(to="/settings") settings
-                    router-link.dropdown-item(to="/fact sources") fact sources
+                    router-link.dropdown-item(to="/factsources") fact sources
                     router-link.dropdown-item(to="/objectives") objectives
                     router-link.dropdown-item(to="/contacts") contacts
-                    router-link.dropdown-item(to="/exfilled files") exfilled files
+                    router-link.dropdown-item(to="/exfilledfiles") exfilled files
         .dropdown.is-hoverable.mb-2
             .dropdown-trigger
                 button.button(aria-haspopup="true" aria-controls="dropdown-menu")
@@ -179,7 +179,8 @@ async function enablePlugin(pluginName) {
 #navigation {
     position: relative;
     background-color: #060606;
-    width: 250px;
+    width: 220px;
+    min-width: 220px;
 }
 #navigation.collapsed {
     width: 50px;

@@ -2,20 +2,23 @@
 import { ref, inject, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 
-import { useCoreDisplayStore } from "../../stores/coreDisplayStore";
-import { useOperationStore } from '../../stores/operationStore';
-import { useAdversaryStore } from "../../stores/adversaryStore";
-import { useCoreStore } from "../../stores/coreStore";
-import { useAgentStore } from "../../stores/agentStore";
+import { useCoreDisplayStore } from "@/stores/coreDisplayStore";
+import { useOperationStore } from '@/stores/operationStore';
+import { useAdversaryStore } from "@/stores/adversaryStore";
+import { useCoreStore } from "@/stores/coreStore";
+import { useAgentStore } from "@/stores/agentStore";
+import { useSourceStore } from "@/stores/sourceStore";
 
 const $api = inject("$api");
 
 const coreDisplayStore = useCoreDisplayStore();
+const { modals } = storeToRefs(coreDisplayStore);
 const adversaryStore = useAdversaryStore();
 const operationStore = useOperationStore();
 const coreStore = useCoreStore();
 const agentStore = useAgentStore();
-const { modals } = storeToRefs(coreDisplayStore);
+const sourceStore = useSourceStore();
+const { sources } = storeToRefs(sourceStore);
 
 let operationName = ref("");
 let selectedAdversary = ref("");
@@ -45,8 +48,8 @@ onMounted(async () => {
 
 async function getSources() {
     try {
-        await coreStore.getSources($api);
-        selectedSource.value = coreStore.sources.find(source => source.name === "basic");
+        await sourceStore.getSources($api);
+        selectedSource.value = sources.find(source => source.name === "basic");
     } catch(error) {
         console.error("Error getting sources", error);
     }
@@ -120,7 +123,7 @@ async function createOperation() {
                         .select
                             select(v-model="selectedSource")
                                 option(disabled selected value="") Choose a Fact Source 
-                                option(v-for="source in coreStore.sources" :key="source.id" :value="source") {{ `${source.name}` }}
+                                option(v-for="source in sources" :key="source.id" :value="source") {{ `${source.name}` }}
             .field.is-horizontal 
                 .field-label.is-normal 
                     label.label Group
