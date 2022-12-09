@@ -107,19 +107,19 @@ function displayManualCommand() {
                     font-awesome-icon(icon="fas fa-plus") 
                 span New Operation
     .column.is-4.m-0
-        .buttons.is-justify-content-right
-            button.button.mr-2(v-if="operationStore.selectedOperation" @click="modals.operations.showDownload = true" type="button")
+        .buttons.is-justify-content-right(v-if="operationStore.selectedOperation.id")
+            button.button.mr-2(@click="modals.operations.showDownload = true" type="button")
                 span.icon
                     font-awesome-icon(icon="fas fa-save")
                 span Download Report
-            button.button.is-danger.is-outlined(v-if="operationStore.selectedOperation" @click="modals.operations.showDelete = true" type="button")
+            button.button.is-danger.is-outlined(@click="modals.operations.showDelete = true" type="button")
                 span.icon
                     font-awesome-icon(icon="fas fa-trash")
                 span Delete Operation
 hr.mt-2
 
 //- Control Panel
-.control-panel.p-0.mb-4(v-if="operationStore.selectedOperation")
+.control-panel.p-0.mb-4(v-if="operationStore.selectedOperation.id")
     .columns.m-0.p-1
         .column.is-4.pt-0.pb-0.is-flex
             .buttons
@@ -162,7 +162,7 @@ hr.mt-2
                 label.label(for="switchManual") {{ operationStore.selectedOperation.autonomous ? 'Autonomous' : 'Manual' }} 
         
 //- Table
-table.table.is-fullwidth.is-narrow.is-striped.mb-8(v-if="operationStore.selectedOperation" id="link-table")
+table.table.is-fullwidth.is-narrow.is-striped.mb-8#link-table(v-if="operationStore.selectedOperation.id")
     thead
         tr
             th Time Ran

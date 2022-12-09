@@ -49,7 +49,7 @@ onMounted(async () => {
 async function getSources() {
     try {
         await sourceStore.getSources($api);
-        selectedSource.value = sources.find(source => source.name === "basic");
+        selectedSource.value = sources.value.find(source => source.name === "basic");
     } catch(error) {
         console.error("Error getting sources", error);
     }

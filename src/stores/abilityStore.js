@@ -58,6 +58,14 @@ export const useAbilityStore = defineStore("abilityStore", {
             } catch(error) {
                 console.error("Error saving ability", error);
             }
+        },
+        async deleteAbility($api, abilityId) {
+            try {
+                await $api.delete(`/api/v2/abilities/${abilityId}`);
+                this.abilities.splice(this.abilities.findIndex((ability) => ability.ability_id === abilityId), 1);
+            } catch(error) {
+                console.error("Error fetching abilities", error);
+            }
         }
     },
 });

@@ -55,6 +55,11 @@ function validateAndSave() {
         emit('close');
     }
 }
+
+async function deleteAbility() {
+    await abilityStore.deleteAbility($api, abilityToEdit.value.ability_id);
+    emit('close');
+}
 </script>
 
 <template lang="pug">
@@ -168,6 +173,10 @@ function validateAndSave() {
                     span.icon
                         font-awesome-icon(icon="fas fa-undo")
                     span Reset
+                button.button.is-danger.is-outlined(@click="deleteAbility()") 
+                    span.icon
+                        font-awesome-icon(icon="fas fa-trash")
+                    span Delete
             .is-flex
                 button.button(@click="emit('close')") Cancel 
                 button.button.is-primary(@click="validateAndSave()")
