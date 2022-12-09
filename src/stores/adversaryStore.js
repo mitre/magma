@@ -6,7 +6,9 @@ export const useAdversaryStore = defineStore("adversaryStore", {
         return {
             adversaries: [],
             selectedAdversary: {},
-            selectedAdversaryAbilities: []
+            selectedAdversaryAbilities: [],
+            objectives: [],
+            selectedObjective: {}
         };
     },
     actions: {
@@ -16,6 +18,30 @@ export const useAdversaryStore = defineStore("adversaryStore", {
                 this.adversaries = response.data;
             } catch(error) {
                 console.error("Error fetching adversaries", error);
+            }
+        },
+        async getObjectives($api) {
+            try {
+                const response = await $api.get("/api/v2/objectives");
+                this.objectives = response.data;
+            } catch(error) {
+                console.error("Error fetching objectives", error);
+            }
+        },
+        async createObjective($api) {
+            try {
+                const response = await $api.post("/api/v2/objectives", { name: "New objective", description: "Enter a description" });
+                this.objectives.push(response.data);
+                this.selectedObjective = this.objectives[this.objectives.length - 1];
+            } catch(error) {
+                console.error("Error creating objective", error);
+            }
+        },
+        async saveObjective($api) {
+            try {
+                await $api.put(`/api/v2/objectives/${this.selectedObjective.id}`, this.selectedObjective);
+            } catch(error) {
+                console.error("Error saving objective", error);
             }
         },
         async createAdversary($api, adversary = null) {

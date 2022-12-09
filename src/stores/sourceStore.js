@@ -16,9 +16,6 @@ export const useSourceStore = defineStore("sourceStore", {
                 console.error("Error getting sources", error);
             }
         },
-        async selectSource(sourceId) {
-            this.selectedSource = this.sources.find((source) => source.id === sourceId);
-        },
         async saveSource($api) {
             try {
                 const response = await $api.put(`/api/v2/sources/${this.selectedSource.id}`, this.selectedSource);

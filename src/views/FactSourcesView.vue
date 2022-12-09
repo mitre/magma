@@ -12,7 +12,6 @@ const $api = inject("$api");
 const sourceStore = useSourceStore();
 const { sources, selectedSource } = storeToRefs(sourceStore);
 
-let selectedSourceId = ref("");
 let isEditingName = ref(false);
 let newSourceName = ref("");
 
@@ -28,14 +27,12 @@ function saveSource() {
 
 async function createSource(duplicate) {
     const newSource = await sourceStore.createSource($api, duplicate);
-    selectedSourceId.value = newSource.id;
-    sourceStore.selectSource(selectedSourceId.value);
+    selectedSource.value = newSource;
 }
 
 async function deleteSource() {
     await sourceStore.deleteSource($api);
-    selectedSourceId.value = "";
-    sourceStore.selectSource();
+    selectedSource.value = {};
 }
 </script>
 
@@ -48,15 +45,15 @@ async function deleteSource() {
         .is-flex.is-justify-content-center.is-flex-wrap-wrap
             .control.mr-2
                 .select
-                    select.has-text-centered(v-model="selectedSourceId" @change="sourceStore.selectSource(selectedSourceId)")
+                    select.has-text-centered(v-model="selectedSource")
                         option(disabled selected value="") Select a source 
-                        option(v-for="source in sources" :value="source.id") {{ source.name }}
+                        option(v-for="source in sources" :value="source") {{ source.name }}
             button.button.is-primary.mr-2(type="button" @click="createSource(false)") 
                 span.icon
                     font-awesome-icon(icon="fas fa-plus") 
                 span New Source
     .column.is-4.m-0
-        .buttons.is-justify-content-right(v-if="selectedSourceId")
+        .buttons.is-justify-content-right(v-if="selectedSource.id")
             button.button.mr-2(type="button" @click="createSource(true)")
                 span.icon
                     font-awesome-icon(icon="far fa-copy")
@@ -67,7 +64,7 @@ async function deleteSource() {
                 span Delete Source
 hr.mt-2
 
-.content(v-if="selectedSourceId")
+.content(v-if="selectedSource.id")
     .is-flex(v-if="!isEditingName")
         h3 {{ selectedSource.name }}
         button.button.ml-3(@click="newSourceName = selectedSource.name; isEditingName = true;")
