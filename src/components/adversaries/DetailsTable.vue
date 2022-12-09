@@ -1,13 +1,14 @@
 <script setup>
 import { storeToRefs } from "pinia";
 import { ref, reactive, watch, inject } from "vue";
-import { useAdversaryStore } from "../../stores/adversaryStore";
-import { useObjectiveStore } from "../../stores/objectiveStore";
-import { useCoreDisplayStore } from "../../stores/coreDisplayStore";
-import CreateEditAbility from "../abilities/CreateEditAbility.vue";
-import FactBreakdownModal from "./FactBreakdownModal.vue";
-import AddAbilitiesFromAdversaryModal from "./AddAbilitiesFromAdversaryModal.vue";
-import AbilitySelection from "../abilities/AbilitySelection.vue";
+
+import { useAdversaryStore } from "@/stores/adversaryStore";
+import { useObjectiveStore } from "@/stores/objectiveStore";
+import { useCoreDisplayStore } from "@/stores/coreDisplayStore";
+import CreateEditAbility from "@/components/abilities/CreateEditAbility.vue";
+import FactBreakdownModal from "@/components/adversaries/FactBreakdownModal.vue";
+import AddAbilitiesFromAdversaryModal from "@/components/adversaries/AddAbilitiesFromAdversaryModal.vue";
+import AbilitySelection from "@/components/abilities/AbilitySelection.vue";
 
 const $api = inject("$api");
 
@@ -41,7 +42,9 @@ let tableDragHoverId = ref(null);
 let selectedAbility = ref({});
 
 // Modals
+let showAbilitySelection = ref(false);
 let showCreateEditAbilityModal = ref(false);
+let showAddFromAdversary = ref(false);
 
 watch(selectedAdversaryAbilities, () => {
     findAbilityDependencies();
@@ -291,6 +294,12 @@ function exportAdversary() {
 
 function addAbilityToAdversary(ability) {
     selectedAdversaryAbilities.value.push(ability);
+    showAbilitySelection.value = false;
+}
+
+function addAbilitiesFromAdversary(abilities) {
+    abilities.forEach((ability) => addAbilityToAdversary(ability));
+    showAddFromAdversary.value = false;
 }
 </script>
 
@@ -311,11 +320,11 @@ form.mb-4(v-else)
 
 //- Button row
 .is-flex.is-align-items-center
-    button.button.mr-2(@click="modals.abilities.showAbilitySelection = true")
+    button.button.mr-2(@click="showAbilitySelection = true")
         span.icon 
             font-awesome-icon(icon="fas fa-plus") 
         span Add Ability 
-    button.button.mr-2(@click="modals.adversaries.showAddFromAdversary = true")
+    button.button.mr-2(@click="showAddFromAdversary = true")
         span.icon 
             font-awesome-icon(icon="fas fa-plus") 
         span Add Adversary 
@@ -389,7 +398,7 @@ table.table.is-striped.is-fullwidth.is-narrow
                 span(v-for="platform in getExecutorDetail('platforms', ability)" v-tooltip="platform")
                     span.icon.is-small.mr-2
                         font-awesome-icon(v-if="platform.includes('windows')" icon="fab fa-windows")
-                        font-awesome-icon(v-if="platform.includes('darwin')" icon="fab fa-darwin")
+                        font-awesome-icon(v-if="platform.includes('darwin')" icon="fab fa-apple")
                         font-awesome-icon(v-if="platform.includes('linux')" icon="fab fa-linux")
             td.has-text-centered(:class="{ 'unlock': onHoverUnlocks.indexOf(ability.ability_id) > -1 }")
                 span(v-if="abilityDependencies[ability.ability_id] && getExecutorDetail('requirements', ability)" v-tooltip="`This ability has requirements: (${abilityDependencies[ability.ability_id].requireTypes})`")
@@ -422,13 +431,13 @@ table.table.is-striped.is-fullwidth.is-narrow
     span One or more of the referenced abilities are not defined
 
 //- Modals
-AbilitySelection(@select="addAbilityToAdversary")
+AbilitySelection(:active="showAbilitySelection" @select="addAbilityToAdversary" @close="showAbilitySelection = false" :canCreate="true")
 
 CreateEditAbility(:ability="selectedAbility" :active="showCreateEditAbilityModal" :creating="false" @close="showCreateEditAbilityModal = false")
 
 FactBreakdownModal(:breakdown="factBreakdown")
 
-AddAbilitiesFromAdversaryModal
+AddAbilitiesFromAdversaryModal(:active="showAddFromAdversary" @select="addAbilitiesFromAdversary" @close="showAddFromAdversary = false")
 </template>
 
 <style scoped>

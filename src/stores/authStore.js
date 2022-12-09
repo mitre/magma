@@ -37,7 +37,7 @@ export const useAuthStore = defineStore({
       try {
         await $api.post("/logout");
         this.isUserAuthenticated = false;
-        router.push({ name: "login" });
+        router.push("/login");
       } catch (error) {
         console.log(error);
       }

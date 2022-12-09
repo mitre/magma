@@ -1,20 +1,31 @@
+<script setup>
+import AgentChartStatus from "@/components/agents/AgentChartStatus.vue";
+</script>
+
 <template lang="pug">
-#home
-  p Select a tab on the left to get started
-  p
-    a.has-text-underlined(href="docs/Getting-started.html" target="blank") 
-      | Getting Started Guide
-      sup
-        font-awesome-icon(icon="fas fa-external-link-alt").pl-1.is-size-7
+.columns
+  .column.is-3
+    .box.is-flex.is-flex-direction-column
+      AgentChartStatus.is-flex-grow-1
+      router-link.button.is-primary.is-fullwidth(to="/agents") 
+        span Manage Agents
+        span.icon
+          font-awesome-icon(icon="fas fa-arrow-right")
+  .column.is-3
+    .box
+      p.has-text-centered.has-text-weight-bold Operations TODO
+  .column.is-3
+    .box
+      p.has-text-centered.has-text-weight-bold Abilities TODO
+  .column.is-3
+    .box
+      p.has-text-centered.has-text-weight-bold Adversaries TODO
+
+
 </template>
 
 <style scoped>
-#home {
-  width: 100%;
-  height: 50%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+.box {
+  height: 300px;
 }
 </style>

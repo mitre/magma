@@ -1,11 +1,13 @@
 <script setup>
 import { inject, onMounted, onBeforeUnmount, ref } from "vue";
-import { useAgentStore } from '../stores/agentStore';
-import { useCoreDisplayStore } from "../stores/coreDisplayStore";
 import { storeToRefs } from "pinia";
-import DeployModal from '../components/agents/DeployModal.vue';
-import ConfigModal from '../components/agents/ConfigModal.vue';
-import DetailsModal from "../components/agents/DetailsModal.vue";
+
+import { useAgentStore } from '@/stores/agentStore';
+import { useCoreDisplayStore } from "@/stores/coreDisplayStore";
+import DeployModal from '@/components/agents/DeployModal.vue';
+import ConfigModal from '@/components/agents/ConfigModal.vue';
+import DetailsModal from "@/components/agents/DetailsModal.vue";
+import { getAgentStatus } from "@/utils/agentUtil.js";
 
 const $api = inject("$api");
 
@@ -27,20 +29,6 @@ onMounted(async () => {
 onBeforeUnmount(() => {
     clearInterval(agentRefreshInterval.value);
 })
-
-function getAgentStatus(agent) {
-    if (!agent.last_seen) return '';
-    let lastSeen = new Date(agent.last_seen).getTime();
-    let msSinceSeen = Date.now() - lastSeen;
-    // Give a buffer of 1 minute to mark an agent dead
-    let isAlive = (msSinceSeen < (agent.sleep_max * 1000));
-
-    if (msSinceSeen <= 60000 && agent.sleep_min === 3 && agent.sleep_max === 3 && agent.watchdog === 1) {
-        return 'pending kill'
-    } else {
-        return msSinceSeen <= 60000 || isAlive ? 'alive' : 'dead';
-    }
-}
 
 function removeDeadAgents() {
     agents.value.forEach((agent, index) => {

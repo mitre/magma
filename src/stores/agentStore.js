@@ -5,7 +5,8 @@ export const useAgentStore = defineStore("agentStore", {
         return {
             agents: [],
             agentConfig: {},
-            selectedAgent: {}
+            selectedAgent: {},
+            agentGroups: []
         };
     },
 
@@ -66,6 +67,10 @@ export const useAgentStore = defineStore("agentStore", {
             } catch(error) {
                 throw error;
             }
+        },
+        updateAgentGroups() {
+            if (!this.agents) return;
+            this.agentGroups = [...new Set(this.agents.map((agent) => agent.group))];
         }
     },
 });

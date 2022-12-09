@@ -19,6 +19,7 @@
     "@vitejs/plugin-vue": "^2.2.2",
     "axios": "^0.26.1",
     "bulma": "^0.9.3",
+    "bulma-switch": "^2.0.4",
     "echarts": "^5.3.1",
     "floating-vue": "^2.0.0-beta.20",
     "fs-extra": "^10.1.0",

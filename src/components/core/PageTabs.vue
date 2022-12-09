@@ -46,10 +46,12 @@ function closeTab(index, isActive) {
 
 <style scoped>
 #tabs {
+    position: fixed;
     width: 100%;
     height: 55px;
     padding: 10px;
     background-color: #111;
+    z-index: 10;
 }
 
 .tag {

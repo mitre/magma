@@ -1,12 +1,13 @@
 <script setup>
 import { inject, reactive, ref, onMounted, computed } from "vue";
 import { storeToRefs } from "pinia";
-import { useAdversaryStore } from "../stores/adversaryStore";
-import { useAbilityStore } from "../stores/abilityStore";
-import { useObjectiveStore } from "../stores/objectiveStore";
-import DetailsTable from "../components/adversaries/DetailsTable.vue";
-import { useCoreDisplayStore } from "../stores/coreDisplayStore";
-import ImportModal from "../components/adversaries/ImportModal.vue";
+
+import { useAdversaryStore } from "@/stores/adversaryStore";
+import { useAbilityStore } from "@/stores/abilityStore";
+import { useObjectiveStore } from "@/stores/objectiveStore";
+import DetailsTable from "@/components/adversaries/DetailsTable.vue";
+import { useCoreDisplayStore } from "@/stores/coreDisplayStore";
+import ImportModal from "@/components/adversaries/ImportModal.vue";
 
 const $api = inject("$api");
 
@@ -59,6 +60,7 @@ hr
                     input.input(v-model="adversarySearchQuery" placeholder="Search for an adversary...")
                 .dropdown-divider
                 a.dropdown-item(v-for="adversary in filteredAdversaries" @click="selectAdversary(adversary)" :class="{ 'is-active': adversary.adversary_id === selectedAdversary.adversary_id }") {{ adversary.name }}
+                p.has-text-centered(v-if="!filteredAdversaries.length") No results
     button.button.is-primary.mr-2(type="button" @click="adversaryStore.createAdversary($api)")
         span.icon 
             font-awesome-icon(icon="fas fa-plus") 
