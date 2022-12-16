@@ -2,9 +2,9 @@
 import { reactive, inject } from "vue";
 import { storeToRefs } from "pinia";
 
-import { useOperationStore } from "../../stores/operationStore";
-import { useCoreDisplayStore } from "../../stores/coreDisplayStore";
-import CodeEditor from "../core/CodeEditor.vue";
+import CodeEditor from "@/components/core/CodeEditor.vue";
+import { useOperationStore } from "@/stores/operationStore";
+import { useCoreDisplayStore } from "@/stores/coreDisplayStore";
 
 const operationStore = useOperationStore();
 const coreDisplayStore = useCoreDisplayStore();

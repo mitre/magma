@@ -32,7 +32,7 @@ function loadComp() {
       loadingComponent: PluginLoadingView,
       errorComponent: PluginErrorView,
       // The error component will be displayed if a timeout is provided and exceeded. Default: Infinity.
-      timeout: 4000,
+      timeout: 10000,
     });
 }
 

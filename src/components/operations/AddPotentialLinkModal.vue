@@ -1,20 +1,23 @@
-<script setup>
-import { inject, ref, onMounted, reactive, computed } from "vue";
+ <script setup>
+import { inject, ref, onMounted, reactive, computed, toRaw } from "vue";
 import { storeToRefs } from "pinia";
 
-import { useCoreDisplayStore } from "@/stores/coreDisplayStore";
+import CodeEditor from "@/components/core/CodeEditor.vue";
 import { useOperationStore } from '@/stores/operationStore';
 import { useAgentStore } from "@/stores/agentStore";
 import { useAbilityStore } from "@/stores/abilityStore";
 import { useSourceStore } from "@/stores/sourceStore";
-import CodeEditor from "@/components/core/CodeEditor.vue";
+
+const props = defineProps({ 
+    active: Boolean,
+    operation: Object,
+    agent: Object
+});
+const emit = defineEmits(['select', 'close']);
 
 const $api = inject("$api");
 
-const coreDisplayStore = useCoreDisplayStore();
-const { modals } = storeToRefs(coreDisplayStore);
 const operationStore = useOperationStore();
-const { selectedOperation } = storeToRefs(operationStore);
 const agentStore = useAgentStore();
 const abilityStore = useAbilityStore();
 const sourceStore = useSourceStore();
@@ -23,12 +26,13 @@ const { sources } = storeToRefs(sourceStore);
 let selectedPotentialLink = ref({});
 let selectedPotentialLinkFacts = ref({});
 let potentialLinkCommand = ref("");
+let potentialLinkFields = ref([]);
 let filters = reactive({
     searchQuery: "",
     tactic: "",
     technique: "",
     executor: "",
-    agent: "",
+    agent: ""
 });
 
 const filteredAbilities = computed(() => {
@@ -58,7 +62,10 @@ const potentialLinksToAdd = computed(() => {
 
     let combinations = [];
     Object.keys(selectedPotentialLinkFacts.value).forEach((factName) => {
-        combinations.push(selectedPotentialLinkFacts.value[factName].filter((fact) => fact.selected).map((fact) => `${factName}|${fact.value}`));
+        combinations.push(selectedPotentialLinkFacts.value[factName].facts.filter((fact) => fact.selected).map((fact) => `${factName}|${fact.value}`));
+        if (selectedPotentialLinkFacts.value[factName].customValue) {
+            combinations[0].push(`${factName}|${selectedPotentialLinkFacts.value[factName].customValue}`);
+        }
     });
     combinations = cartesian(combinations);
 
@@ -89,6 +96,10 @@ const potentialLinksToAdd = computed(() => {
         links.push({
             ability: selectedPotentialLink.value,
             paw: filters.agent.paw,
+            facts: factGroup.map((fact) => { 
+                let split = fact.split('|');
+                return { trait: split[0], value: '1' };
+            }),
             executor: {
                 ...executor,
                 command: command
@@ -99,48 +110,15 @@ const potentialLinksToAdd = computed(() => {
     return links;
 });
 
-function closeModal() {
-    modals.value.operations.showAddPotentialLink = false;
-    selectedPotentialLink.value = {};
-}
-
-function selectPotentialLink(link) {
-    selectedPotentialLink.value = link;
-    selectedPotentialLinkFacts.value = {};
-    if (!selectedPotentialLink.value.ability_id) return;
-
-    let executor = link.executors.find((e) => filters.executor === e.name);
-    const fields = [...new Set([...executor.command.matchAll(/#{(.*?)}/gm)].map((field) => field[1]))];
-    const opSource = sources.find((s) => s.id === selectedOperation.source.id);
-    const opSourceCollected = sources.find((source) => source.name === selectedOperation.name);
-    const facts = (opSource.facts.concat(opSourceCollected ? opSourceCollected.facts : [])).concat(operationStore.facts);
-    potentialLinkCommand.value = executor.command;
-
-    fields.filter((field) => facts.find((fact) => fact.name === field)).forEach((field) => {
-        selectedPotentialLinkFacts.value[field] = []
-        facts.filter((fact) => fact.name === field).forEach((fact) => {
-            selectedPotentialLinkFacts.value[field].push({
-                value: fact.value,
-                origin: fact.origin_type,
-                selected: false
-            });
-        });
-    });
-
-    if (selectedOperation.state === "paused") {
-        // TODO: let user know operation is paused and new link might not be added
-    }
-}
-
-async function addPotentialLink() {
-    await operationStore.addPotentialLinks($api, JSON.parse(JSON.stringify(potentialLinksToAdd.value)));
-    closeModal();
-}
+const canSelectAgent = computed(() => !props.agent || !props.agent.paw);
 
 onMounted(async () => {
     await agentStore.getAgents($api);
-    if (agentStore.agents.length > 0){
+    if (agentStore.agents.length > 0 && canSelectAgent) {
         filters.agent = agentStore.agents[0];
+        filters.executor = filters.agent.executors[0];
+    } else {
+        filters.agent = props.agent.paw;
         filters.executor = filters.agent.executors[0];
     }
     await abilityStore.getAbilities($api);
@@ -148,11 +126,45 @@ onMounted(async () => {
     await operationStore.getFacts($api);
 });
 
+function selectPotentialLink(link) {
+    selectedPotentialLink.value = link;
+    selectedPotentialLinkFacts.value = {};
+    if (!selectedPotentialLink.value.ability_id) return;
+
+    let executor = link.executors.find((e) => filters.executor === e.name);
+    potentialLinkCommand.value = executor.command;
+    potentialLinkFields.value = [...new Set([...executor.command.matchAll(/#{(.*?)}/gm)].map((field) => field[1]))];
+
+    potentialLinkFields.value.forEach((field) => {
+        selectedPotentialLinkFacts.value[field] = {
+            customValue: "",
+            facts: []
+        };
+
+        if (props.operation && props.operation.id) {
+            const opSource = sources.value.find((s) => s.id === props.operation.source.id);
+            const opSourceCollected = sources.value.find((source) => source.name === props.operation.name);
+            const facts = (opSource.facts.concat(opSourceCollected ? opSourceCollected.facts : [])).concat(operationStore.facts);
+            
+            facts.filter((fact) => fact.name === field).forEach((fact) => {
+                selectedPotentialLinkFacts.value[field].facts.push({
+                    value: fact.value,
+                    origin: fact.origin_type,
+                    selected: false
+                });
+            });
+        }
+    });
+
+    if (props.operation && props.operation.state === "paused") {
+        // TODO: let user know operation is paused and new link might not be added
+    }
+}
 </script>
 
 <template lang="pug">
-.modal(:class="{ 'is-active': modals.operations.showAddPotentialLink }")
-    .modal-background(@click="closeModal()")
+.modal(:class="{ 'is-active': props.active }")
+    .modal-background(@click="emit('close')")
     .modal-card
         header.modal-card-head 
             p.modal-card-title Add Potential Links
@@ -162,11 +174,13 @@ onMounted(async () => {
                     label.label Agent
                 .field-body
                     .field
-                        .control
+                        .control(v-if="canSelectAgent")
                             .select.is-fullwidth
                                 select(v-model="filters.agent")
                                     option(disabled default value="") Select an agent
-                                    option(v-for="agent in agentStore.agents" :key="agent.paw" :value="agent") {{ `${agent.display_name} - ${agent.paw}` }}
+                                    option(v-for="agent in agentStore.agents" :key="agent.paw" :value="agent") {{ agent.display_name }} - {{ agent.paw }}
+                        .control(v-else)
+                            p.pt-2 {{ props.agent.display_name }} - {{ props.agent.paw }}
             .field.is-horizontal
                 .field-label.is-normal 
                     label.label Executor
@@ -224,31 +238,32 @@ onMounted(async () => {
                 p {{ `${selectedPotentialLink.description}` }}
             hr
 
-            label.label.has-text-centered Fact Templates
-            div(v-if="Object.keys(selectedPotentialLinkFacts).length") 
-                p.block This link needs facts in order to run properly. Select one value for each fact to add one potential link, otherwise, select multiple values and a potential link will be added for each possible combination.
+            label.label.has-text-centered.mt-3 Link Command 
+            CodeEditor(v-model="potentialLinkCommand" language="bash" line-numbers)
+            p.help Editing the fact templates (<code>\#{...}</code>) may result in unexpected behavior.
+
+            div(v-if="potentialLinkFields.length") 
+                label.label.has-text-centered Fact Templates
+                p.mb-2 This link needs facts in order to run properly. Select at least one value for each fact, and/or add a custom value.
                 .block(v-for="factName in Object.keys(selectedPotentialLinkFacts)")
                     span.icon-text 
                         label.label.mb-0 {{ factName }}
                         span.icon.has-text-warning(
-                            v-if="selectedPotentialLinkFacts[factName] ? selectedPotentialLinkFacts[factName].every((fact) => !fact.selected) : false"
-                            v-tooltip="`There are currently empty fact templates. You can still add this link but it may not run properly.`"
-                            )
+                            v-if="selectedPotentialLinkFacts[factName].facts.every((fact) => !fact.selected) && !selectedPotentialLinkFacts[factName].customValue"
+                            v-tooltip="`There are currently empty fact templates. You can still add this link but it may not run properly.`")
                             font-awesome-icon(icon="fa-exclamation-triangle")
-                    div(v-for="fact in selectedPotentialLinkFacts[factName]")
+                    .control
+                        input.input(v-model="selectedPotentialLinkFacts[factName].customValue" type="text" placeholder="Enter a custom value")
+                    div(v-for="fact in selectedPotentialLinkFacts[factName].facts")
                         label.checkbox
                             input.mr-2(type="checkbox" v-model="fact.selected")
                             span.mr-2 {{ fact.value }}
                             span.tag.mr-2 {{ fact.origin }}
-            p(v-else) This link has no fact templates.
-            
-            label.label.has-text-centered.mt-3 Link Command 
-            p.block You can edit the link's command here. Editing the fact templates (<code>\#{...}</code>) may result in unexpected behavior.
-            CodeEditor(v-model="potentialLinkCommand" language="bash" line-numbers)
+    
         footer.modal-card-foot
-            button.button(@click="closeModal()") Cancel 
+            button.button(@click="emit('close')") Cancel 
             button.button(v-if="selectedPotentialLink" @click="selectedPotentialLink = ''") Back
-            button.button.is-primary.ml-auto(@click="addPotentialLink()") Add {{ potentialLinksToAdd.length }} Potential Link{{ potentialLinksToAdd.length > 1 ? 's' : '' }}
+            button.button.is-primary.ml-auto(@click="emit('select', potentialLinksToAdd)") Add {{ potentialLinksToAdd.length }} Potential Link{{ potentialLinksToAdd.length > 1 ? 's' : '' }}
             
 </template>
 

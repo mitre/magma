@@ -1,9 +1,10 @@
 <script setup>
 import { inject, ref, reactive, watch } from "vue";
-import { useAbilityStore } from "../../stores/abilityStore";
 import { storeToRefs } from "pinia";
-import AutoSuggest from "../core/AutoSuggest.vue";
-import CodeEditor from "../core/CodeEditor.vue";
+
+import { useAbilityStore } from "@/stores/abilityStore";
+import CodeEditor from "@/components/core/CodeEditor.vue";
+import AutoSuggest from "@/components/core/AutoSuggest.vue";
 
 const props = defineProps({ 
     ability: Object,

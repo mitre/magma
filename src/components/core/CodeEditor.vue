@@ -14,11 +14,11 @@ const { modelValue, lineNumbers, language } = defineProps({
     lineNumbers: Boolean,
     language: String,
 });
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue']); 
 
 let focused = ref(false);
 
-function highlighter(code) {
+function highlighter(code) { 
     let lang = languages[language];
 
     if (language === "bash") {

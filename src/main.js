@@ -1,10 +1,11 @@
 import { createApp } from "vue";
 import { createPinia } from "pinia";
-import App from "./App.vue";
-import router from "./router";
 import VueScrollTo from "vue-scrollto";
 import axios from "axios";
 import FloatingVue from "floating-vue";
+
+import App from "@/App.vue";
+import router from "@/router.js";
 
 // Global styles
 import 'floating-vue/dist/style.css';
@@ -20,7 +21,7 @@ app.provide("$api", $api);
 app.use(createPinia());
 app.use(router);
 app.use(VueScrollTo);
-app.use(FloatingVue)
+app.use(FloatingVue);
 
 // Font awesome icons, add more icons here as needed
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -28,12 +29,12 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 import { 
   faAngleDown, faAngleRight, faAngleUp, faAnglesLeft, faAnglesRight, faArrowRight, faBan, faBook, faCheck, faCog, faDownload, faExclamationTriangle, 
-  faExternalLinkAlt, faFileExport, faFileImport, faFlag, faKey, faLock, faMinus, faPause, faPencilAlt, faPlay, faPlus, faPuzzlePiece, faRedo, faSave, 
+  faExternalLinkAlt, faFileExport, faFileImport, faFlag, faKey, faLock, faMinus, faPause, faPencilAlt, faPlay, faPlus, faPuzzlePiece, faRedo, faRunning, faSave, 
   faSearch, faSkullCrossbones, faSignOutAlt, faStop, faTimes, faTrash, faUndo, faUnlockAlt, faUpload, faUser, faWeightHanging 
 } from '@fortawesome/free-solid-svg-icons';
 library.add(
   faAngleDown, faAngleRight, faAngleUp, faAnglesLeft, faAnglesRight, faArrowRight, faBan, faBook, faCheck, faCog, faDownload, faExclamationTriangle, 
-  faExternalLinkAlt, faFileExport, faFileImport, faFlag, faKey, faLock, faMinus, faPause, faPencilAlt, faPlay, faPlus, faPuzzlePiece, faRedo, faSave, 
+  faExternalLinkAlt, faFileExport, faFileImport, faFlag, faKey, faLock, faMinus, faPause, faPencilAlt, faPlay, faPlus, faPuzzlePiece, faRedo, faRunning, faSave, 
   faSearch, faSkullCrossbones, faSignOutAlt, faStop, faTimes, faTrash, faUndo, faUnlockAlt, faUpload, faUser, faWeightHanging 
 );
 import { 

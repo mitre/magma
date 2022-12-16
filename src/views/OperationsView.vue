@@ -2,19 +2,20 @@
 import { inject, ref, onMounted, onBeforeUnmount } from "vue";
 import { storeToRefs } from "pinia";
 
-import CreateModal from '../components/operations/CreateModal.vue';
-import DeleteModal from '../components/operations/DeleteModal.vue';
-import DetailsModal from '../components/operations/DetailsModal.vue';
-import DownloadModal from '../components/operations/DownloadModal.vue';
-import CommandPopup from '../components/operations/CommandPopup.vue';
-import OutputPopup from '../components/operations/OutputPopup.vue';
-import AddPotentialLinkModal from "../components/operations/AddPotentialLinkModal.vue";
-import ManualCommand from "../components/operations/ManualCommand.vue";
-import { useOperationStore } from '../stores/operationStore';
-import { useAgentStore } from "../stores/agentStore";
-import { useCoreDisplayStore } from "../stores/coreDisplayStore";
-import { useCoreStore } from "../stores/coreStore";
-import { getHumanFriendlyTimeISO8601, b64DecodeUnicode, getReadableTime } from "../utils/utils";
+import CreateModal from '@/components/operations/CreateModal.vue';
+import DeleteModal from '@/components/operations/DeleteModal.vue';
+import DetailsModal from '@/components/operations/DetailsModal.vue';
+import DownloadModal from '@/components/operations/DownloadModal.vue';
+import CommandPopup from '@/components/operations/CommandPopup.vue';
+import OutputPopup from '@/components/operations/OutputPopup.vue';
+import AddPotentialLinkModal from "@/components/operations/AddPotentialLinkModal.vue";
+import ManualCommand from "@/components/operations/ManualCommand.vue";
+import { useOperationStore } from '@/stores/operationStore';
+import { useAgentStore } from "@/stores/agentStore";
+import { useCoreDisplayStore } from "@/stores/coreDisplayStore";
+import { useCoreStore } from "@/stores/coreStore";
+import { getHumanFriendlyTimeISO8601, b64DecodeUnicode, getReadableTime } from "@/utils/utils";
+import { getLinkStatus } from "@/utils/operationUtil.js";
 
 const $api = inject("$api");
 
@@ -25,28 +26,7 @@ const coreStore = useCoreStore();
 const { modals } = storeToRefs(coreDisplayStore);
 
 let updateInterval = ref();
-let isControlPanelActive = ref(true);
-
-const LINK_STATUSES = {
-    0: "success",
-    '-1': "paused",
-    1: "failed",
-    '-2': "discarded",
-    '-3': "collect",
-    '-4': "untrusted",
-    '-5': "visible",
-    124: "timeout",
-};
-const LINK_COLORS = {
-    0: "#4a9",
-    '-1': "#ffc500",
-    1: "#c31",
-    '-2': "#a05195",
-    '-3': "#ffb000",
-    '-4': "white",
-    '-5': "#f012be",
-    124: "cornflowerblue",
-};
+let showPotentialLinkModal = ref(false);
 
 onMounted(async () => {
     await operationStore.getOperations($api);
@@ -86,7 +66,15 @@ function displayManualCommand() {
             behavior: "smooth"
         });
     }, 2);
+}
 
+async function addPotentialLinks(links) {
+    try {
+        await operationStore.addPotentialLinks($api, links);
+        showPotentialLinkModal.value = false;
+    } catch(error) {
+        console.error("Error adding potential links", error);
+    }
 }
 
 </script>
@@ -127,7 +115,7 @@ hr.mt-2
                     span.icon
                         font-awesome-icon.fa(icon="fas fa-plus")
                     span Manual Command
-                button.button(@click="modals.operations.showAddPotentialLink = true")
+                button.button(@click="showPotentialLinkModal = true")
                     span.icon
                         font-awesome-icon.fa(icon="fas fa-plus")
                     span Potential Link
@@ -178,8 +166,8 @@ table.table.is-fullwidth.is-narrow.is-striped.mb-8#link-table(v-if="operationSto
             td {{ getReadableTime(link.decide) }}
             td
                 .is-flex.is-align-items-center(style="border-bottom-width: 0px !important")
-                    .link-status.mr-2(:style="{ color: LINK_COLORS[link.status]}") 
-                    span(:style="{ color: LINK_COLORS[link.status]}") {{ LINK_STATUSES[link.status] }}
+                    .link-status.mr-2(:style="{ color: getLinkStatus(link).color}") 
+                    span(:style="{ color: getLinkStatus(link).color}") {{ getLinkStatus(link).text }}
             td {{ link.ability.name }}
             td {{ link.paw }}
             td {{ link.host }}
@@ -208,7 +196,11 @@ CreateModal
 DeleteModal
 DetailsModal
 DownloadModal
-AddPotentialLinkModal
+AddPotentialLinkModal(
+    :active="showPotentialLinkModal" 
+    :operation="operationStore.selectedOperation"
+    @select="addPotentialLinks" 
+    @close="showPotentialLinkModal = false")
 </template>
 
 <style>
