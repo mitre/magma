@@ -6,60 +6,81 @@ import { useAbilityStore } from "@/stores/abilityStore";
 import CodeEditor from "@/components/core/CodeEditor.vue";
 import AutoSuggest from "@/components/core/AutoSuggest.vue";
 
-const props = defineProps({ 
-    ability: Object,
-    active: Boolean,
-    creating: Boolean
+const props = defineProps({
+  ability: Object,
+  active: Boolean,
+  creating: Boolean,
 });
-const emit = defineEmits(['close']);
+const emit = defineEmits(["close"]);
 
 const $api = inject("$api");
 
 const abilityStore = useAbilityStore();
-const { tactics, techniqueIds, techniqueNames, platforms } = storeToRefs(abilityStore);
+const { tactics, techniqueIds, techniqueNames, platforms } =
+  storeToRefs(abilityStore);
 
 let abilityToEdit = ref({});
 let validation = reactive({
-    name: "",
-    tactic: "",
-    techniqueId: "",
-    techniqueName: "",
-    executors: ""
+  name: "",
+  tactic: "",
+  techniqueId: "",
+  techniqueName: "",
+  executors: "",
 });
 
 watch(() => props.ability, setAbilityToEdit);
 
 function setAbilityToEdit() {
-    abilityToEdit.value = JSON.parse(JSON.stringify(props.ability));
+  abilityToEdit.value = JSON.parse(JSON.stringify(props.ability));
 }
 
 function addExecutor() {
-    const baseExecutor = { cleanup: [], timeout: 60 };
-    if (!abilityToEdit.value.executors) {
-        abilityToEdit.value.executors = [baseExecutor];
-    } else {
-        abilityToEdit.value.executors.push(baseExecutor);
-    }
+  const baseExecutor = {
+    cleanup: [],
+    timeout: 60,
+    platform: "darwin",
+    name: platforms.value.darwin[0],
+  };
+  if (!abilityToEdit.value.executors) {
+    abilityToEdit.value.executors = [baseExecutor];
+  } else {
+    abilityToEdit.value.executors.push(baseExecutor);
+  }
 }
 
 function validateAndSave() {
-    validation.name = abilityToEdit.value.name ? "" : "Name cannot be empty";
-    validation.tactic = abilityToEdit.value.tactic ? "" : "Tactic cannot be empty";
-    validation.techniqueId = abilityToEdit.value.technique_id ? "" : "Technique ID cannot be empty";
-    validation.techniqueName = abilityToEdit.value.technique_name ? "" : "Technique Name cannot be empty";
-    validation.executors = abilityToEdit.value.executors && abilityToEdit.value.executors.every((executor) => (
-            executor.platform && executor.name && executor.command && executor.timeout !== null && executor.timeout >= 0
-        )) ? "" : "There must be at least 1 executor. Each executor must have a command, platform, timeout, and executor.";
+  validation.name = abilityToEdit.value.name ? "" : "Name cannot be empty";
+  validation.tactic = abilityToEdit.value.tactic
+    ? ""
+    : "Tactic cannot be empty";
+  validation.techniqueId = abilityToEdit.value.technique_id
+    ? ""
+    : "Technique ID cannot be empty";
+  validation.techniqueName = abilityToEdit.value.technique_name
+    ? ""
+    : "Technique Name cannot be empty";
+  validation.executors =
+    abilityToEdit.value.executors &&
+    abilityToEdit.value.executors.every(
+      (executor) =>
+        executor.platform &&
+        executor.name &&
+        executor.command &&
+        executor.timeout !== null &&
+        executor.timeout >= 0
+    )
+      ? ""
+      : "There must be at least 1 executor. Each executor must have a command, platform, timeout, and executor.";
 
-    if (Object.keys(validation).every((k) => !validation[k])) {
-        abilityStore.saveAbility($api, abilityToEdit.value, props.creating); 
-        emit('close');
-    }
+  if (Object.keys(validation).every((k) => !validation[k])) {
+    abilityStore.saveAbility($api, abilityToEdit.value, props.creating);
+    emit("close");
+  }
 }
 
 async function deleteAbility() {
-    await abilityStore.deleteAbility($api, abilityToEdit.value.ability_id);
-    emit('close');
+  await abilityStore.deleteAbility($api, abilityToEdit.value.ability_id);
+  emit("close");
 }
 </script>
 
@@ -174,7 +195,7 @@ async function deleteAbility() {
                     span.icon
                         font-awesome-icon(icon="fas fa-undo")
                     span Reset
-                button.button.is-danger.is-outlined(@click="deleteAbility()") 
+                button.button.is-danger.is-outlined(v-if="!props.creating" @click="deleteAbility()") 
                     span.icon
                         font-awesome-icon(icon="fas fa-trash")
                     span Delete
@@ -188,22 +209,22 @@ async function deleteAbility() {
 
 <style scoped>
 .box {
-    position: relative;
+  position: relative;
 }
 
 .delete-btn {
-    position: absolute;
-    top: 18px;
-    right: 20px;
+  position: absolute;
+  top: 18px;
+  right: 20px;
 }
 
 .modal-card {
-    width: 1000px;
+  width: 1000px;
 }
 
 @media screen and (max-width: 1050px) {
-    .modal-card {
-        width: 600px;
-    }
+  .modal-card {
+    width: 600px;
+  }
 }
 </style>
