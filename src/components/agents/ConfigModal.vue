@@ -1,9 +1,11 @@
 <script setup>
-import { ref, reactive, inject } from "vue";
+import { ref, reactive, inject} from "vue";
 import { useAgentStore } from "../../stores/agentStore";
 import { useAbilityStore } from "../../stores/abilityStore";
 import { useCoreDisplayStore } from "../../stores/coreDisplayStore";
 import { storeToRefs } from "pinia";
+
+
 
 const $api = inject("$api");
 
@@ -72,9 +74,16 @@ function getAbilityName(id) {
 
 function searchAbilitiesByName(searchTerm, limit = 10) {
     if (!searchTerm) return [];
-    return abilities.value
+    if (searchTerm.includes('"') || searchTerm.includes("'")){
+        let newSearchTerm = searchTerm.replace(/"/g, '').replace(/'/g, '')
+        return abilities.value
+        .filter((ability) => ability.name.toLowerCase().startsWith(newSearchTerm.toLowerCase()))
+        .splice(0, limit);
+    } else{
+        return abilities.value
         .filter((ability) => ability.name.toLowerCase().includes(searchTerm.toLowerCase()))
         .splice(0, limit);
+    }
 }
 
 function addBootstrapAbility(id) {
@@ -131,7 +140,11 @@ function addDeadmanAbility(id) {
                             input.input(v-model="agentConfig.implant_name" type="text" placeholder="splunkd" :class="{ 'is-danger': validation.implantName }")
                             p.help.has-text-danger(v-if="validation.implantName") {{ validation.implantName }}
                     tr
-                        th Bootstrap Abilities
+                        th Bootstrap Abilities 
+                            v-tooltip(bottom)
+                                template(v-slot:activator="{ on, attrs }")
+                                    img(src="../../assets/img/info-icon.png" alt="info-icon" style="width:10%; margin-left:10px;" title="For exact search start your search query with \"")
+                                span Tooltip text
                         td
                             .field.is-grouped.is-grouped-multiline
                                 .control(v-for="(abilityId, index) of agentConfig.bootstrap_abilities")
@@ -152,6 +165,7 @@ function addDeadmanAbility(id) {
                                     a.button(@click="isAddingBootstrapAbility = false") Cancel
                     tr
                         th Deadman Abilities
+                            img(src="../../assets/img/info-icon.png" alt="info-icon" style="width:10%; margin-left:10px;" title="For exact search start your search query with \"")
                         td
                             .field.is-grouped.is-grouped-multiline
                                 .control(v-for="(abilityId, index) of agentConfig.deadman_abilities")

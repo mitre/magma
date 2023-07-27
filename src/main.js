@@ -8,7 +8,7 @@ import App from "@/App.vue";
 import router from "@/router.js";
 
 // Global styles
-import 'floating-vue/dist/style.css';
+import "floating-vue/dist/style.css";
 
 const app = createApp(App);
 // Set default API url
