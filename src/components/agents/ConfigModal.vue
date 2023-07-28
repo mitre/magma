@@ -141,10 +141,7 @@ function addDeadmanAbility(id) {
                             p.help.has-text-danger(v-if="validation.implantName") {{ validation.implantName }}
                     tr
                         th Bootstrap Abilities 
-                            v-tooltip(bottom)
-                                template(v-slot:activator="{ on, attrs }")
                                     img(src="../../assets/img/info-icon.png" alt="info-icon" style="width:10%; margin-left:10px;" title="For exact search start your search query with \"")
-                                span Tooltip text
                         td
                             .field.is-grouped.is-grouped-multiline
                                 .control(v-for="(abilityId, index) of agentConfig.bootstrap_abilities")
