@@ -83,7 +83,7 @@ export const useCoreStore = defineStore("coreStore", {
     async downloadContactReport($api, contact) {
       try {
         const response = await $api.get(`/api/v2/contacts/${contact}`);
-        downloadJson(`${contact}_contact_report`, response.data);
+        this.downloadJson(`${contact}_contact_report`, response.data);
       } catch (error) {
         console.error("Error downloading contact report", error);
       }
@@ -100,16 +100,16 @@ export const useCoreStore = defineStore("coreStore", {
         JSON.stringify(this.userSettings)
       );
     },
-  },
-  downloadJson(filename, data) {
-    let dataStr =
-      "data:text/json;charset=utf-8," +
-      encodeURIComponent(JSON.stringify(data, null, 2));
-    let downloadAnchorNode = document.createElement("a");
-    downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", filename + ".json");
-    document.body.appendChild(downloadAnchorNode);
-    downloadAnchorNode.click();
-    downloadAnchorNode.remove();
+    downloadJson(filename, data) {
+      let dataStr =
+        "data:text/json;charset=utf-8," +
+        encodeURIComponent(JSON.stringify(data, null, 2));
+      let downloadAnchorNode = document.createElement("a");
+      downloadAnchorNode.setAttribute("href", dataStr);
+      downloadAnchorNode.setAttribute("download", filename + ".json");
+      document.body.appendChild(downloadAnchorNode);
+      downloadAnchorNode.click();
+      downloadAnchorNode.remove();
+    },
   },
 });
