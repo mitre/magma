@@ -15,6 +15,7 @@ export const useCoreDisplayStore = defineStore("coreDisplayStore", {
           showFactBreakdown: false,
           showImport: false,
           showDetails: false,
+          showDeleteConfirm: false,
         },
         operations: {
           showCreate: false,
