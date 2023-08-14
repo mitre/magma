@@ -24,7 +24,7 @@ const { modals } = storeToRefs(coreDisplayStore);
 
         footer.modal-card-foot.is-flex.is-justify-content-flex-end 
             button.button(@click="modals.adversaries.showDeleteConfirm = false") Cancel
-            button.button.is-danger(@click="adversaryStore.deleteAdversary($api)")
+            button.button.is-danger(@click="adversaryStore.deleteAdversary($api) && (modals.adversaries.showDeleteConfirm = false)")
                 span.icon
                     font-awesome-icon(icon="fas fa-trash")
                 span Delete
