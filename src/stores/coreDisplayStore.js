@@ -15,6 +15,11 @@ export const useCoreDisplayStore = defineStore("coreDisplayStore", {
           showFactBreakdown: false,
           showImport: false,
           showDetails: false,
+          showDeleteConfirm: false,
+        },
+        core: {
+          showPluginPopup: false,
+          selectedPlugin: "",
         },
         operations: {
           showCreate: false,

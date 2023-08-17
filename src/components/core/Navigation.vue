@@ -2,15 +2,17 @@
 import { inject } from "vue";
 import { storeToRefs } from "pinia";
 import { useRoute, useRouter } from "vue-router";
-
 import { useCoreStore } from "@/stores/coreStore";
 import { useCoreDisplayStore } from "@/stores/coreDisplayStore.js";
 import { useAuthStore } from "@/stores/authStore.js";
+import PluginModal from "./PluginModal.vue";
+
 
 const authStore = useAuthStore();
 const coreDisplayStore = useCoreDisplayStore();
 const coreStore = useCoreStore();
 const { enabledPlugins, availablePlugins, userSettings } = storeToRefs(coreStore);
+const { modals } = storeToRefs(coreDisplayStore);
 
 const router = useRouter();
 
@@ -29,21 +31,10 @@ function handleLogout() {
 }
 
 function promptToEnablePlugin(pluginName) {
-    if (confirm(`The "${pluginName}" plugin is currently disabled. Would you like to enable it?\n\nNote: Enabling the plugin will require you to restart CALDERA.`)) {
-        enablePlugin(pluginName);
-    }
+    this.modals.core.selectedPlugin = pluginName;
+    this.modals.core.showPluginPopup = true;
 }
 
-async function enablePlugin(pluginName) {
-    try {
-        await $api.patch('/api/v2/config/main', {
-            value: pluginName,
-            prop: 'plugin'
-        });
-    } catch(error) {
-        console.error(`Error enabling ${pluginName}`);
-    }
-}
 </script>
 
 <template lang="pug">
@@ -155,6 +146,9 @@ async function enablePlugin(pluginName) {
                     a.dropdown-item(href="/api/docs" target="_blank") 
                         | api docs
                         font-awesome-icon(icon="fas fa-external-link-alt").pl-1.is-size-7
+
+//- Modals
+PluginModal
 </template>
 
 <style scoped>

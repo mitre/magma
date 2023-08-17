@@ -9,6 +9,7 @@ import CreateEditAbility from "@/components/abilities/CreateEditAbility.vue";
 import FactBreakdownModal from "@/components/adversaries/FactBreakdownModal.vue";
 import AddAbilitiesFromAdversaryModal from "@/components/adversaries/AddAbilitiesFromAdversaryModal.vue";
 import AbilitySelection from "@/components/abilities/AbilitySelection.vue";
+import DeleteAdversaryConfirmationModal from "./DeleteAdversaryConfirmationModal.vue";
 
 const $api = inject("$api");
 
@@ -267,12 +268,6 @@ function validateAndSaveAdversary() {
     isEditingName.value = false;
 }
 
-function deleteAdversary() {
-    if (confirm(`Are you sure you want to remove the ${selectedAdversary.value.name} adversary? This cannot be undone.`)) {
-        adversaryStore.deleteAdversary($api);
-    }
-}
-
 function exportAdversary() {
     let yaml = `id: ${selectedAdversary.value.adversary_id}\n`;
     yaml += `name: ${selectedAdversary.value.name}\n`;
@@ -348,7 +343,7 @@ form.mb-4(v-else)
         span.icon
             font-awesome-icon(icon="fas fa-save")
         span Save 
-    button.button.is-danger.is-outlined.mr-2(@click="deleteAdversary()") 
+    button.button.is-danger.is-outlined.mr-2(@click="modals.adversaries.showDeleteConfirm = true") 
         span.icon
             font-awesome-icon(icon="fas fa-trash")
         span Delete
@@ -438,6 +433,8 @@ CreateEditAbility(:ability="selectedAbility" :active="showCreateEditAbilityModal
 FactBreakdownModal(:breakdown="factBreakdown")
 
 AddAbilitiesFromAdversaryModal(:active="showAddFromAdversary" @select="addAbilitiesFromAdversary" @close="showAddFromAdversary = false")
+
+DeleteAdversaryConfirmationModal
 </template>
 
 <style scoped>
