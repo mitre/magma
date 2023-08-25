@@ -9,7 +9,7 @@ export const useCoreDisplayStore = defineStore("coreDisplayStore", {
         agents: {
           showDeploy: false,
           showConfig: false,
-          showDetails: false
+          showDetails: false,
         },
         adversaries: {
           showFactBreakdown: false,
@@ -27,8 +27,8 @@ export const useCoreDisplayStore = defineStore("coreDisplayStore", {
           showDetails: false,
           showDownload: false,
           showAddManualCommand: false,
-        }
-      }
+        },
+      },
     };
   },
 
@@ -47,6 +47,8 @@ export const useCoreDisplayStore = defineStore("coreDisplayStore", {
       ) {
         this.openTabs.push(newTab);
       }
+      this.openTabs.push("");
+      this.openTabs.pop();
       this.activeTab = name;
     },
     removeTab(index) {

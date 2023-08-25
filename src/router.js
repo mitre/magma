@@ -16,6 +16,7 @@ import ObfuscatorsView from "./views/ObfuscatorsView.vue";
 import SettingsView from "./views/SettingsView.vue";
 import ExfilledFilesView from "./views/ExfilledFilesView.vue";
 import PluginView from "./views/PluginView.vue";
+import NotFoundView from "./views/NotFoundView.vue";
 
 // Cant use global API variable because we aren't in a component
 const $api = axios.create({
@@ -97,6 +98,7 @@ const router = createRouter({
       component: PluginView,
       props: true,
     },
+    { path: "/:pathMatch(.*)*", name: "NotFound", component: NotFoundView },
   ],
 });
 
