@@ -6,6 +6,7 @@ export const useAuthStore = defineStore({
   state: () => ({
     isUserAuthenticated: false,
     returnUrl: null,
+    group: "",
   }),
   actions: {
     async login(username, password, $api) {
@@ -16,6 +17,7 @@ export const useAuthStore = defineStore({
         await $api.post("/enter", fd);
 
         this.isUserAuthenticated = true;
+        await this.getGroup($api);
         router.push({ name: this.returnUrl || "home" });
       } catch (error) {
         if (error.response.status == 401) {
@@ -31,6 +33,15 @@ export const useAuthStore = defineStore({
         return true;
       } catch (error) {
         return false;
+      }
+    },
+    async getGroup($api) {
+      try {
+        const response = await $api.get("/api/v2/health");
+        this.group = response.data.access;
+        return response.data.access;
+      } catch (error) {
+        console.log(error);
       }
     },
     async logout($api) {

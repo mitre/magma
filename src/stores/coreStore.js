@@ -31,8 +31,8 @@ export const useCoreStore = defineStore("coreStore", {
     },
     async getAvailablePlugins($api) {
       try {
-        const response = await $api.get("/api/v2/health");
-        this.availablePlugins = response.data.plugins;
+        const response = await $api.get("/api/v2/plugins");
+        this.availablePlugins = response.data;
       } catch (error) {
         throw error;
       }
