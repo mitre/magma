@@ -12,6 +12,7 @@ const route = useRoute();
 const router = useRouter();
 
 watch(route, (route, prevRoute) => {
+    if (route.name === "NotFound") return;
     if (route.params.pluginName) {
         activeTab = route.params.pluginName;
         coreDisplayStore.addTab(
