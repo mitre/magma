@@ -2,19 +2,23 @@
 import { inject, ref, onMounted, onBeforeUnmount } from "vue";
 import { storeToRefs } from "pinia";
 
-import CreateModal from '@/components/operations/CreateModal.vue';
-import DeleteModal from '@/components/operations/DeleteModal.vue';
-import DetailsModal from '@/components/operations/DetailsModal.vue';
-import DownloadModal from '@/components/operations/DownloadModal.vue';
-import CommandPopup from '@/components/operations/CommandPopup.vue';
-import OutputPopup from '@/components/operations/OutputPopup.vue';
+import CreateModal from "@/components/operations/CreateModal.vue";
+import DeleteModal from "@/components/operations/DeleteModal.vue";
+import DetailsModal from "@/components/operations/DetailsModal.vue";
+import DownloadModal from "@/components/operations/DownloadModal.vue";
+import CommandPopup from "@/components/operations/CommandPopup.vue";
+import OutputPopup from "@/components/operations/OutputPopup.vue";
 import AddPotentialLinkModal from "@/components/operations/AddPotentialLinkModal.vue";
 import ManualCommand from "@/components/operations/ManualCommand.vue";
-import { useOperationStore } from '@/stores/operationStore';
+import { useOperationStore } from "@/stores/operationStore";
 import { useAgentStore } from "@/stores/agentStore";
 import { useCoreDisplayStore } from "@/stores/coreDisplayStore";
 import { useCoreStore } from "@/stores/coreStore";
-import { getHumanFriendlyTimeISO8601, b64DecodeUnicode, getReadableTime } from "@/utils/utils";
+import {
+  getHumanFriendlyTimeISO8601,
+  b64DecodeUnicode,
+  getReadableTime,
+} from "@/utils/utils";
 import { getLinkStatus } from "@/utils/operationUtil.js";
 
 const $api = inject("$api");
@@ -29,54 +33,65 @@ let updateInterval = ref();
 let showPotentialLinkModal = ref(false);
 
 onMounted(async () => {
-    await operationStore.getOperations($api);
-    await coreStore.getObfuscators($api);
-    await agentStore.getAgents($api);
-    agentStore.updateAgentGroups();
+  await operationStore.getOperations($api);
+  await coreStore.getObfuscators($api);
+  await agentStore.getAgents($api);
+  agentStore.updateAgentGroups();
+  selectOperation();
 });
 
 onBeforeUnmount(() => {
-    if(updateInterval) clearInterval(updateInterval);
+  if (updateInterval) clearInterval(updateInterval);
 });
 
 function selectOperation() {
-    if(updateInterval || !operationStore.selectedOperation) clearInterval(updateInterval);
-    updateInterval = setInterval(async () => {
-        if(operationStore.selectedOperation){
-            await operationStore.updateOperationChain($api);
-        } else {
-            clearInterval(updateInterval);
-        }
-    }, "3000");
+  //TODO: Stop updating if operation is finished
+  if (updateInterval) clearInterval(updateInterval);
+  if (operationStore.selectedOperationID === "") return;
+  updateInterval = setInterval(async () => {
+    if (operationStore.selectedOperationID !== "") {
+      await operationStore.getOperations($api);
+    } else {
+      clearInterval(updateInterval);
+    }
+  }, "3000");
 }
 
 async function updateAuto(event) {
-    operationStore.selectedOperation.autonomous = event.target.checked ? 1 : 0;
-    await operationStore.updateOperation($api, 'autonomous', operationStore.selectedOperation.autonomous);
+  // operationStore.operations[operationStore.selectedOperationID].autonomous = event.target.checked ? 1 : 0;
+  await operationStore.updateOperation(
+    $api,
+    "autonomous",
+    event.target.checked ? 1 : 0
+  );
 }
 
 function isRerun() {
-    return operationStore.selectedOperation.state === 'cleanup' || operationStore.selectedOperation.state === 'finished';
+  return (
+    operationStore.operations[operationStore.selectedOperationID].state ===
+      "cleanup" ||
+    operationStore.operations[operationStore.selectedOperationID].state ===
+      "finished"
+  );
 }
 
 function displayManualCommand() {
-    modals.value.operations.showAddManualCommand = true;
-    setTimeout(() => {
-        document.getElementById("manual-input-command").scrollIntoView({
-            behavior: "smooth"
-        });
-    }, 2);
+  modals.value.operations.showAddManualCommand = true;
+  setTimeout(() => {
+    document.getElementById("manual-input-command").scrollIntoView({
+      behavior: "smooth",
+    });
+  }, 2);
 }
 
 async function addPotentialLinks(links) {
-    try {
-        await operationStore.addPotentialLinks($api, links);
-        showPotentialLinkModal.value = false;
-    } catch(error) {
-        console.error("Error adding potential links", error);
-    }
+  try {
+    await operationStore.addPotentialLinks($api, links);
+    showPotentialLinkModal.value = false;
+  } catch (error) {
+    console.error("Error adding potential links", error);
+  }
 }
-
 </script>
 
 <template lang="pug">
@@ -87,15 +102,15 @@ async function addPotentialLinks(links) {
         .is-flex.is-justify-content-center.is-flex-wrap-wrap
             .control.mr-2
                 .select
-                    select.has-text-centered(v-model="operationStore.selectedOperation" @change="selectOperation()")
+                    select.has-text-centered(v-model="operationStore.selectedOperationID" @change="selectOperation()")
                         option(disabled selected value="") Select an operation 
-                        option(v-for="operation in operationStore.operations" :key="operation.id" :value="operation") {{ `${operation.name} - ${operation.chain.length} decisions | ${getHumanFriendlyTimeISO8601(operation.start)}` }}
+                        option(v-for="operation in operationStore.operations" :key="operation.id" :value="operation.id") {{ `${operation.name} - ${operation.chain.length} decisions | ${getHumanFriendlyTimeISO8601(operation.start)}` }}
             button.button.is-primary.mr-2(@click="modals.operations.showCreate = true" type="button") 
                 span.icon
                     font-awesome-icon(icon="fas fa-plus") 
                 span New Operation
     .column.is-4.m-0
-        .buttons.is-justify-content-right(v-if="operationStore.selectedOperation.id")
+        .buttons.is-justify-content-right(v-if="operationStore.operations[operationStore.selectedOperationID]")
             button.button.mr-2(@click="modals.operations.showDownload = true" type="button")
                 span.icon
                     font-awesome-icon(icon="fas fa-save")
@@ -107,25 +122,25 @@ async function addPotentialLinks(links) {
 hr.mt-2
 
 //- Control Panel
-.control-panel.p-0.mb-4(v-if="operationStore.selectedOperation.id")
+.control-panel.p-0.mb-4(v-if="operationStore.selectedOperationID")
     .columns.m-0.p-1
         .column.is-4.pt-0.pb-0.is-flex
             .buttons
-                button.button(@click="displayManualCommand()")
+                button.button(v-if="operationStore.isOperationRunning()" @click="displayManualCommand()")
                     span.icon
                         font-awesome-icon.fa(icon="fas fa-plus")
                     span Manual Command
-                button.button(@click="showPotentialLinkModal = true")
+                button.button(v-if="operationStore.isOperationRunning()" @click="showPotentialLinkModal = true")
                     span.icon
                         font-awesome-icon.fa(icon="fas fa-plus")
                     span Potential Link
                 button.button(@click="modals.operations.showDetails = true" type="button") Operation Details
         .column.is-4.pt-0.pb-0
-            span.has-text-success.is-flex.is-justify-content-center {{ operationStore.selectedOperation.state }}
+            span.has-text-success.is-flex.is-justify-content-center {{ operationStore.operations[operationStore.selectedOperationID].state }}
             .is-flex.is-justify-content-center.is-align-items-center.pb-2
                 a.icon.is-medium.ml-3.mr-3(v-if="!isRerun()" @click="operationStore.updateOperation($api, 'state', 'cleanup')" v-tooltip="'Stop'")
                     font-awesome-icon.fa-2x(icon="fas fa-stop")
-                a.icon.is-medium.ml-3.mr-3(v-if="!isRerun() && operationStore.selectedOperation.state === 'paused' || operationStore.selectedOperation.state === 'run_one_link'" @click="operationStore.updateOperation($api, 'state', 'running')" v-tooltip="'Play'")
+                a.icon.is-medium.ml-3.mr-3(v-if="!isRerun() && operationStore.operations[operationStore.selectedOperationID].state === 'paused' || operationStore.operations[operationStore.selectedOperationID].state === 'run_one_link'" @click="operationStore.updateOperation($api, 'state', 'running')" v-tooltip="'Play'")
                     font-awesome-icon.fa-2x(icon="fas fa-play")
                 a.icon.is-medium.ml-3.mr-3(v-else v-if="!isRerun()" @click="operationStore.updateOperation($api, 'state', 'paused')" v-tooltip="'Pause'")
                     font-awesome-icon.fa-2x(icon="fas fa-pause")
@@ -136,21 +151,33 @@ hr.mt-2
                     font-awesome-icon.fa-2x(icon="fas fa-redo")
         .column.is-4.is-flex.is-justify-content-right.is-align-items-center.is-flex-wrap-wrap.pt-0.pb-0
             span.is-size-6 Obfuscator: 
-            .control
+            .control(v-if="operationStore.isOperationRunning()")
                 .select.ml-1.mr-4
-                    select(v-model="operationStore.selectedOperation.obfuscator" @change="operationStore.updateOperation($api, 'obfuscator', operationStore.selectedOperation.obfuscator)")
+                    select(v-model="operationStore.operations[operationStore.selectedOperationID].obfuscator" @change="operationStore.updateOperation($api, 'obfuscator', operationStore.operations[operationStore.selectedOperationID].obfuscator)")
                         option(v-for="(obf, idx) in coreStore.obfuscators" :key="idx" :value="obf.name") {{ `${obf.name}` }}
-            .control
+            .control(v-else)
+                .select.ml-1.mr-4
+                    select(v-model="operationStore.operations[operationStore.selectedOperationID].obfuscator" :disabled="true")
+                        option(v-for="(obf, idx) in coreStore.obfuscators" :key="idx" :value="obf.name") {{ `${obf.name}` }}
+            .control(v-if="operationStore.isOperationRunning()")
                 input.switch(
-                    :checked="operationStore.selectedOperation.autonomous === 1" 
+                    :checked="operationStore.operations[operationStore.selectedOperationID].autonomous === 1" 
                     id="switchManual" 
                     type="checkbox" 
                     @change="updateAuto($event)"
                 )
-                label.label(for="switchManual") {{ operationStore.selectedOperation.autonomous ? 'Autonomous' : 'Manual' }} 
+                label.label(for="switchManual") {{ operationStore.operations[operationStore.selectedOperationID].autonomous ? 'Autonomous' : 'Manual' }} 
+            .control(v-else)
+                input.switch(
+                    :checked="operationStore.operations[operationStore.selectedOperationID].autonomous === 1" 
+                    :disabled="true"
+                    id="switchManual" 
+                    type="checkbox" 
+                )
+                label.label(for="switchManual") {{ operationStore.operations[operationStore.selectedOperationID].autonomous ? 'Autonomous' : 'Manual' }}
         
 //- Table
-table.table.is-fullwidth.is-narrow.is-striped.mb-8#link-table(v-if="operationStore.selectedOperation.id")
+table.table.is-fullwidth.is-narrow.is-striped.mb-8#link-table(v-if="operationStore.selectedOperationID")
     thead
         tr
             th Time Ran
@@ -162,7 +189,7 @@ table.table.is-fullwidth.is-narrow.is-striped.mb-8#link-table(v-if="operationSto
             th Link Command 
             th Link Output
     tbody
-        tr(v-for="(link, idx) in operationStore.selectedOperation.chain" :key="link.id")
+        tr(v-for="(link, idx) in operationStore.operations[operationStore.selectedOperationID].chain" :key="link.id")
             td {{ getReadableTime(link.decide) }}
             td
                 .is-flex.is-align-items-center(style="border-bottom-width: 0px !important")
@@ -192,57 +219,57 @@ table.table.is-fullwidth.is-narrow.is-striped.mb-8#link-table(v-if="operationSto
         ManualCommand(v-if="modals.operations.showAddManualCommand")
                 
 //- Modals
-CreateModal
+CreateModal(:selectInterval="selectOperation")
 DeleteModal
 DetailsModal
 DownloadModal
 AddPotentialLinkModal(
     :active="showPotentialLinkModal" 
-    :operation="operationStore.selectedOperation"
+    :operation="operationStore.operations[operationStore.selectedOperationID]"
     @select="addPotentialLinks" 
     @close="showPotentialLinkModal = false")
 </template>
 
 <style>
 .control-panel {
-    position: sticky;
-    top: 70px;
-    z-index: 10;
-    border-radius: 8px;
-    background-color: #383838;
-    border: 1px solid #121212;
+  position: sticky;
+  top: 70px;
+  z-index: 10;
+  border-radius: 8px;
+  background-color: #383838;
+  border: 1px solid #121212;
 }
 
 .link-status {
-    background-color: #242424;
-    border: 0.2em solid;
-    border-radius: 50%;
-    height: 1em;
-    width: 1em;
-    z-index: 1;
+  background-color: #242424;
+  border: 0.2em solid;
+  border-radius: 50%;
+  height: 1em;
+  width: 1em;
+  z-index: 1;
 }
 
 .dropdown-menu.command-popup {
-    top: 0;
-    left: initial;
-    right: 100%;
-    max-height: 300px;
-    border-radius: 8px;
-    padding: 0;
+  top: 0;
+  left: initial;
+  right: 100%;
+  max-height: 300px;
+  border-radius: 8px;
+  padding: 0;
 }
 .dropdown-menu.command-popup > .dropdown-content {
-    padding: 10px;
-    margin-right: 10px;
-    border: 1px solid hsl(0deg, 0%, 71%);
-    overflow-y: scroll;
-    max-height: 300px;
+  padding: 10px;
+  margin-right: 10px;
+  border: 1px solid hsl(0deg, 0%, 71%);
+  overflow-y: scroll;
+  max-height: 300px;
 }
 
 a.icon {
-    text-decoration: none !important;  
+  text-decoration: none !important;
 }
 
 .table td {
-    vertical-align: middle !important;
+  vertical-align: middle !important;
 }
 </style>

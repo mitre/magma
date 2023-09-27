@@ -20,6 +20,12 @@ const agentStore = useAgentStore();
 const sourceStore = useSourceStore();
 const { sources } = storeToRefs(sourceStore);
 
+const props = defineProps({
+    selectInterval: {
+        type: Function,
+    },
+});
+
 let operationName = ref("");
 let selectedAdversary = ref("");
 let selectedSource = ref("")
@@ -87,7 +93,12 @@ async function createOperation() {
         adversary: {adversary_id: JSON.parse(JSON.stringify(selectedAdversary.value.adversary_id))},
         group: selectedGroup.value,
     };
-    await operationStore.createOperation($api, newOperation);
+    try {
+        await operationStore.createOperation($api, newOperation);
+        props.selectInterval();
+    } catch(error) {
+        console.error("Error creating operation", error);
+    }
     modals.value.operations.showCreate = false
 }
 
