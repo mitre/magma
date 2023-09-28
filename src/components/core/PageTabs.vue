@@ -12,6 +12,7 @@ const route = useRoute();
 const router = useRouter();
 
 watch(route, (route, prevRoute) => {
+    if (route.name === "NotFound") return;
     if (route.params.pluginName) {
         activeTab = route.params.pluginName;
         coreDisplayStore.addTab(
@@ -40,7 +41,7 @@ function closeTab(index, isActive) {
 <template lang="pug">
 #tabs.is-flex.is-flex-direction-row
     .tags.has-addons.mr-2.mb-0(v-for="(tab, index) in openTabs" @click="router.push(tab.path)")
-        p.tag.is-large(:to="tab.path" :class="{ 'is-primary': tab.name === activeTab }") {{ tab.name }}
+        p.tag.is-large(:class="{ 'is-primary': tab.name === activeTab }") {{ tab.name }}
         p.tag.is-large.is-delete(@click.stop="closeTab(index, tab.name === activeTab)" :class="{ 'is-primary': tab.name === activeTab }")
 </template>
 
