@@ -3,6 +3,8 @@ import { createPinia } from "pinia";
 import VueScrollTo from "vue-scrollto";
 import axios from "axios";
 import FloatingVue from "floating-vue";
+import VNetworkGraph from "v-network-graph"
+import "v-network-graph/lib/style.css"
 
 import App from "@/App.vue";
 import router from "@/router.js";
@@ -22,6 +24,7 @@ app.use(createPinia());
 app.use(router);
 app.use(VueScrollTo);
 app.use(FloatingVue);
+app.use(VNetworkGraph);
 
 // Font awesome icons, add more icons here as needed
 import { library } from '@fortawesome/fontawesome-svg-core';

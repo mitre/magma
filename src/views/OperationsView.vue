@@ -2,6 +2,8 @@
 import { inject, ref, onMounted, onBeforeUnmount } from "vue";
 import { storeToRefs } from "pinia";
 
+import * as vNG from "v-network-graph";
+
 import CreateModal from "@/components/operations/CreateModal.vue";
 import DeleteModal from "@/components/operations/DeleteModal.vue";
 import DetailsModal from "@/components/operations/DetailsModal.vue";
@@ -31,6 +33,33 @@ const { modals } = storeToRefs(coreDisplayStore);
 
 let updateInterval = ref();
 let showPotentialLinkModal = ref(false);
+
+//Graph stuff
+const nodes = {
+  node1: { name: "Node1" },
+  node2: { name: "Node2" },
+};
+
+const edges = {
+  edge1: { source: "node1", target: "node2" },
+};
+
+const graphConfig = vNG.defineConfigs({
+  node: {
+    label: {
+      visible: true,
+      color: "#fff",
+      fontFamily: "inherit",
+      fontSize: 12,
+    },
+  },
+
+  view: {
+    scalingObjects: true,
+    minZoomLevel: 0.2,
+    maxZoomLevel: 1.5,
+  },
+});
 
 onMounted(async () => {
   await operationStore.getOperations($api);
@@ -120,6 +149,8 @@ async function addPotentialLinks(links) {
                     font-awesome-icon(icon="fas fa-trash")
                 span Delete Operation
 hr.mt-2
+
+v-network-graph.graph(v-if="operationStore.selectedOperationID" :nodes="nodes" :edges="edges" :configs="graphConfig")
 
 //- Control Panel
 .control-panel.p-0.mb-4(v-if="operationStore.selectedOperationID")
@@ -231,6 +262,14 @@ AddPotentialLinkModal(
 </template>
 
 <style>
+.graph {
+  width: 80vw;
+  height: 200px;
+  border: 1px solid #fff;
+  background-color: #000;
+  margin-bottom: 1rem;
+}
+
 .control-panel {
   position: sticky;
   top: 70px;

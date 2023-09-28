@@ -14,6 +14,9 @@ const { modelValue, lineNumbers, language } = defineProps({
     lineNumbers: Boolean,
     language: String,
 });
+
+const newModelValue = ref(modelValue);
+
 const emit = defineEmits(['update:modelValue']); 
 
 let focused = ref(false);
@@ -43,7 +46,7 @@ function updateValue(event) {
 </script>
 
 <template lang="pug">
-prism-editor.my-editor(v-model="modelValue" @change="updateValue" @focus="focused = true" @blur="focused = false" :highlight="highlighter" :line-numbers="lineNumbers" :class="{ focused }")
+prism-editor.my-editor(:value="modelValue" @change="updateValue" @focus="focused = true" @blur="focused = false" :highlight="highlighter" :line-numbers="lineNumbers" :class="{ focused }")
 </template>
 
 <style scoped>
