@@ -268,6 +268,33 @@ const graphConfig = reactive(vNG.defineConfigs(configData));
 
 // End graph stuff
 
+//Graph stuff
+const nodes = {
+  node1: { name: "Node1" },
+  node2: { name: "Node2" },
+};
+
+const edges = {
+  edge1: { source: "node1", target: "node2" },
+};
+
+const graphConfig = vNG.defineConfigs({
+  node: {
+    label: {
+      visible: true,
+      color: "#fff",
+      fontFamily: "inherit",
+      fontSize: 12,
+    },
+  },
+
+  view: {
+    scalingObjects: true,
+    minZoomLevel: 0.2,
+    maxZoomLevel: 1.5,
+  },
+});
+
 onMounted(async () => {
   await operationStore.getOperations($api);
   await coreStore.getObfuscators($api);
@@ -644,7 +671,6 @@ AddPotentialLinkModal(
   justify-content: space-between;
   align-items: center;
 }
-
 .control-panel {
   position: sticky;
   top: 70px;
