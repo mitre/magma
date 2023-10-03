@@ -19,7 +19,7 @@ const abilityStore = useAbilityStore();
 const { tactics, techniqueIds, techniqueNames, platforms } =
   storeToRefs(abilityStore);
 
-let abilityToEdit = ref({});
+let abilityToEdit = reactive({});
 let validation = reactive({
   name: "",
   tactic: "",
@@ -31,7 +31,7 @@ let validation = reactive({
 watch(() => props.ability, setAbilityToEdit);
 
 function setAbilityToEdit() {
-  abilityToEdit.value = JSON.parse(JSON.stringify(props.ability));
+  Object.assign(abilityToEdit, JSON.parse(JSON.stringify(props.ability)));
 }
 
 function addExecutor() {
@@ -41,27 +41,27 @@ function addExecutor() {
     platform: "darwin",
     name: platforms.value.darwin[0],
   };
-  if (!abilityToEdit.value.executors) {
-    abilityToEdit.value.executors = [baseExecutor];
+  if (!abilityToEdit.executors) {
+    abilityToEdit.executors = [baseExecutor];
   } else {
-    abilityToEdit.value.executors.push(baseExecutor);
+    abilityToEdit.executors.push(baseExecutor);
   }
 }
 
 function validateAndSave() {
-  validation.name = abilityToEdit.value.name ? "" : "Name cannot be empty";
-  validation.tactic = abilityToEdit.value.tactic
+  validation.name = abilityToEdit.name ? "" : "Name cannot be empty";
+  validation.tactic = abilityToEdit.tactic
     ? ""
     : "Tactic cannot be empty";
-  validation.techniqueId = abilityToEdit.value.technique_id
+  validation.techniqueId = abilityToEdit.technique_id
     ? ""
     : "Technique ID cannot be empty";
-  validation.techniqueName = abilityToEdit.value.technique_name
+  validation.techniqueName = abilityToEdit.technique_name
     ? ""
     : "Technique Name cannot be empty";
   validation.executors =
-    abilityToEdit.value.executors &&
-    abilityToEdit.value.executors.every(
+    abilityToEdit.executors &&
+    abilityToEdit.executors.every(
       (executor) =>
         executor.platform &&
         executor.name &&
@@ -73,13 +73,13 @@ function validateAndSave() {
       : "There must be at least 1 executor. Each executor must have a command, platform, timeout, and executor.";
 
   if (Object.keys(validation).every((k) => !validation[k])) {
-    abilityStore.saveAbility($api, abilityToEdit.value, props.creating);
+    abilityStore.saveAbility($api, abilityToEdit, props.creating);
     emit("close");
   }
 }
 
 async function deleteAbility() {
-  await abilityStore.deleteAbility($api, abilityToEdit.value.ability_id);
+  await abilityStore.deleteAbility($api, abilityToEdit.ability_id);
   emit("close");
 }
 </script>
@@ -166,7 +166,7 @@ async function deleteAbility() {
                     .field
                         label.label Command
                         .control
-                            CodeEditor(v-model="executor.command" language="bash" line-numbers)
+                            CodeEditor(v-model="executor.command" :key="executor.command + index" language="bash" line-numbers)
                     .field
                         label.label Timeout
                         .control
@@ -174,7 +174,7 @@ async function deleteAbility() {
                     label.label Cleanup
                     .field.has-addons(v-for="(cleanup, index) of executor.cleanup")
                         .control.is-expanded
-                            CodeEditor(v-model="executor.cleanup[index]" language="bash" line-numbers)
+                            CodeEditor(v-model="executor.cleanup[index]" :key="executor.cleanup[index] + index" language="bash" line-numbers)
                         .control
                             a.button(@click="executor.cleanup.splice(index, 1)")
                                 span.icon

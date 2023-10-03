@@ -12,7 +12,7 @@ const $api = inject("$api");
 
 const operationStore = useOperationStore();
 
-let editableCommand = ref();
+let editableCommand = ref(props.link.command || "");
 
 const command = computed(() => {
   if (props.link.command === props.link.plaintext_command) return "";
@@ -28,7 +28,6 @@ const isCommandObfuscated = computed(() => {
 function isLinkEditable(currentLink) {
   if (!currentLink) return false;
   if (!currentLink.finish) return false;
-  editableCommand.value = props.link.command;
   // Link can only be editable if operation is running, and if link is paused, queued, or completed
   return (
     operationStore.isOperationRunning() &&
@@ -50,7 +49,13 @@ section(v-if="isLinkEditable(props.link)")
         pre.m-0.pt-2.pb-2 {{ plaintextCommand }}
     pre.m-0.pt-2.pb-2(v-else) {{ plaintextCommand }}
     
-.buttons
-    button.button.is-primary(v-if="isLinkEditable(props.link)" @click="operationStore.updateLink($api, -3, editableCommand)") Approve
-    button.button.is-danger.ml-auto(v-if="isLinkEditable(props.link)" @click="operationStore.updateLink($api, -2)") Discard 
+.buttons.p-2(v-if="isLinkEditable(props.link)")
+    button.button.is-primary(@click="operationStore.updateLink($api, -3, editableCommand, props.link)") Approve
+    button.button.is-danger.ml-auto(@click="operationStore.updateLink($api, -2, null, props.link)") Discard 
 </template>
+
+<style>
+.buttons {
+  flex-wrap: nowrap !important;
+}
+</style>

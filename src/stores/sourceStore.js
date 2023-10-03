@@ -4,7 +4,7 @@ export const useSourceStore = defineStore("sourceStore", {
     state: () => {
         return {
             sources: [],
-            selectedSource: {}
+            selectedSource: "",
         };
     },
     actions: {

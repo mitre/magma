@@ -3,6 +3,8 @@ import { inject, ref, onMounted, onBeforeUnmount, watch } from "vue";
 import * as echarts from "echarts";
 import { storeToRefs } from "pinia";
 
+import { useOperationStore } from "@/stores/operationStore";
+
 import { useAgentStore } from "@/stores/agentStore";
 import { getAgentStatus } from "@/utils/agentUtil.js";
 
@@ -10,7 +12,9 @@ const $api = inject("$api");
 
 const agentStore = useAgentStore();
 const { agents } = storeToRefs(agentStore);
-const agentChartStatus = ref(null);
+
+const operationStore = useOperationStore();
+const operationChartStatus = ref(null);
 const chart = ref(null);
 
 onMounted(() => {
@@ -22,19 +26,19 @@ onBeforeUnmount(() => {
   window.removeEventListener("resize", resizeChart);
 });
 
-watch(agents, () => {
+watch(operationStore.operations, () => {
   setChartOption();
 });
 
 async function initChart() {
-  chart.value = echarts.init(agentChartStatus.value);
+  chart.value = echarts.init(operationChartStatus.value);
   chart.value.showLoading("default", {
     maskColor: "rgba(25, 25, 25, 0.8)",
     textColor: "white",
   });
   resizeChart();
 
-  await agentStore.getAgents($api);
+  await operationStore.getOperations($api);
   setChartOption();
   chart.value.hideLoading();
 }
@@ -42,7 +46,9 @@ async function initChart() {
 function setChartOption() {
   chart.value.setOption({
     title: {
-      text: `${agents.value.length} Agent${agents.value.length > 1 ? "s" : ""}`,
+      text: `${Object.keys(operationStore.operations).length} Operation${
+        Object.keys(operationStore.operations).length > 1 ? "s" : ""
+      }`,
       textStyle: {
         color: "white",
       },
@@ -55,7 +61,7 @@ function setChartOption() {
     },
     series: [
       {
-        name: "Agent Status",
+        name: "Operation Status",
         type: "pie",
         radius: ["40%", "70%"],
         avoidLabelOverlap: false,
@@ -76,36 +82,49 @@ function setChartOption() {
     ],
   });
 }
+//Cleanup
+//Finished
+//Running
+//Pause
+//Out_of_time
 
 function getChartData() {
-  if (!agents.value.length) return [];
+  if (!Object.keys(operationStore.operations).length) return [];
   return [
     {
-      name: "Alive (trusted)",
-      value: agents.value.filter(
-        (agent) => getAgentStatus(agent) === "alive" && agent.trusted
+      name: "running",
+      value: Object.values(operationStore.operations).filter(
+        (operation) => operation.state === "running"
       ).length,
       itemStyle: { color: "#4a9" },
     },
     {
-      name: "Alive (untrusted)",
-      value: agents.value.filter(
-        (agent) => getAgentStatus(agent) === "alive" && !agent.trusted
+      name: "paused",
+      value: Object.values(operationStore.operations).filter(
+        (operation) => operation.state === "paused"
       ).length,
       itemStyle: { color: "#F7DB89" },
     },
     {
-      name: "Pending kill",
-      value: agents.value.filter(
-        (agent) => getAgentStatus(agent) === "pending kill"
+      name: "cleanup",
+      value: Object.values(operationStore.operations).filter(
+        (operation) => operation.state === "cleanup"
       ).length,
       itemStyle: { color: "hsl(207deg, 61%, 53%)" },
     },
     {
-      name: "Dead",
-      value: agents.value.filter((agent) => getAgentStatus(agent) === "dead")
-        .length,
+      name: "out_of_time",
+      value: Object.values(operationStore.operations).filter(
+        (operation) => operation.state === "out_of_time"
+      ).length,
       itemStyle: { color: "#c31" },
+    },
+    {
+      name: "finished",
+      value: Object.values(operationStore.operations).filter(
+        (operation) => operation.state === "finished"
+      ).length,
+      itemStyle: { color: "#a05195" },
     },
   ];
 }
@@ -117,11 +136,11 @@ function resizeChart() {
 </script>
 
 <template lang="pug">
-#agentChartStatus(ref="agentChartStatus")
+#operationChartStatus(ref="operationChartStatus")
 </template>
 
 <style scoped>
-#agentChartStatus {
+#operationChartStatus {
   width: 100%;
   height: 100%;
 }

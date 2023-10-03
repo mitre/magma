@@ -1,8 +1,18 @@
 <script setup>
-import { inject, ref, onMounted, onBeforeUnmount } from "vue";
+import {
+  inject,
+  ref,
+  onMounted,
+  onBeforeUnmount,
+  computed,
+  watch,
+  reactive,
+} from "vue";
 import { storeToRefs } from "pinia";
 
+//Graph imports
 import * as vNG from "v-network-graph";
+import { ForceLayout } from "v-network-graph/lib/force-layout";
 
 import CreateModal from "@/components/operations/CreateModal.vue";
 import DeleteModal from "@/components/operations/DeleteModal.vue";
@@ -33,33 +43,143 @@ const { modals } = storeToRefs(coreDisplayStore);
 
 let updateInterval = ref();
 let showPotentialLinkModal = ref(false);
+let isSidebarOpen = ref(false);
+let isGraphOpen = ref(true);
 
 //Graph stuff
-const nodes = {
-  node1: { name: "Node1" },
-  node2: { name: "Node2" },
-};
+const graph = ref();
+const tooltip = ref();
+const selectedNodeId = ref();
 
-const edges = {
-  edge1: { source: "node1", target: "node2" },
-};
-
-const graphConfig = vNG.defineConfigs({
-  node: {
-    label: {
-      visible: true,
-      color: "#fff",
-      fontFamily: "inherit",
-      fontSize: 12,
-    },
+const nodes = reactive({
+  1: {
+    name: "1",
+    platform: "windows",
+    username: "admin",
   },
-
-  view: {
-    scalingObjects: true,
-    minZoomLevel: 0.2,
-    maxZoomLevel: 1.5,
+  2: {
+    name: "2",
+    platform: "windows",
+    username: "admin",
   },
 });
+const layouts = ref({
+  nodes: {},
+});
+
+const edges = reactive({
+  1: {
+    source: "1",
+    target: "2",
+  },
+});
+
+const targetNodeId = ref("");
+const tooltipOpacity = ref(0); // 0 or 1
+const tooltipPos = ref({ left: "0px", top: "0px" });
+
+const targetNodePos = computed(() => {
+  const nodePos = layouts.value.nodes[targetNodeId.value];
+  return nodePos || { x: 0, y: 0 };
+});
+
+const buildGraph = () => {
+  if (Object.keys(operationStore.operations).length > 0) {
+    if (operationStore.currentOperation) {
+      const newNodes = {};
+      operationStore.currentOperation.host_group.forEach((hostGroup) => {
+        newNodes[hostGroup.host] = {
+          name: hostGroup.host,
+          username: hostGroup.username,
+          platform: hostGroup.platform,
+        };
+      });
+      // for (let node in nodes) {
+      //   delete nodes[node];
+      // }
+      Object.assign(nodes, newNodes);
+    }
+  }
+};
+
+watch(operationStore.operations, () => {
+  buildGraph();
+});
+
+// Update `tooltipPos`
+watch(
+  () => [targetNodePos.value, tooltipOpacity.value],
+  () => {
+    if (!graph.value || !tooltip.value) return;
+
+    // translate coordinates: SVG -> DOM
+    const domPoint = graph.value.translateFromSvgToDomCoordinates(
+      targetNodePos.value
+    );
+    // calculates top-left position of the tooltip.
+    tooltipPos.value = {
+      left: domPoint.x - tooltip.value.offsetWidth / 2 + "px",
+      top: domPoint.y - 16 - tooltip.value.offsetHeight - 10 + "px",
+    };
+  },
+  { deep: true }
+);
+
+const eventHandlers = {
+  "node:pointerover": ({ node }) => {
+    targetNodeId.value = node;
+    tooltipOpacity.value = 1; // show
+  },
+  "node:pointerout": (_) => {
+    tooltipOpacity.value = 0; // hide
+  },
+  "node:click": ({ node }) => {
+    selectedNodeId.value = node;
+    isSidebarOpen.value = true;
+  },
+};
+
+const graphConfig = reactive(
+  vNG.defineConfigs({
+    view: {
+      layoutHandler: new ForceLayout({
+        positionFixedByDrag: false,
+        positionFixedByClickWithAltKey: true,
+        createSimulation: (d3, nodes, edges) => {
+          // d3-force parameters
+          const forceLink = d3.forceLink(edges).id((d) => d.id);
+          return d3
+            .forceSimulation(nodes)
+            .force("edge", forceLink.distance(60).strength(0.2))
+            .force("charge", d3.forceManyBody().strength(-200))
+            .force("center", d3.forceCenter().strength(0.05))
+            .alphaMin(0.001);
+
+          // * The following are the default parameters for the simulation.
+          // const forceLink = d3.forceLink(edges).id((d) => d.id);
+          // return d3
+          //   .forceSimulation(nodes)
+          //   .force("edge", forceLink.distance(100))
+          //   .force("charge", d3.forceManyBody())
+          //   .force("collide", d3.forceCollide(50).strength(0.2))
+          //   .force("center", d3.forceCenter().strength(0.05))
+          //   .alphaMin(0.001);
+        },
+      }),
+      scalingObjects: true,
+      minZoomLevel: 0.5,
+      maxZoomLevel: 1.5,
+    },
+    node: {
+      label: {
+        visible: true,
+        color: "#fff",
+        fontFamily: "inherit",
+        fontSize: 12,
+      },
+    },
+  })
+);
 
 onMounted(async () => {
   await operationStore.getOperations($api);
@@ -77,6 +197,7 @@ function selectOperation() {
   //TODO: Stop updating if operation is finished
   if (updateInterval) clearInterval(updateInterval);
   if (operationStore.selectedOperationID === "") return;
+  buildGraph();
   updateInterval = setInterval(async () => {
     if (operationStore.selectedOperationID !== "") {
       await operationStore.getOperations($api);
@@ -128,7 +249,7 @@ async function addPotentialLinks(links) {
     .column.is-4.m-0.content
         h2.m-0 Operations
     .column.is-4.m-0
-        .is-flex.is-justify-content-center.is-flex-wrap-wrap
+        .is-flex.is-justify-content-center
             .control.mr-2
                 .select
                     select.has-text-centered(v-model="operationStore.selectedOperationID" @change="selectOperation()")
@@ -150,7 +271,59 @@ async function addPotentialLinks(links) {
                 span Delete Operation
 hr.mt-2
 
-v-network-graph.graph(v-if="operationStore.selectedOperationID" :nodes="nodes" :edges="edges" :configs="graphConfig")
+.graph-wrapper(v-if="operationStore.selectedOperationID")
+  .graph-header.is-fullwidth.is-flex.is-flex-direction-row.is-align-items-center.is-justify-content-space-between.p-2(@click="isGraphOpen = !isGraphOpen")
+    h3 Graph
+    span.icon(v-if="!isGraphOpen")
+      font-awesome-icon(icon="fas fa-plus")
+    span.icon(v-if="isGraphOpen")
+      font-awesome-icon(icon="fas fa-minus")
+  .graph-container(:style="{height: isGraphOpen ? '30rem' : '0px'}")
+    .tooltip-wrapper()
+      v-network-graph.graph(ref="graph" :nodes="nodes" :edges="edges" :event-handlers="eventHandlers" :configs="graphConfig" :layouts="layouts")
+      .tooltip(ref="tooltip" :style="{...tooltipPos, opacity: tooltipOpacity}")
+        span(v-if="targetNodeId") {{ nodes[targetNodeId].name }}
+    .sidebar(:style="{width: isSidebarOpen && isGraphOpen ? '400px' : '65px'}")
+      button.button(v-if="!isSidebarOpen && isGraphOpen" type="button" @click="isSidebarOpen = true" :disabled="!selectedNodeId")
+          span.icon
+            font-awesome-icon(icon="fas fa-arrow-left") 
+      .sidebar-header(v-if="isSidebarOpen && isGraphOpen")
+        button.button(type="button" @click="isSidebarOpen = false") 
+          span.icon
+            font-awesome-icon(icon="fas fa-arrow-right") 
+        h3.node-text {{nodes[selectedNodeId].name}}
+      table.table.sidebar-table(v-if="isSidebarOpen && isGraphOpen" :style="{opacity: !isSidebarOpen ? 0 : 1}")
+        tbody(v-if="selectedNodeId")
+          tr
+            th Name
+            td {{nodes[selectedNodeId].name}}
+          tr
+            th Adversary
+            td {{`${operationStore.operations[operationStore.selectedOperationID].adversary.name}`}}
+          tr
+            th Fact Source
+            td {{`${operationStore.operations[operationStore.selectedOperationID].source.name}`}}
+          tr
+            th Group
+            td {{operationStore.operations[operationStore.selectedOperationID].autonomous ? "all" : "red"}}
+          tr
+            th Planner
+            td {{`${operationStore.operations[operationStore.selectedOperationID].planner.name}`}}
+          tr
+            th Obfuscator
+            td {{`${operationStore.operations[operationStore.selectedOperationID].obfuscator}`}}
+          tr
+            th Autonomous
+            td {{operationStore.operations[operationStore.selectedOperationID].autonomous ? "autonomous" : "manual"}}
+          tr
+            th Parser
+            td {{`${operationStore.operations[operationStore.selectedOperationID].use_learning_parsers}`}}
+          tr
+            th Auto Close
+            td {{`${operationStore.operations[operationStore.selectedOperationID].auto_close}`}}
+          tr
+            th Jitter
+            td {{`${operationStore.operations[operationStore.selectedOperationID].jitter}`}}
 
 //- Control Panel
 .control-panel.p-0.mb-4(v-if="operationStore.selectedOperationID")
@@ -262,12 +435,81 @@ AddPotentialLinkModal(
 </template>
 
 <style>
-.graph {
-  width: 80vw;
-  height: 200px;
-  border: 1px solid #fff;
-  background-color: #000;
+.node-text {
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.graph-header {
+  cursor: pointer;
+  background-color: #383838;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 10px;
+  border: 1px solid #8b00ff;
+  border-bottom: 0px;
+}
+
+.graph-header h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.graph-container {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   margin-bottom: 1rem;
+  border: 1px solid #8b00ff;
+  border-top: 0px;
+  /* min-height: 30rem; */
+  transition: height 0.5s;
+}
+
+.graph {
+  background-color: #000;
+  border-right: 1px solid #8b00ff;
+}
+
+.tooltip-wrapper {
+  width: 100%;
+  position: relative;
+}
+
+.tooltip {
+  top: 0;
+  left: 0;
+  opacity: 0;
+  position: absolute;
+  width: 8rem;
+  height: 4rem;
+  font-size: 0.7rem;
+  padding: 5px;
+  background-color: #000;
+  border: 1px solid #fff;
+  box-shadow: 0 0 5px #0b0b0b;
+  transition: opacity 0.2s linear;
+  pointer-events: none;
+}
+
+.sidebar {
+  padding: 1rem;
+  transition: width 0.5s;
+}
+
+.sidebar-table {
+  margin-top: 0.5rem;
+  font-size: 0.89rem;
+  border-radius: 8px;
+  box-shadow: 0 0 5px #121212;
+}
+
+.sidebar-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .control-panel {
@@ -277,6 +519,13 @@ AddPotentialLinkModal(
   border-radius: 8px;
   background-color: #383838;
   border: 1px solid #121212;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 1);
+}
+
+#link-table {
+  border-radius: 10px;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 1);
+  padding: 5rem;
 }
 
 .link-status {
@@ -291,7 +540,7 @@ AddPotentialLinkModal(
 .dropdown-menu.command-popup {
   top: 0;
   left: initial;
-  right: 100%;
+  right: 90%;
   max-height: 300px;
   border-radius: 8px;
   padding: 0;
@@ -300,7 +549,8 @@ AddPotentialLinkModal(
   padding: 10px;
   margin-right: 10px;
   border: 1px solid hsl(0deg, 0%, 71%);
-  overflow-y: scroll;
+  overflow-y: auto;
+  max-width: 85vw;
   max-height: 300px;
 }
 
