@@ -268,32 +268,6 @@ const graphConfig = reactive(vNG.defineConfigs(configData));
 
 // End graph stuff
 
-//Graph stuff
-const nodes = {
-  node1: { name: "Node1" },
-  node2: { name: "Node2" },
-};
-
-const edges = {
-  edge1: { source: "node1", target: "node2" },
-};
-
-const graphConfig = vNG.defineConfigs({
-  node: {
-    label: {
-      visible: true,
-      color: "#fff",
-      fontFamily: "inherit",
-      fontSize: 12,
-    },
-  },
-
-  view: {
-    scalingObjects: true,
-    minZoomLevel: 0.2,
-    maxZoomLevel: 1.5,
-  },
-});
 
 onMounted(async () => {
   await operationStore.getOperations($api);
@@ -311,6 +285,7 @@ function selectOperation() {
   //TODO: Stop updating if operation is finished
   if (updateInterval) clearInterval(updateInterval);
   if (operationStore.selectedOperationID === "") return;
+  buildGraph();
   updateInterval = setInterval(async () => {
     if (operationStore.selectedOperationID !== "") {
       await operationStore.getOperations($api);
@@ -590,6 +565,78 @@ AddPotentialLinkModal(
 .node-text {
   white-space: nowrap;
   overflow: hidden;
+}
+
+.graph-header {
+  cursor: pointer;
+  background-color: #383838;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 10px;
+  border: 1px solid #8b00ff;
+  border-bottom: 0px;
+}
+
+.graph-header h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.graph-container {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  border: 1px solid #8b00ff;
+  border-top: 0px;
+  /* min-height: 30rem; */
+  transition: height 0.5s;
+}
+
+.graph {
+  background-color: #000;
+  border-right: 1px solid #8b00ff;
+}
+
+.tooltip-wrapper {
+  width: 100%;
+  position: relative;
+}
+
+.tooltip {
+  top: 0;
+  left: 0;
+  opacity: 0;
+  position: absolute;
+  width: 8rem;
+  height: 4rem;
+  font-size: 0.7rem;
+  padding: 5px;
+  background-color: #000;
+  border: 1px solid #fff;
+  box-shadow: 0 0 5px #0b0b0b;
+  transition: opacity 0.2s linear;
+  pointer-events: none;
+}
+
+.sidebar {
+  padding: 1rem;
+  transition: width 0.5s;
+}
+
+.sidebar-table {
+  margin-top: 0.5rem;
+  font-size: 0.89rem;
+  border-radius: 8px;
+  box-shadow: 0 0 5px #121212;
+}
+
+.sidebar-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .graph-header {
