@@ -2,7 +2,7 @@
 import { inject, ref } from "vue";
 import { storeToRefs } from "pinia";
 import { useCoreDisplayStore } from "../../stores/coreDisplayStore";
-import { useOperationStore } from '../../stores/operationStore';
+import { useOperationStore } from "../../stores/operationStore";
 const $api = inject("$api");
 const coreDisplayStore = useCoreDisplayStore();
 const { modals } = storeToRefs(coreDisplayStore);
@@ -11,10 +11,14 @@ let reportType = ref(1);
 let isAgentOutput = ref(false);
 
 async function downloadOperation() {
-    await operationStore.downloadOperationInfo($api, reportType.value, operationStore.selectedOperation.id, isAgentOutput.value);
-    modals.value.operations.showDownload = false;
+  await operationStore.downloadOperationInfo(
+    $api,
+    reportType.value,
+    operationStore.selectedOperationID,
+    isAgentOutput.value
+  );
+  modals.value.operations.showDownload = false;
 }
-
 </script>
 
 <template lang="pug">
@@ -46,6 +50,6 @@ async function downloadOperation() {
 
 <style scoped>
 .modal-card-foot {
-    display: block;
+  display: block;
 }
 </style>

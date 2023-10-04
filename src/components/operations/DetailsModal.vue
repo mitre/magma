@@ -14,39 +14,39 @@ const operationStore = useOperationStore();
     .modal-card
         header.modal-card-head 
             p.modal-card-title Operation Details
-        .modal-card-body(v-if="operationStore.selectedOperation.id")
+        .modal-card-body(v-if="operationStore.selectedOperationID")
             table.table.is-fullwidth.is-striped
                 tbody
                     tr
                         th Name
-                        td {{`${operationStore.selectedOperation.name}`}}
+                        td {{`${operationStore.operations[operationStore.selectedOperationID].name}`}}
                     tr
                         th Adversary
-                        td {{`${operationStore.selectedOperation.adversary.name}`}}
+                        td {{`${operationStore.operations[operationStore.selectedOperationID].adversary.name}`}}
                     tr
                         th Fact Source
-                        td {{`${operationStore.selectedOperation.source.name}`}}
+                        td {{`${operationStore.operations[operationStore.selectedOperationID].source.name}`}}
                     tr
                         th Group
-                        td {{operationStore.selectedOperation.autonomous ? "all" : "red"}}
+                        td {{operationStore.operations[operationStore.selectedOperationID].autonomous ? "all" : "red"}}
                     tr
                         th Planner
-                        td {{`${operationStore.selectedOperation.planner.name}`}}
+                        td {{`${operationStore.operations[operationStore.selectedOperationID].planner.name}`}}
                     tr
                         th Obfuscator
-                        td {{`${operationStore.selectedOperation.obfuscator}`}}
+                        td {{`${operationStore.operations[operationStore.selectedOperationID].obfuscator}`}}
                     tr
                         th Autonomous
-                        td {{operationStore.selectedOperation.autonomous ? "autonomous" : "manual"}}
+                        td {{operationStore.operations[operationStore.selectedOperationID].autonomous ? "autonomous" : "manual"}}
                     tr
                         th Parser
-                        td {{`${operationStore.selectedOperation.use_learning_parsers}`}}
+                        td {{`${operationStore.operations[operationStore.selectedOperationID].use_learning_parsers}`}}
                     tr
                         th Auto Close
-                        td {{`${operationStore.selectedOperation.auto_close}`}}
+                        td {{`${operationStore.operations[operationStore.selectedOperationID].auto_close}`}}
                     tr
                         th Jitter
-                        td {{`${operationStore.selectedOperation.jitter}`}}
+                        td {{`${operationStore.operations[operationStore.selectedOperationID].jitter}`}}
         footer.modal-card-foot.is-justify-content-right
             button.button(@click="modals.operations.showDetails = false") Close 
             

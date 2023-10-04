@@ -13,28 +13,28 @@ const { modals } = storeToRefs(coreDisplayStore);
 const $api = inject("$api");
 
 const manualCommand = reactive({
-    agent: operationStore.selectedOperation.host_group[0],
-    executor: {
-        name: operationStore.selectedOperation.host_group[0].executors[0],
-        command: "",
-        platform: ""    
-    },
-    paw: "",
+  agent: operationStore.currentOperation.host_group[0],
+  executor: {
+    name: operationStore.currentOperation.host_group[0].executors[0],
+    command: "",
+    platform: "",
+  },
+  paw: "",
 });
 
 function addManualCommand() {
-    if (manualCommand.executor.command.length <= 0) {
-        //TODO tell user to enter manual command
-        return;
-    }
-    manualCommand.paw = manualCommand.agent.paw;
-    manualCommand.executor.platform = manualCommand.agent.platform;
-    if (operationStore.selectedOperation.state === "paused") {
-        // TODO tell user operation is paused
-        modals.value.operations.showAddManualCommand = false;
-    }
-    operationStore.addManualCommand($api, manualCommand);
+  if (manualCommand.executor.command.length <= 0) {
+    //TODO tell user to enter manual command
+    return;
+  }
+  manualCommand.paw = manualCommand.agent.paw;
+  manualCommand.executor.platform = manualCommand.agent.platform;
+  if (operationStore.currentOperation.state === "paused") {
+    // TODO tell user operation is paused
     modals.value.operations.showAddManualCommand = false;
+  }
+  operationStore.addManualCommand($api, manualCommand);
+  modals.value.operations.showAddManualCommand = false;
 }
 </script>
 
@@ -46,7 +46,7 @@ tr(id="manual-input-command")
             .select
                 select(v-model="manualCommand.agent")
                     option(disabled default value="") Select an agent
-                    option(v-for="(agent, idx) in operationStore.selectedOperation.host_group" :key="agent.paw" :value="agent") {{ `${agent.display_name} - ${agent.paw}` }}
+                    option(v-for="(agent, idx) in operationStore.currentOperation.host_group" :key="agent.paw" :value="agent") {{ `${agent.display_name} - ${agent.paw}` }}
     td
         .control
             .select 

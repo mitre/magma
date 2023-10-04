@@ -26,7 +26,7 @@ onMounted(() => {
 async function getLinkOutput() {
     if (props.link.output !== "True") return;
     try {
-        const response = await $api.get(`/api/v2/operations/${operationStore.selectedOperation.id}/links/${props.link.id}/result`);
+        const response = await $api.get(`/api/v2/operations/${operationStore.selectedOperationID}/links/${props.link.id}/result`);
         const result = JSON.parse(b64DecodeUnicode(response.data.result));
         stdout.value = result.stdout;
         stderr.value = result.stderr;
