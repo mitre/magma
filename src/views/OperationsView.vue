@@ -569,12 +569,17 @@ AddPotentialLinkModal(
 
 .graph-header {
   cursor: pointer;
+  padding-right: 1rem;
+  padding-left: 1rem;
   background-color: #383838;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  padding-left: 10px;
+  padding-top: 0.8rem;
+  padding-bottom: 0.8rem;
   border: 1px solid #8b00ff;
   border-bottom: 0px;
+}
+
+.graph-header:hover {
+  background-color: #4a4a4a;
 }
 
 .graph-header h3 {
