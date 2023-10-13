@@ -88,11 +88,21 @@ const buildGraph = () => {
     if (operationStore.currentOperation) {
       const newNodes = {};
       operationStore.currentOperation.host_group.forEach((hostGroup) => {
-        newNodes[hostGroup.host] = {
-          name: hostGroup.host,
-          username: hostGroup.username,
-          platform: hostGroup.platform,
-        };
+        // If host doesnt exist already create it
+        if (!nodes[hostGroup.host]) {
+          newNodes[hostGroup.host] = {
+            name: hostGroup.host,
+            username: hostGroup.username,
+            platform: hostGroup.platform,
+            agents: [hostGroup.paw],
+            ips: hostGroup.host_ip_addrs,
+          };
+        }
+        // If that host is already found that means it's a new agent on an existing host
+        else {
+          nodes[hostGroup.host].agents.push(hostGroup.paw);
+          nodes[hostGroup.host].ips.push(...hostGroup.host_ip_addrs);
+        }
       });
       // for (let node in nodes) {
       //   delete nodes[node];
@@ -101,6 +111,17 @@ const buildGraph = () => {
     }
   }
 };
+
+async function downloadGraphAsSvg() {
+  if (!graph.value) return;
+  const text = await graph.value.exportAsSvgText();
+  const url = URL.createObjectURL(new Blob([text], { type: "octet/stream" }));
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "network-graph.svg"; // filename to download
+  a.click();
+  window.URL.revokeObjectURL(url);
+}
 
 watch(operationStore.operations, () => {
   buildGraph();
@@ -272,8 +293,11 @@ async function addPotentialLinks(links) {
 hr.mt-2
 
 .graph-wrapper(v-if="operationStore.selectedOperationID")
-  .graph-header.is-fullwidth.is-flex.is-flex-direction-row.is-align-items-center.is-justify-content-space-between.p-2(@click="isGraphOpen = !isGraphOpen")
-    h3 Graph
+  .graph-header.is-fullwidth.is-flex.is-flex-direction-row.is-align-items-center.is-justify-content-space-between(@click="isGraphOpen = !isGraphOpen")
+    .left-graph-header.is-flex.is-flex-direction-row.is-align-items-center.is-3
+      h3 Graph
+      button.button.ml-4(type="button" @click="downloadGraphAsSvg")
+        span Download Graph SVG
     span.icon(v-if="!isGraphOpen")
       font-awesome-icon(icon="fas fa-plus")
     span.icon(v-if="isGraphOpen")
@@ -442,12 +466,17 @@ AddPotentialLinkModal(
 
 .graph-header {
   cursor: pointer;
+  padding-right: 1rem;
+  padding-left: 1rem;
   background-color: #383838;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  padding-left: 10px;
+  padding-top: 0.8rem;
+  padding-bottom: 0.8rem;
   border: 1px solid #8b00ff;
   border-bottom: 0px;
+}
+
+.graph-header:hover {
+  background-color: #4a4a4a;
 }
 
 .graph-header h3 {

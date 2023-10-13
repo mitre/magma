@@ -50,7 +50,7 @@ function updateValue(event) {
 </script>
 
 <template lang="pug">
-prism-editor.my-editor(v-model="intervalValue" @change="updateValue" @focus="focused = true" @blur="focused = false" :highlight="highlighter" :line-numbers="lineNumbers" :class="{ focused }")
+prism-editor.my-editor(v-model="intervalValue" @input="updateValue" @focus="focused = true" @blur="focused = false" :highlight="highlighter" :line-numbers="lineNumbers" :class="{ focused }")
 </template>
 
 <style scoped>
