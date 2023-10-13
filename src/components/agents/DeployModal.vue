@@ -31,7 +31,8 @@ watch(agentConfig, () => {
     findDeployableAbilities();
 });
 
-function findDeployableAbilities() {
+async function findDeployableAbilities() {
+    await abilityStore.getAbilities($api);
     deployableAbilities.value = [];
     if (!agentConfig.value.deployments) return;
     agentConfig.value.deployments.forEach((abilityId) => {
