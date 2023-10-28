@@ -12,12 +12,14 @@ import { storeToRefs } from "pinia";
 
 //Graph imports
 import * as vNG from "v-network-graph";
+import configData from "@/utils/graphConfig";
 import { ForceLayout } from "v-network-graph/lib/force-layout";
 
 import CreateModal from "@/components/operations/CreateModal.vue";
 import DeleteModal from "@/components/operations/DeleteModal.vue";
 import DetailsModal from "@/components/operations/DetailsModal.vue";
 import DownloadModal from "@/components/operations/DownloadModal.vue";
+import AgentDetailsModal from "@/components/agents/DetailsModal.vue";
 import CommandPopup from "@/components/operations/CommandPopup.vue";
 import OutputPopup from "@/components/operations/OutputPopup.vue";
 import AddPotentialLinkModal from "@/components/operations/AddPotentialLinkModal.vue";
@@ -73,6 +75,9 @@ const edges = reactive({
     target: "2",
   },
 });
+const paths = reactive({
+  path1: { edges: [] },
+});
 
 const targetNodeId = ref("");
 const tooltipOpacity = ref(0); // 0 or 1
@@ -83,32 +88,59 @@ const targetNodePos = computed(() => {
   return nodePos || { x: 0, y: 0 };
 });
 
-const buildGraph = () => {
-  if (Object.keys(operationStore.operations).length > 0) {
-    if (operationStore.currentOperation) {
-      const newNodes = {};
-      operationStore.currentOperation.host_group.forEach((hostGroup) => {
-        // If host doesnt exist already create it
-        if (!nodes[hostGroup.host]) {
-          newNodes[hostGroup.host] = {
-            name: hostGroup.host,
-            username: hostGroup.username,
-            platform: hostGroup.platform,
-            agents: [hostGroup.paw],
-            ips: hostGroup.host_ip_addrs,
+const buildGraph = async () => {
+  if (
+    Object.keys(operationStore.operations).length > 0 &&
+    operationStore.currentOperation
+  ) {
+    const newNodes = {};
+    const newEdges = {};
+    const newPaths = {};
+    // Get graph data
+    // TODO: Change to actual api endpoint
+    try {
+      const res = await $api.get(
+        "http://localhost:3000/src/public/operation_graph.json"
+      );
+      const graphData = res.data;
+      for (const hostKey in graphData.hosts) {
+        const host = graphData.hosts[hostKey];
+        newNodes[host.host] = {
+          name: host.host,
+          displayName: host.display_name,
+          platform: host.platform,
+          reachable: host.reachable_hosts,
+          ips: host.host_ip_addrs,
+          agents: [],
+        };
+        host.reachable_hosts.forEach((reachableHost) => {
+          newEdges[`${host.host}-${reachableHost}`] = {
+            source: host.host,
+            target: reachableHost,
           };
-        }
-        // If that host is already found that means it's a new agent on an existing host
-        else {
-          nodes[hostGroup.host].agents.push(hostGroup.paw);
-          nodes[hostGroup.host].ips.push(...hostGroup.host_ip_addrs);
-        }
+          newPaths[`${host.host}-${reachableHost}`] = {
+            edges: [`${host.host}-${reachableHost}`],
+          };
+        });
+      }
+      graphData.agents.forEach((agent) => {
+        newNodes[agent.host].agents.push(agent);
       });
-      // for (let node in nodes) {
-      //   delete nodes[node];
-      // }
-      Object.assign(nodes, newNodes);
+    } catch (error) {
+      console.error(error);
+      return;
     }
+    for (const node in nodes) {
+      delete nodes[node];
+    }
+    console.log(newNodes);
+    Object.assign(nodes, newNodes);
+    for (const edge in edges) {
+      delete edges[edge];
+    }
+    console.log(newEdges);
+    Object.assign(edges, newEdges);
+    Object.assign(paths, newPaths);
   }
 };
 
@@ -123,9 +155,12 @@ async function downloadGraphAsSvg() {
   window.URL.revokeObjectURL(url);
 }
 
-watch(operationStore.operations, () => {
-  buildGraph();
-});
+watch(
+  () => operationStore.currentOperation,
+  () => {
+    buildGraph();
+  }
+);
 
 // Update `tooltipPos`
 watch(
@@ -160,47 +195,9 @@ const eventHandlers = {
   },
 };
 
-const graphConfig = reactive(
-  vNG.defineConfigs({
-    view: {
-      layoutHandler: new ForceLayout({
-        positionFixedByDrag: false,
-        positionFixedByClickWithAltKey: true,
-        createSimulation: (d3, nodes, edges) => {
-          // d3-force parameters
-          const forceLink = d3.forceLink(edges).id((d) => d.id);
-          return d3
-            .forceSimulation(nodes)
-            .force("edge", forceLink.distance(60).strength(0.2))
-            .force("charge", d3.forceManyBody().strength(-200))
-            .force("center", d3.forceCenter().strength(0.05))
-            .alphaMin(0.001);
+const graphConfig = reactive(vNG.defineConfigs(configData));
 
-          // * The following are the default parameters for the simulation.
-          // const forceLink = d3.forceLink(edges).id((d) => d.id);
-          // return d3
-          //   .forceSimulation(nodes)
-          //   .force("edge", forceLink.distance(100))
-          //   .force("charge", d3.forceManyBody())
-          //   .force("collide", d3.forceCollide(50).strength(0.2))
-          //   .force("center", d3.forceCenter().strength(0.05))
-          //   .alphaMin(0.001);
-        },
-      }),
-      scalingObjects: true,
-      minZoomLevel: 0.5,
-      maxZoomLevel: 1.5,
-    },
-    node: {
-      label: {
-        visible: true,
-        color: "#fff",
-        fontFamily: "inherit",
-        fontSize: 12,
-      },
-    },
-  })
-);
+// End graph stuff
 
 onMounted(async () => {
   await operationStore.getOperations($api);
@@ -218,7 +215,6 @@ function selectOperation() {
   //TODO: Stop updating if operation is finished
   if (updateInterval) clearInterval(updateInterval);
   if (operationStore.selectedOperationID === "") return;
-  buildGraph();
   updateInterval = setInterval(async () => {
     if (operationStore.selectedOperationID !== "") {
       await operationStore.getOperations($api);
@@ -304,10 +300,15 @@ hr.mt-2
       font-awesome-icon(icon="fas fa-minus")
   .graph-container(:style="{height: isGraphOpen ? '30rem' : '0px'}")
     .tooltip-wrapper()
-      v-network-graph.graph(ref="graph" :nodes="nodes" :edges="edges" :event-handlers="eventHandlers" :configs="graphConfig" :layouts="layouts")
+      v-network-graph.graph(ref="graph" :nodes="nodes" :edges="edges" :paths="paths" :event-handlers="eventHandlers" :configs="graphConfig" :layouts="layouts")
       .tooltip(ref="tooltip" :style="{...tooltipPos, opacity: tooltipOpacity}")
-        span(v-if="targetNodeId") {{ nodes[targetNodeId].name }}
-    .sidebar(:style="{width: isSidebarOpen && isGraphOpen ? '400px' : '65px'}")
+        span(v-if="targetNodeId") {{ nodes[targetNodeId].displayName }}
+        span(v-if="targetNodeId") Platform: {{ nodes[targetNodeId].platform }}
+        div
+          span(v-if="targetNodeId") {{nodes[targetNodeId].agents.length}} agent
+          |
+          span(v-if="targetNodeId && nodes[targetNodeId].agents.length != 1") s
+    .sidebar(:style="{width: isSidebarOpen && isGraphOpen ? '500px' : '65px'}")
       button.button(v-if="!isSidebarOpen && isGraphOpen" type="button" @click="isSidebarOpen = true" :disabled="!selectedNodeId")
           span.icon
             font-awesome-icon(icon="fas fa-arrow-left") 
@@ -319,36 +320,20 @@ hr.mt-2
       table.table.sidebar-table(v-if="isSidebarOpen && isGraphOpen" :style="{opacity: !isSidebarOpen ? 0 : 1}")
         tbody(v-if="selectedNodeId")
           tr
-            th Name
-            td {{nodes[selectedNodeId].name}}
+            th Host Name
+            td {{nodes[selectedNodeId].displayName}}
           tr
-            th Adversary
-            td {{`${operationStore.operations[operationStore.selectedOperationID].adversary.name}`}}
+            th Platform
+            td {{ nodes[selectedNodeId].platform }}
           tr
-            th Fact Source
-            td {{`${operationStore.operations[operationStore.selectedOperationID].source.name}`}}
+            th IP Addresses
+            td {{nodes[selectedNodeId].ips.join(", ")}}
           tr
-            th Group
-            td {{operationStore.operations[operationStore.selectedOperationID].autonomous ? "all" : "red"}}
-          tr
-            th Planner
-            td {{`${operationStore.operations[operationStore.selectedOperationID].planner.name}`}}
-          tr
-            th Obfuscator
-            td {{`${operationStore.operations[operationStore.selectedOperationID].obfuscator}`}}
-          tr
-            th Autonomous
-            td {{operationStore.operations[operationStore.selectedOperationID].autonomous ? "autonomous" : "manual"}}
-          tr
-            th Parser
-            td {{`${operationStore.operations[operationStore.selectedOperationID].use_learning_parsers}`}}
-          tr
-            th Auto Close
-            td {{`${operationStore.operations[operationStore.selectedOperationID].auto_close}`}}
-          tr
-            th Jitter
-            td {{`${operationStore.operations[operationStore.selectedOperationID].jitter}`}}
-
+            th Agents ({{nodes[selectedNodeId].agents.length}})
+            td 
+              ul
+                li(v-for="agent in nodes[selectedNodeId].agents" :key="agent.id")
+                  button.button.is-small(type="button" @click="modals.agents.showDetails = true; agentStore.selectedAgent = agent") {{agent.paw}}
 //- Control Panel
 .control-panel.p-0.mb-4(v-if="operationStore.selectedOperationID")
     .columns.m-0.p-1
@@ -451,6 +436,7 @@ CreateModal(:selectInterval="selectOperation")
 DeleteModal
 DetailsModal
 DownloadModal
+AgentDetailsModal
 AddPotentialLinkModal(
     :active="showPotentialLinkModal" 
     :operation="operationStore.operations[operationStore.selectedOperationID]"
@@ -511,7 +497,7 @@ AddPotentialLinkModal(
   left: 0;
   opacity: 0;
   position: absolute;
-  width: 8rem;
+  min-width: 8rem;
   height: 4rem;
   font-size: 0.7rem;
   padding: 5px;
@@ -520,6 +506,8 @@ AddPotentialLinkModal(
   box-shadow: 0 0 5px #0b0b0b;
   transition: opacity 0.2s linear;
   pointer-events: none;
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar {
@@ -532,6 +520,7 @@ AddPotentialLinkModal(
   font-size: 0.89rem;
   border-radius: 8px;
   box-shadow: 0 0 5px #121212;
+  width: 350px;
 }
 
 .sidebar-header {
