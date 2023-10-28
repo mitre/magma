@@ -113,6 +113,17 @@ const filteredChain = computed(() => {
         result = result.filter((row) => filterValues.includes(row[property]));
       }
     }
+    for (const node in nodes) {
+      delete nodes[node];
+    }
+    console.log(newNodes);
+    Object.assign(nodes, newNodes);
+    for (const edge in edges) {
+      delete edges[edge];
+    }
+    console.log(newEdges);
+    Object.assign(edges, newEdges);
+    Object.assign(paths, newPaths);
   }
 
   // Sort the data
@@ -285,7 +296,6 @@ function selectOperation() {
   //TODO: Stop updating if operation is finished
   if (updateInterval) clearInterval(updateInterval);
   if (operationStore.selectedOperationID === "") return;
-  buildGraph();
   updateInterval = setInterval(async () => {
     if (operationStore.selectedOperationID !== "") {
       await operationStore.getOperations($api);
@@ -614,7 +624,7 @@ AddPotentialLinkModal(
   left: 0;
   opacity: 0;
   position: absolute;
-  width: 8rem;
+  min-width: 8rem;
   height: 4rem;
   font-size: 0.7rem;
   padding: 5px;
@@ -623,6 +633,8 @@ AddPotentialLinkModal(
   box-shadow: 0 0 5px #0b0b0b;
   transition: opacity 0.2s linear;
   pointer-events: none;
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar {
@@ -635,6 +647,7 @@ AddPotentialLinkModal(
   font-size: 0.89rem;
   border-radius: 8px;
   box-shadow: 0 0 5px #121212;
+  width: 350px;
 }
 
 .sidebar-header {
