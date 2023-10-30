@@ -14,6 +14,7 @@ import { storeToRefs } from "pinia";
 import * as vNG from "v-network-graph";
 import configData from "@/utils/graphConfig";
 import { ForceLayout } from "v-network-graph/lib/force-layout";
+import graphDataUrl from "@/public/operation_graph.json";
 
 import CreateModal from "@/components/operations/CreateModal.vue";
 import DeleteModal from "@/components/operations/DeleteModal.vue";
@@ -99,10 +100,7 @@ const buildGraph = async () => {
     // Get graph data
     // TODO: Change to actual api endpoint
     try {
-      const res = await $api.get(
-        "http://localhost:3000/src/public/operation_graph.json"
-      );
-      const graphData = res.data;
+      const graphData = graphDataUrl;
       for (const hostKey in graphData.hosts) {
         const host = graphData.hosts[hostKey];
         newNodes[host.host] = {
