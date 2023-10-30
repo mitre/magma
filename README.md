@@ -3,27 +3,30 @@ The future of CALDERA's UI/UX.
 
 ## Dependencies
 * NodeJS (v16+ recommended)
-* CALDERA (v4.0.0+)
+* Caldera (v4.0.0+)
 
 ## Installation
-CALDERA needs to be running in the background, so be sure to start it up
+Checkout the magma branch in core Caldera. Caldera needs to be running in the background, so be sure to start it up
 beforehand and make sure it's accessible at http://localhost:8888.
 
 If you are going to run Magma without developing on it, you can build 
-this project into a static directory to serve up however you choose, i.e. 
-nginx. To do so:
+this project and start Caldera how you normally would. To do so:
 
+In the magma directory:
 1. Run `npm install`.
 1. Run `npm run build`.
+In the Caldera directory:
+1. Run `python3 server.py`.
 
 Your bundled directory is called `dist/`, located at the project root.
 
 ### Development
 To serve up the UI in a development environment (with hot-reloading, etc.), do
 
+In the magma directory:
 1. Run `npm install`.
-1. Run `npm run dev`.
-
+In the Caldera directory:
+1. Run `python3 server.py --uidev localhost`.
 You can reach the UI in your browser at [http://localhost:3000](http://localhost:3000)
 
 ### Code Quality
