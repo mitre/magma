@@ -15,6 +15,7 @@ this project and start Caldera how you normally would. To do so:
 In the magma directory:
 1. Run `npm install`.
 1. Run `npm run build`.
+
 In the Caldera directory:
 1. Run `python3 server.py`.
 
@@ -25,8 +26,10 @@ To serve up the UI in a development environment (with hot-reloading, etc.), do
 
 In the magma directory:
 1. Run `npm install`.
+
 In the Caldera directory:
 1. Run `python3 server.py --uidev localhost`.
+
 You can reach the UI in your browser at [http://localhost:3000](http://localhost:3000)
 
 ### Code Quality
