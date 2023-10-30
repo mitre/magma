@@ -120,7 +120,7 @@ function saveAgent() {
                     tr
                         th.has-text-right Host
                         td {{ `${selectedAgent.host} (${selectedAgent.host_ip_addrs ? selectedAgent.host_ip_addrs.join(', ') : ''})` }}
-                    tr
+                    tr(v-if="selectedAgent.display_name")
                         th.has-text-right Display Name
                         td {{ selectedAgent.display_name }}
                     tr
@@ -156,7 +156,7 @@ function saveAgent() {
                     tr
                         th.has-text-right Executors
                         td {{ selectedAgent.executors ? selectedAgent.executors.join(", ") : '' }}
-                    tr
+                    tr(v-if="selectedAgent.host_ip_addrs")
                         th.has-text-right Host IP Addresses
                         td {{ selectedAgent.host_ip_addrs ? selectedAgent.host_ip_addrs.join(", ") : '' }}
                     tr

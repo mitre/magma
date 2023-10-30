@@ -19,7 +19,7 @@ import CreateModal from "@/components/operations/CreateModal.vue";
 import DeleteModal from "@/components/operations/DeleteModal.vue";
 import DetailsModal from "@/components/operations/DetailsModal.vue";
 import DownloadModal from "@/components/operations/DownloadModal.vue";
-import AgentDetailsModal from "@/components/agents/DetailsModal.vue";
+import AgentDetailsModal from "@/components/operations/AgentDetailsModal.vue";
 import CommandPopup from "@/components/operations/CommandPopup.vue";
 import OutputPopup from "@/components/operations/OutputPopup.vue";
 import AddPotentialLinkModal from "@/components/operations/AddPotentialLinkModal.vue";
@@ -333,7 +333,7 @@ hr.mt-2
             td 
               ul
                 li(v-for="agent in nodes[selectedNodeId].agents" :key="agent.id")
-                  button.button.is-small(type="button" @click="modals.agents.showDetails = true; agentStore.selectedAgent = agent") {{agent.paw}}
+                  button.button.is-small(type="button" @click="modals.operations.showAgentDetails = true; agentStore.selectedAgent = agent") {{agent.paw}}
 //- Control Panel
 .control-panel.p-0.mb-4(v-if="operationStore.selectedOperationID")
     .columns.m-0.p-1

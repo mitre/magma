@@ -72,7 +72,7 @@ function promptToEnablePlugin(pluginName) {
             li(v-for="plugin in availablePlugins")
                 router-link.menu-item(v-if="plugin.name === 'fieldmanual'" :to="'/docs/index.html'") {{ plugin.name }}
                 router-link.menu-item(v-else-if="enabledPlugins.includes(plugin.name)" :to="`/plugins/${plugin.name}`") {{ plugin.name }}
-                p.menu-item(v-else @click="promptToEnablePlugin(plugin.name)") {{ plugin.name }}
+                p.menu-item(v-else-if="plugin.name !== 'magma'" @click="promptToEnablePlugin(plugin.name)") {{ plugin.name }}
         p.menu-label
             font-awesome-icon(icon="fas fa-cog").pr-2
             | Configuration

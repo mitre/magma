@@ -92,7 +92,7 @@
       "privilege": "User",
       "exe_name": "splunkd",
       "host": "MM251535-PC",
-      "contact": "HTTP",
+      "pending_contact": "HTTP",
       "proxy_receivers": {},
       "proxy_chain": [],
       "origin_link_id": "",
