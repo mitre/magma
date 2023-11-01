@@ -3,6 +3,8 @@ import { createPinia } from "pinia";
 import VueScrollTo from "vue-scrollto";
 import axios from "axios";
 import FloatingVue from "floating-vue";
+import VNetworkGraph from "v-network-graph"
+import "v-network-graph/lib/style.css"
 
 import App from "@/App.vue";
 import router from "@/router.js";
@@ -22,6 +24,7 @@ app.use(createPinia());
 app.use(router);
 app.use(VueScrollTo);
 app.use(FloatingVue);
+app.use(VNetworkGraph);
 
 // Font awesome icons, add more icons here as needed
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -30,12 +33,12 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { 
   faAngleDown, faAngleRight, faAngleUp, faAnglesLeft, faAnglesRight, faArrowRight, faBan, faBook, faCheck, faCog, faDownload, faExclamationTriangle, 
   faExternalLinkAlt, faFileExport, faFileImport, faFlag, faKey, faLock, faMinus, faPause, faPencilAlt, faPlay, faPlus, faPuzzlePiece, faRedo, faRunning, faSave, 
-  faSearch, faSkullCrossbones, faSignOutAlt, faStop, faTimes, faTrash, faUndo, faUnlockAlt, faUpload, faUser, faWeightHanging, faFolderOpen, faFolder, faFile, faDragon, faFolderClosed
+  faSearch, faSkullCrossbones, faSignOutAlt, faStop, faTimes, faTrash, faUndo, faUnlockAlt, faUpload, faUser, faWeightHanging, faFolderOpen, faFolder, faFile, faDragon, faFolderClosed, faArrowLeft, faArrowUp, faArrowDown
 } from '@fortawesome/free-solid-svg-icons';
 library.add(
   faAngleDown, faAngleRight, faAngleUp, faAnglesLeft, faAnglesRight, faArrowRight, faBan, faBook, faCheck, faCog, faDownload, faExclamationTriangle, 
   faExternalLinkAlt, faFileExport, faFileImport, faFlag, faKey, faLock, faMinus, faPause, faPencilAlt, faPlay, faPlus, faPuzzlePiece, faRedo, faRunning, faSave, 
-  faSearch, faSkullCrossbones, faSignOutAlt, faStop, faTimes, faTrash, faUndo, faUnlockAlt, faUpload, faUser, faWeightHanging, faFolderOpen, faFolder, faFile, faDragon, faFolderClosed
+  faSearch, faSkullCrossbones, faSignOutAlt, faStop, faTimes, faTrash, faUndo, faUnlockAlt, faUpload, faUser, faWeightHanging, faFolderOpen, faFolder, faFile, faDragon, faFolderClosed, faArrowLeft, faArrowUp, faArrowDown
 );
 import { 
   faCircle, faCircleQuestion, faCopy 

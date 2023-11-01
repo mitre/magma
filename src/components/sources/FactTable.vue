@@ -17,46 +17,46 @@ let showAbilitySelection = ref(false);
 let showAddFromAdversary = ref(false);
 
 function addFact() {
-    selectedSource.value.facts.push({
-        trait: "",
-        value: "",
-        score: 0
-    });
-    factIndexToEdit.value = selectedSource.value.facts.length - 1;
+  selectedSource.value.facts.push({
+    trait: "",
+    value: "",
+    score: 0,
+  });
+  factIndexToEdit.value = selectedSource.value.facts.length - 1;
 }
 
 function removeFact(factIndex) {
-    selectedSource.value.facts.splice(factIndex, 1);
-    saveFacts();
+  selectedSource.value.facts.splice(factIndex, 1);
+  saveFacts();
 }
 
 async function saveFacts() {
-    factIndexToEdit.value = -1;
-    await sourceStore.saveSource($api);
+  factIndexToEdit.value = -1;
+  await sourceStore.saveSource($api);
 }
 
 async function addFromAbility(ability) {
-    const abilityFacts = getAbilityFacts(ability);
-    if (!abilityFacts.length) {
-        // TODO: Notify user that ability had no facts to add
-        showAbilitySelection.value = false;
-        return;
-    }
-
-    abilityFacts.forEach((fact) => {
-        selectedSource.value.facts.push({
-            trait: fact,
-            value: "",
-            score: 0
-        });
-    });
+  const abilityFacts = getAbilityFacts(ability);
+  if (!abilityFacts.length) {
+    // TODO: Notify user that ability had no facts to add
     showAbilitySelection.value = false;
-    await sourceStore.saveSource($api);
+    return;
+  }
+
+  abilityFacts.forEach((fact) => {
+    selectedSource.value.facts.push({
+      trait: fact,
+      value: "",
+      score: 0,
+    });
+  });
+  showAbilitySelection.value = false;
+  await sourceStore.saveSource($api);
 }
 
 async function addFromAdversary(abilities) {
-    abilities.forEach((ability) => addFromAbility(ability));
-    showAddFromAdversary.value = false;
+  abilities.forEach((ability) => addFromAbility(ability));
+  showAddFromAdversary.value = false;
 }
 </script>
 
@@ -100,9 +100,7 @@ table.table.is-striped.is-fullwidth
             td
                 .buttons
                     button.button.is-primary(
-                            v-if="factIndexToEdit === index" @click="saveFacts()"
-                            :disabled="!fact.trait || !fact.value || fact.score === ''"
-                            )
+                            v-if="factIndexToEdit === index" @click="saveFacts()")
                         span.icon
                             font-awesome-icon(icon="fa-save")
                     button.button(v-else @click="factIndexToEdit = index")

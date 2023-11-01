@@ -32,6 +32,7 @@ function addManualCommand() {
   if (operationStore.currentOperation.state === "paused") {
     // TODO tell user operation is paused
     modals.value.operations.showAddManualCommand = false;
+    return;
   }
   operationStore.addManualCommand($api, manualCommand);
   modals.value.operations.showAddManualCommand = false;

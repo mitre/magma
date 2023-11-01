@@ -102,16 +102,16 @@ export const useOperationStore = defineStore("operationStore", {
         this.operations[this.selectedOperationID].state === "out_of_time"
       );
     },
-    async updateLink($api, status, command = null) {
+    async updateLink($api, status, command = null, currentLink) {
       const updatedLink = {
-        ...this.selectedLink,
-        command: b64DecodeUnicode(this.selectedLink.command),
+        ...currentLink,
+        command: b64DecodeUnicode(currentLink.command),
       };
       if (command) updatedLink.command = command;
       updatedLink.status = status;
       try {
         const response = await $api.patch(
-          `/api/v2/operations/${this.selectedOperationID}/links/${this.selectedLink.id}`,
+          `/api/v2/operations/${this.selectedOperationID}/links/${currentLink.id}`,
           updatedLink
         );
         await this.getOperations($api);

@@ -15,7 +15,7 @@ const coreDisplayStore = useCoreDisplayStore();
 const { modals } = storeToRefs(coreDisplayStore);
 
 let deployableAbilities = ref([]);
-let selectedDeployableAbility = ref({ ability_id: "" });
+let selectedDeployableAbility = ref("");
 let platforms = ref([]);
 let selectedPlatform = ref("");
 let deployCommands = ref([]);
@@ -31,7 +31,8 @@ watch(agentConfig, () => {
     findDeployableAbilities();
 });
 
-function findDeployableAbilities() {
+async function findDeployableAbilities() {
+    await abilityStore.getAbilities($api);
     deployableAbilities.value = [];
     if (!agentConfig.value.deployments) return;
     agentConfig.value.deployments.forEach((abilityId) => {
@@ -41,7 +42,7 @@ function findDeployableAbilities() {
 }
 
 async function selectDeployableAbility() {
-    selectedDeployableAbility.value = deployableAbilities.value.find((ability) => ability.ability_id === selectedDeployableAbility.value.ability_id);
+    // selectedDeployableAbility.value = deployableAbilities.value.find((ability) => ability.ability_id === selectedDeployableAbility.value.ability_id);
     platforms.value = [...new Set(selectedDeployableAbility.value.executors.map((executor) => executor.platform))];
     if (!platforms.value.includes(selectedPlatform.value)) {
         selectedPlatform.value = "";
@@ -106,9 +107,9 @@ function copyCommandToClipboard(command) {
                     label.label Agent 
                     .control 
                         .select 
-                            select(v-model="selectedDeployableAbility.ability_id" @change="selectDeployableAbility()")
-                                option(disabled selected value="") Chose an agent 
-                                option(v-for="ability in deployableAbilities" :key="ability.ability_id" :value="ability.ability_id") {{ `${ability.name} | ${ability.description}` }}
+                            select(v-model="selectedDeployableAbility" @change="selectDeployableAbility()")
+                                option(disabled selected value="") Choose an agent 
+                                option(v-for="ability in deployableAbilities" :key="ability.ability_id" :value="ability") {{ `${ability.name} | ${ability.description}` }}
                 .field(v-if="selectedDeployableAbility.ability_id")
                     label.label Platform 
                     .control.is-flex.is-justify-content-center

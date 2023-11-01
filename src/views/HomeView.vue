@@ -1,5 +1,6 @@
 <script setup>
 import AgentChartStatus from "@/components/agents/AgentChartStatus.vue";
+import OperationChartStatus from "@/components/operations/OperationChartStatus.vue";
 </script>
 
 <template lang="pug">
@@ -12,8 +13,12 @@ import AgentChartStatus from "@/components/agents/AgentChartStatus.vue";
         span.icon
           font-awesome-icon(icon="fas fa-arrow-right")
   .column.is-3
-    .box
-      p.has-text-centered.has-text-weight-bold Operations TODO
+    .box.is-flex.is-flex-direction-column
+      OperationChartStatus.is-flex-grow-1
+      router-link.button.is-primary.is-fullwidth(to="/operations")
+        span Manage operations
+        span.icon
+          font-awesome-icon(icon="fas fa-arrow-right")
   .column.is-3
     .box
       p.has-text-centered.has-text-weight-bold Abilities TODO

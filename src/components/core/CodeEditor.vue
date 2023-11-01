@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { PrismEditor } from "vue-prism-editor";
 import "vue-prism-editor/dist/prismeditor.min.css";
 
@@ -14,6 +14,12 @@ const { modelValue, lineNumbers, language } = defineProps({
     lineNumbers: Boolean,
     language: String,
 });
+
+const intervalValue = ref(modelValue);
+
+onMounted(() => {
+})
+
 const emit = defineEmits(['update:modelValue']); 
 
 let focused = ref(false);
@@ -38,12 +44,13 @@ function highlighter(code) {
 }
 
 function updateValue(event) {
+    intervalValue.value = event.target.value
     emit('update:modelValue', event.target.value);
 }
 </script>
 
 <template lang="pug">
-prism-editor.my-editor(v-model="modelValue" @change="updateValue" @focus="focused = true" @blur="focused = false" :highlight="highlighter" :line-numbers="lineNumbers" :class="{ focused }")
+prism-editor.my-editor(v-model="intervalValue" @input="updateValue" @focus="focused = true" @blur="focused = false" :highlight="highlighter" :line-numbers="lineNumbers" :class="{ focused }")
 </template>
 
 <style scoped>
