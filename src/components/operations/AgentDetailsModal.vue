@@ -17,7 +17,7 @@ let validation = reactive({
   watchdogTimer: "",
 });
 let showDetails = ref(false);
-let showActions = ref(true);
+let showActions = ref(false);
 
 function getAgentStatus(agent) {
   if (!agent.last_seen) return "";

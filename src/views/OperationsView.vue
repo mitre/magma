@@ -44,6 +44,17 @@ const agentStore = useAgentStore();
 const coreStore = useCoreStore();
 const { modals } = storeToRefs(coreDisplayStore);
 
+const tableFilter = reactive({
+  sortBy: "",
+  sortOrder: "",
+  filters: {
+    decide: [],
+    status: [],
+    abilityName: [],
+    pid: [],
+    host: [],
+  },
+});
 let updateInterval = ref();
 let showPotentialLinkModal = ref(false);
 let isSidebarOpen = ref(false);
@@ -89,6 +100,66 @@ const targetNodePos = computed(() => {
   return nodePos || { x: 0, y: 0 };
 });
 
+const filteredChain = computed(() => {
+  let result = [...operationStore.currentOperation.chain];
+  // Filter the data
+  if (tableFilter.filters) {
+    for (let property in tableFilter.filters) {
+      if (tableFilter.filters[property].length === 0) {
+        continue;
+      }
+      const filterValues = tableFilter.filters[property];
+      if (filterValues && filterValues.length > 0) {
+        result = result.filter((row) => filterValues.includes(row[property]));
+      }
+    }
+  }
+
+  // Sort the data
+  if (tableFilter.sortBy) {
+    const sortOrder = tableFilter.sortOrder === "ASC" ? 1 : -1;
+    if (tableFilter.sortBy == "abilityName") {
+      result.sort((a, b) => {
+        if (a.ability.name < b.ability.name) return -1 * sortOrder;
+        if (a.ability.name > b.ability.name) return 1 * sortOrder;
+        return 0;
+      });
+      return result;
+    }
+    result.sort((a, b) => {
+      if (a[tableFilter.sortBy] < b[tableFilter.sortBy]) return -1 * sortOrder;
+      if (a[tableFilter.sortBy] > b[tableFilter.sortBy]) return 1 * sortOrder;
+      return 0;
+    });
+  }
+  return result;
+});
+
+const handleTableSort = (property) => {
+  if (tableFilter.sortBy === property) {
+    if (tableFilter.sortOrder == "ASC") {
+      tableFilter.sortOrder = "DESC";
+    } else {
+      tableFilter.sortOrder = "";
+      tableFilter.sortBy = "";
+    }
+  } else {
+    tableFilter.sortBy = property;
+    tableFilter.sortOrder = "ASC";
+  }
+};
+
+const getSortIconColor = (property, direction) => {
+  if (tableFilter.sortBy === property) {
+    if (tableFilter.sortOrder == "ASC" && direction === "up") {
+      return "#fff";
+    } else if (tableFilter.sortOrder == "DESC" && direction === "down") {
+      return "#fff";
+    }
+  }
+  return "grey";
+};
+
 const buildGraph = async () => {
   if (
     Object.keys(operationStore.operations).length > 0 &&
@@ -131,12 +202,12 @@ const buildGraph = async () => {
     for (const node in nodes) {
       delete nodes[node];
     }
-    console.log(newNodes);
+    // console.log(newNodes);
     Object.assign(nodes, newNodes);
     for (const edge in edges) {
       delete edges[edge];
     }
-    console.log(newEdges);
+    // console.log(newEdges);
     Object.assign(edges, newEdges);
     Object.assign(paths, newPaths);
   }
@@ -391,16 +462,62 @@ hr.mt-2
 table.table.is-fullwidth.is-narrow.is-striped.mb-8#link-table(v-if="operationStore.selectedOperationID")
     thead
         tr
-            th Time Ran
-            th Status
-            th Ability Name 
-            th Agent 
-            th Host 
-            th pid 
-            th Link Command 
-            th Link Output
+          th
+            div.is-flex.is-flex-direction-row.is-align-items-center.gap-5(@click="handleTableSort('decide')" :style="{ cursor: 'pointer', width: 'fit-content' }")
+              span Time Ran 
+              div.is-flex.is-flex-direction-column.is-justify-content-center
+                span.icon.m-n5(:style="{ color: getSortIconColor('decide', 'up') }")
+                  font-awesome-icon(icon="fas fa-angle-up")
+                span.icon(:style="{ color: getSortIconColor('decide', 'down') }")
+                  font-awesome-icon(icon="fas fa-angle-down")
+          th
+            div.is-flex.is-flex-direction-row.is-align-items-center.gap-5(@click="handleTableSort('status')" :style="{ cursor: 'pointer', width: 'fit-content' }")
+              span Status
+              div.is-flex.is-flex-direction-column.is-justify-content-center
+                span.icon.m-n5(:style="{ color: getSortIconColor('status', 'up') }")
+                  font-awesome-icon(icon="fas fa-angle-up")
+                span.icon(:style="{ color: getSortIconColor('status', 'down') }")
+                  font-awesome-icon(icon="fas fa-angle-down")
+          th
+            div.is-flex.is-flex-direction-row.is-align-items-center.gap-5(@click="handleTableSort('abilityName')" :style="{ cursor: 'pointer', width: 'fit-content' }")
+              span Ability Name
+              div.is-flex.is-flex-direction-column.is-justify-content-center
+                span.icon.m-n5(:style="{ color: getSortIconColor('abilityName', 'up') }")
+                  font-awesome-icon(icon="fas fa-angle-up")
+                span.icon(:style="{ color: getSortIconColor('abilityName', 'down') }")
+                  font-awesome-icon(icon="fas fa-angle-down")
+          th
+            div.is-flex.is-flex-direction-row.is-align-items-center.gap-5(@click="handleTableSort('agent')" :style="{ cursor: 'pointer', width: 'fit-content' }")
+              span Agent
+              div.is-flex.is-flex-direction-column.is-justify-content-center
+                span.icon.m-n5(:style="{ color: getSortIconColor('agent', 'up') }")
+                  font-awesome-icon(icon="fas fa-angle-up")
+                span.icon(:style="{ color: getSortIconColor('agent', 'down') }")
+                  font-awesome-icon(icon="fas fa-angle-down")
+          th
+            div.is-flex.is-flex-direction-row.is-align-items-center.gap-5(@click="handleTableSort('host')" :style="{ cursor: 'pointer', width: 'fit-content' }")
+              span Host
+              div.is-flex.is-flex-direction-column.is-justify-content-center
+                span.icon.m-n5(:style="{ color: getSortIconColor('host', 'up') }")
+                  font-awesome-icon(icon="fas fa-angle-up")
+                span.icon(:style="{ color: getSortIconColor('host', 'down') }")
+                  font-awesome-icon(icon="fas fa-angle-down")
+          th
+            div.is-flex.is-flex-direction-row.is-align-items-center.gap-5(@click="handleTableSort('pid')" :style="{ cursor: 'pointer', width: 'fit-content' }")
+              span pid
+              div.is-flex.is-flex-direction-column.is-justify-content-center
+                span.icon.m-n5(:style="{ color: getSortIconColor('pid', 'up') }")
+                  font-awesome-icon(icon="fas fa-angle-up")
+                span.icon(:style="{ color: getSortIconColor('pid', 'down') }")
+                  font-awesome-icon(icon="fas fa-angle-down")
+          th
+            div.is-flex.is-flex-direction-column.is-justify-content-center
+              span.mt-2 Link Command 
+          th
+            div.is-flex.is-flex-direction-column.is-justify-content-center
+              span.mt-2 Link Output 
     tbody
-        tr(v-for="(link, idx) in operationStore.operations[operationStore.selectedOperationID].chain" :key="link.id")
+        tr(v-for="(link, idx) in filteredChain" :key="link.id")
             td {{ getReadableTime(link.decide) }}
             td
                 .is-flex.is-align-items-center(style="border-bottom-width: 0px !important")
@@ -542,6 +659,14 @@ AddPotentialLinkModal(
   border-radius: 10px;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 1);
   padding: 5rem;
+}
+
+.gap-5 {
+  gap: 0.4rem;
+}
+
+.m-n5 {
+  margin-bottom: -0.5rem;
 }
 
 .link-status {
