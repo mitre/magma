@@ -360,7 +360,7 @@ hr.mt-2
 .graph-wrapper(v-if="operationStore.selectedOperationID")
   .graph-header.is-fullwidth.is-flex.is-flex-direction-row.is-align-items-center.is-justify-content-space-between(@click="isGraphOpen = !isGraphOpen")
     .left-graph-header.is-flex.is-flex-direction-row.is-align-items-center.is-3
-      h3 Graph
+      h3 Graph (WORK IN PROGRESS)
       button.button.ml-4(type="button" @click="downloadGraphAsSvg")
         span Download Graph SVG
     span.icon(v-if="!isGraphOpen")
