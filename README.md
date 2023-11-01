@@ -22,6 +22,7 @@ To serve up the UI in a development environment (with hot-reloading, etc.), do
 
 In the magma directory:
 1. Run `npm install`.
+2. Run `npm run build`
 
 In the Caldera directory:
 1. Run `python3 server.py --uidev localhost`.
