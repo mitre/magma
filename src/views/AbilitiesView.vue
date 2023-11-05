@@ -3,6 +3,7 @@ import { storeToRefs } from "pinia";
 import { reactive, ref, inject, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
 import { useAbilityStore } from "@/stores/abilityStore";
+import { getAbilityPlatforms } from "@/utils/abilityUtil.js";
 import CreateEditAbility from "@/components/abilities/CreateEditAbility.vue";
 
 const $api = inject("$api");
@@ -29,7 +30,7 @@ const filteredAbilities = computed(() => {
         && (!filters.tactic || ability.tactic === filters.tactic)
         && (!filters.technique || `${ability.technique_id} | ${ability.technique_name}` === filters.technique)
         && (!filters.plugin || ability.plugin === filters.plugin)
-        && (!filters.platform || getAbilityPlatforms(ability).indexOf(filters.platform) > 0)
+        && (!filters.platform || getAbilityPlatforms(ability).indexOf(filters.platform) >= 0)
     ));
 });
 
@@ -42,9 +43,6 @@ function clearFilters() {
     Object.keys(filters).forEach((k) => filters[k] = "");
 }
 
-function getAbilityPlatforms(ability, withName = false) {
-    return [...new Set(ability.executors.map((exec) => withName ? `${exec.platform} (${exec.name})` : exec.platform))];
-}
 
 function selectAbility(ability, creating) {
     selectedAbility.value = ability;

@@ -13,7 +13,7 @@ const coreStore = useCoreStore();
 const { modals } = storeToRefs(coreDisplayStore);
 const { enabledPlugins, availablePlugins, userSettings } =
   storeToRefs(coreStore);
-const { group } = storeToRefs(authStore);
+const { group, version } = storeToRefs(authStore);
 
 const router = useRouter();
 
@@ -47,10 +47,11 @@ function promptToEnablePlugin(pluginName) {
         img(src="/src/assets/img/caldera-logo.png" alt="Caldera Logo" @click="router.push('/')")
     #logo-collapsed(v-if="userSettings.collapseNavigation")
         img(src="/src/assets/img/caldera-logo-mtn.png" alt="Caldera Logo" @click="router.push('/')")
-    div.team-container
-      span.icon(:class="{ 'is-red': group === 'RED', 'is-blue': group === 'BLUE'}")
-        font-awesome-icon(icon="fas fa-flag")
-      span(:class="{ 'has-text-danger': group === 'RED', 'has-text-info': group === 'BLUE'}" v-text="group.toLowerCase()")
+    #user-info(v-if="!userSettings.collapseNavigation")
+      div.team-container
+        span.icon(:class="{ 'is-red': group === 'RED', 'is-blue': group === 'BLUE'}")
+          font-awesome-icon(icon="fas fa-user")
+        span {{ version }}
     aside.menu(v-if="!userSettings.collapseNavigation")
         
         p.menu-label
@@ -165,7 +166,7 @@ PluginModal
 #logo > img {
   max-height: 150px;
   cursor: pointer;
-  padding: 2em 3em;
+  padding: 1.5em 3em;
 }
 #logo-collapsed > img {
   width: auto;
@@ -229,6 +230,13 @@ p.menu-item:hover {
   top: 0;
   left: 100%;
   padding-top: 0;
+}
+
+.team-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .team-container {

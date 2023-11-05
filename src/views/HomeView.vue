@@ -1,6 +1,21 @@
 <script setup>
 import AgentChartStatus from "@/components/agents/AgentChartStatus.vue";
 import OperationChartStatus from "@/components/operations/OperationChartStatus.vue";
+import AbilityChartStatus from "@/components/abilities/AbilityChartStatus.vue";
+import CodeEditor from "@/components/core/CodeEditor.vue";
+import { useCoreStore } from "@/stores/coreStore";
+import { storeToRefs } from "pinia";
+import { onMounted, inject } from "vue";
+
+const coreStore = useCoreStore();
+const $api = inject("$api");
+onMounted(async () => {
+  try {
+    await coreStore.getMainConfig($api);
+  } catch (error) {
+    console.error(error);
+  }
+});
 </script>
 
 <template lang="pug">
@@ -16,15 +31,25 @@ import OperationChartStatus from "@/components/operations/OperationChartStatus.v
     .box.is-flex.is-flex-direction-column
       OperationChartStatus.is-flex-grow-1
       router-link.button.is-primary.is-fullwidth(to="/operations")
-        span Manage operations
+        span Manage Operations
+        span.icon
+          font-awesome-icon(icon="fas fa-arrow-right")
+  .column.is-3
+    .box.is-flex.is-flex-direction-column
+      AbilityChartStatus.is-flex-grow-1
+      router-link.button.is-primary.is-fullwidth(to="/abilities")
+        span Manage Abilities
         span.icon
           font-awesome-icon(icon="fas fa-arrow-right")
   .column.is-3
     .box
-      p.has-text-centered.has-text-weight-bold Abilities TODO
+      p.has-text-centered.has-text-weight-bold Adversaries TODO
+.columns
   .column.is-3
     .box
-      p.has-text-centered.has-text-weight-bold Adversaries TODO
+      p.has-text-centered.has-text-weight-bold Address
+      span Your caldera instance is running at {{ coreStore.mainConfig["app.contact.http"]}}
+      
 
 
 </template>

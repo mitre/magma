@@ -95,7 +95,11 @@ export const useOperationStore = defineStore("operationStore", {
       }
     },
     isOperationRunning() {
-      if (this.selectedOperationID === "") return false;
+      if (
+        this.selectedOperationID === "" ||
+        !this.operations[this.selectedOperationID]
+      )
+        return false;
       return !(
         this.operations[this.selectedOperationID].state === "finished" ||
         this.operations[this.selectedOperationID].state === "cleanup" ||

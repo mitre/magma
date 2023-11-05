@@ -25,6 +25,7 @@ import CommandPopup from "@/components/operations/CommandPopup.vue";
 import OutputPopup from "@/components/operations/OutputPopup.vue";
 import AddPotentialLinkModal from "@/components/operations/AddPotentialLinkModal.vue";
 import ManualCommand from "@/components/operations/ManualCommand.vue";
+import FiltersModal from "@/components/operations/FiltersModal.vue";
 import { useOperationStore } from "@/stores/operationStore";
 import { useAgentStore } from "@/stores/agentStore";
 import { useCoreDisplayStore } from "@/stores/coreDisplayStore";
@@ -51,10 +52,20 @@ const tableFilter = reactive({
     decide: [],
     status: [],
     abilityName: [],
+    paw: [],
+    tactic: [],
     pid: [],
     host: [],
   },
 });
+const possibleFilters = reactive({
+  abilityName: [],
+  tactic: [],
+  pid: [],
+  paw: [],
+  host: [],
+});
+
 let updateInterval = ref();
 let showPotentialLinkModal = ref(false);
 let isSidebarOpen = ref(false);
@@ -100,8 +111,29 @@ const targetNodePos = computed(() => {
   return nodePos || { x: 0, y: 0 };
 });
 
+const updatePossibleFilters = (chain) => {
+  chain.forEach((chain) => {
+    if (!possibleFilters.abilityName.includes(chain.ability.name)) {
+      possibleFilters.abilityName.push(chain.ability.name);
+    }
+    if (!possibleFilters.tactic.includes(chain.ability.tactic)) {
+      possibleFilters.tactic.push(chain.ability.tactic);
+    }
+    if (!possibleFilters.paw.includes(chain.paw)) {
+      possibleFilters.paw.push(chain.paw);
+    }
+    if (!possibleFilters.pid.includes(chain.pid)) {
+      possibleFilters.pid.push(chain.pid);
+    }
+    if (!possibleFilters.host.includes(chain.host)) {
+      possibleFilters.host.push(chain.host);
+    }
+  });
+};
+
 const filteredChain = computed(() => {
   let result = [...operationStore.currentOperation.chain];
+  updatePossibleFilters(result);
   // Filter the data
   if (tableFilter.filters) {
     for (let property in tableFilter.filters) {
@@ -110,7 +142,14 @@ const filteredChain = computed(() => {
       }
       const filterValues = tableFilter.filters[property];
       if (filterValues && filterValues.length > 0) {
-        result = result.filter((row) => filterValues.includes(row[property]));
+        result = result.filter((row) => {
+          if (property === "abilityName") {
+            return filterValues.includes(row.ability.name);
+          } else if (property === "tactic") {
+            return filterValues.includes(row.ability.tactic);
+          }
+          return filterValues.includes(row[property].toString());
+        });
       }
     }
     for (const node in nodes) {
@@ -133,6 +172,13 @@ const filteredChain = computed(() => {
       result.sort((a, b) => {
         if (a.ability.name < b.ability.name) return -1 * sortOrder;
         if (a.ability.name > b.ability.name) return 1 * sortOrder;
+        return 0;
+      });
+      return result;
+    } else if (tableFilter.sortBy == "tactic") {
+      result.sort((a, b) => {
+        if (a.ability.tactic < b.ability.tactic) return -1 * sortOrder;
+        if (a.ability.tactic > b.ability.tactic) return 1 * sortOrder;
         return 0;
       });
       return result;
@@ -292,10 +338,23 @@ onBeforeUnmount(() => {
   if (updateInterval) clearInterval(updateInterval);
 });
 
+const resetFilter = () => {
+  tableFilter.sortBy = "";
+  tableFilter.sortOrder = "";
+  tableFilter.filters.decide = [];
+  tableFilter.filters.status = [];
+  tableFilter.filters.abilityName = [];
+  tableFilter.filters.paw = [];
+  tableFilter.filters.tactic = [];
+  tableFilter.filters.host = [];
+  tableFilter.filters.pid = [];
+};
+
 function selectOperation() {
   //TODO: Stop updating if operation is finished
   if (updateInterval) clearInterval(updateInterval);
   if (operationStore.selectedOperationID === "") return;
+  resetFilter();
   updateInterval = setInterval(async () => {
     if (operationStore.selectedOperationID !== "") {
       await operationStore.getOperations($api);
@@ -429,6 +488,10 @@ hr.mt-2
                         font-awesome-icon.fa(icon="fas fa-plus")
                     span Potential Link
                 button.button(@click="modals.operations.showDetails = true" type="button") Operation Details
+                button.button(@click="modals.operations.showFilters = true" type="button")
+                  span.icon
+                    font-awesome-icon(icon="fas fa-filter")
+                  span Filters
         .column.is-4.pt-0.pb-0
             span.has-text-success.is-flex.is-justify-content-center {{ operationStore.operations[operationStore.selectedOperationID].state }}
             .is-flex.is-justify-content-center.is-align-items-center.pb-2
@@ -499,6 +562,14 @@ table.table.is-fullwidth.is-narrow.is-striped.mb-8#link-table(v-if="operationSto
                 span.icon(:style="{ color: getSortIconColor('abilityName', 'down') }")
                   font-awesome-icon(icon="fas fa-angle-down")
           th
+            div.is-flex.is-flex-direction-row.is-align-items-center.gap-5(@click="handleTableSort('tactic')" :style="{ cursor: 'pointer', width: 'fit-content' }")
+              span Tactic
+              div.is-flex.is-flex-direction-column.is-justify-content-center
+                span.icon.m-n5(:style="{ color: getSortIconColor('tactic', 'up') }")
+                  font-awesome-icon(icon="fas fa-angle-up")
+                span.icon(:style="{ color: getSortIconColor('tactic', 'down') }")
+                  font-awesome-icon(icon="fas fa-angle-down")
+          th
             div.is-flex.is-flex-direction-row.is-align-items-center.gap-5(@click="handleTableSort('agent')" :style="{ cursor: 'pointer', width: 'fit-content' }")
               span Agent
               div.is-flex.is-flex-direction-column.is-justify-content-center
@@ -536,6 +607,7 @@ table.table.is-fullwidth.is-narrow.is-striped.mb-8#link-table(v-if="operationSto
                     .link-status.mr-2(:style="{ color: getLinkStatus(link).color}") 
                     span(:style="{ color: getLinkStatus(link).color}") {{ getLinkStatus(link).text }}
             td {{ link.ability.name }}
+            td {{ link.ability.tactic }}
             td {{ link.paw }}
             td {{ link.host }}
             td {{ link.pid ? link.pid : "N/A" }}
@@ -569,6 +641,7 @@ AddPotentialLinkModal(
     :operation="operationStore.operations[operationStore.selectedOperationID]"
     @select="addPotentialLinks" 
     @close="showPotentialLinkModal = false")
+FiltersModal(:filters="tableFilter.filters" :possibleFilters="possibleFilters")
 </template>
 
 <style>
