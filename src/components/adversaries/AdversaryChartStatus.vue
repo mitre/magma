@@ -85,9 +85,10 @@ function getChartData() {
   if (!Object.keys(adversaryStore.adversaries).length) return [];
   const adversaryPlugins = [
     ...new Set(
-      Object.values(adversaryStore.adversaries).map(
-        (adversary) => adversary.plugin
-      )
+      Object.values(adversaryStore.adversaries).map((adversary) => {
+        if (adversary.plugin === "") return "none";
+        return adversary.plugin;
+      })
     ),
   ];
   let currentColorIndex = 0;
@@ -95,9 +96,10 @@ function getChartData() {
     if (currentColorIndex >= possibleColors.length) currentColorIndex = 0;
     return {
       name: plugin,
-      value: Object.values(adversaryStore.adversaries).filter(
-        (adversary) => adversary.plugin === plugin
-      ).length,
+      value: Object.values(adversaryStore.adversaries).filter((adversary) => {
+        if (plugin === "none") return adversary.plugin === "";
+        return adversary.plugin === plugin;
+      }).length,
       itemStyle: { color: possibleColors[currentColorIndex++] },
     };
   });
