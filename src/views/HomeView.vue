@@ -2,6 +2,7 @@
 import AgentChartStatus from "@/components/agents/AgentChartStatus.vue";
 import OperationChartStatus from "@/components/operations/OperationChartStatus.vue";
 import AbilityChartStatus from "@/components/abilities/AbilityChartStatus.vue";
+import AdversaryChartStatus from "@/components/adversaries/AdversaryChartStatus.vue";
 import CodeEditor from "@/components/core/CodeEditor.vue";
 import { useCoreStore } from "@/stores/coreStore";
 import { storeToRefs } from "pinia";
@@ -42,8 +43,12 @@ onMounted(async () => {
         span.icon
           font-awesome-icon(icon="fas fa-arrow-right")
   .column.is-3
-    .box
-      p.has-text-centered.has-text-weight-bold Adversaries TODO
+    .box.is-flex.is-flex-direction-column
+      AdversaryChartStatus.is-flex-grow-1
+      router-link.button.is-primary.is-fullwidth(to="/adversaries")
+        span Manage Adversaries
+        span.icon
+          font-awesome-icon(icon="fas fa-arrow-right")
 .columns
   .column.is-3
     .box
