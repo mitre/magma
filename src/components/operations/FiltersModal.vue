@@ -12,10 +12,6 @@ const { filters, possibleFilters } = defineProps({
   possibleFilters: Object,
 });
 
-onMounted(async () => {
-  console.log(possibleFilters);
-});
-
 const handleLinkInput = (event) => {
   if (event.target.checked) {
     filters.status.push(event.target.value);
