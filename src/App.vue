@@ -46,6 +46,21 @@ main {
     width: calc(100% - 220px);
 }
 
+*::-webkit-scrollbar {
+  background-color: #0000;
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: #3f3f3f;
+  border-radius: 10px;
+  height: 50px;
+}
+*::-webkit-scrollbar-corner {
+  background-color: #0000;
+  color: white;
+}
+
 .code {
     font-family: monospace;
 }

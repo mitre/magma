@@ -27,6 +27,14 @@ let validation = reactive({
   techniqueName: "",
   executors: "",
 });
+const payloads = ref([
+  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "3xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "4",
+  "4",
+  "5",
+]);
 
 watch(() => props.ability, setAbilityToEdit);
 
@@ -40,7 +48,7 @@ function addExecutor() {
     timeout: 60,
     platform: "darwin",
     name: platforms.value.darwin[0],
-    payloads: ["hihidsla"],
+    payloads: [],
   };
   if (!abilityToEdit.executors) {
     abilityToEdit.executors = [baseExecutor];
@@ -158,17 +166,21 @@ async function deleteAbility() {
                             .select
                                 select(v-model="executor.name")
                                     option(v-for="exec in platforms[executor.platform]" :value="exec") {{ exec }}
-                    .field
+                    .field.is-grouped.is-grouped-multiline
                         label.label Payloads
-                        .control
-                            span TODO
-                        .control
-                            span.tag(v-for="payload in executor.payloads") {{ payload }}
-                        .control
+                        br
+                        .control(v-if="executor.payloads.length === 0")
+                            span.tag.is-light No payloads
+                        .control(v-for="(payload, idx) in executor.payloads")
+                          .tags.has-addons
+                            span.tag.is-primary {{ payload }}
+                            a.tag.is-delete(@click="executor.payloads.splice(idx, 1)")
+                    .field
+                        .control.mt-3
                             div.select.is-small.is-multiple.is-fullwidth
-                              select.select.is-multiple
-                                template(v-for="payload of payloads")
-                                option(v-if="executor.payloads.indexOf(payload) === -1" @click="executor.payloads.push(payload)") {{ payload }}
+                              select.select.is-multiple(multiple size="6")
+                                template(v-for="payload in payloads")
+                                  option(v-if="executor.payloads.indexOf(payload) === -1" @click="executor.payloads.push(payload)") {{ payload }}
                     .field
                         label.label Command
                         .control
