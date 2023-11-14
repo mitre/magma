@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, inject } from "vue";
+import { reactive, inject, ref } from "vue";
 import { storeToRefs } from "pinia";
 
 import CodeEditor from "@/components/core/CodeEditor.vue";
@@ -21,6 +21,11 @@ const manualCommand = reactive({
   },
   paw: "",
 });
+const selectedAgent = ref(operationStore.currentOperation.host_group[0].paw);
+
+const handleAgentSelect = (agent) => {
+  manualCommand.agent = agent;
+};
 
 function addManualCommand() {
   if (manualCommand.executor.command.length <= 0) {
@@ -45,9 +50,9 @@ tr(id="manual-input-command")
     td(colspan="2")
         .control
             .select
-                select(v-model="manualCommand.agent")
+                select(v-model="selectedAgent")
                     option(disabled default value="") Select an agent
-                    option(v-for="(agent, idx) in operationStore.currentOperation.host_group" :key="agent.paw" :value="agent") {{ `${agent.display_name} - ${agent.paw}` }}
+                    option(v-for="(agent, idx) in operationStore.currentOperation.host_group" :key="agent.paw" :value="agent.paw" @change="handleAgentSelect(agent)") {{ `${agent.display_name} - ${agent.paw}` }}
     td
         .control
             .select 
