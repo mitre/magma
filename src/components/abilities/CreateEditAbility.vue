@@ -40,6 +40,7 @@ function addExecutor() {
     timeout: 60,
     platform: "darwin",
     name: platforms.value.darwin[0],
+    payloads: ["hihidsla"],
   };
   if (!abilityToEdit.executors) {
     abilityToEdit.executors = [baseExecutor];
@@ -50,9 +51,7 @@ function addExecutor() {
 
 function validateAndSave() {
   validation.name = abilityToEdit.name ? "" : "Name cannot be empty";
-  validation.tactic = abilityToEdit.tactic
-    ? ""
-    : "Tactic cannot be empty";
+  validation.tactic = abilityToEdit.tactic ? "" : "Tactic cannot be empty";
   validation.techniqueId = abilityToEdit.technique_id
     ? ""
     : "Technique ID cannot be empty";
@@ -163,6 +162,13 @@ async function deleteAbility() {
                         label.label Payloads
                         .control
                             span TODO
+                        .control
+                            span.tag(v-for="payload in executor.payloads") {{ payload }}
+                        .control
+                            div.select.is-small.is-multiple.is-fullwidth
+                              select.select.is-multiple
+                                template(v-for="payload of payloads")
+                                option(v-if="executor.payloads.indexOf(payload) === -1" @click="executor.payloads.push(payload)") {{ payload }}
                     .field
                         label.label Command
                         .control
