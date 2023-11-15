@@ -107,17 +107,6 @@ const filteredChain = computed(() => {
         });
       }
     }
-    for (const node in nodes) {
-      delete nodes[node];
-    }
-    console.log(newNodes);
-    Object.assign(nodes, newNodes);
-    for (const edge in edges) {
-      delete edges[edge];
-    }
-    console.log(newEdges);
-    Object.assign(edges, newEdges);
-    Object.assign(paths, newPaths);
   }
 
   // Sort the data
@@ -172,7 +161,6 @@ const getSortIconColor = (property, direction) => {
   return "grey";
 };
 //END SORTING AND FILTERING
-
 
 onMounted(async () => {
   await operationStore.getOperations($api);
