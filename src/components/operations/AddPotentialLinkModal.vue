@@ -61,14 +61,13 @@ const potentialLinksToAdd = computed(() => {
     }
 
     let combinations = [];
-    Object.keys(selectedPotentialLinkFacts.value).forEach((factName) => {
+    Object.keys(selectedPotentialLinkFacts.value).forEach((factName, i) => {
         combinations.push(selectedPotentialLinkFacts.value[factName].facts.filter((fact) => fact.selected).map((fact) => `${factName}|${fact.value}`));
         if (selectedPotentialLinkFacts.value[factName].customValue) {
-            combinations[0].push(`${factName}|${selectedPotentialLinkFacts.value[factName].customValue}`);
+            combinations[i].push(`${factName}|${selectedPotentialLinkFacts.value[factName].customValue}`);
         }
     });
     combinations = cartesian(combinations);
-
     let executor;
     if (selectedPotentialLink.value.executors) {
         executor = selectedPotentialLink.value.executors.find((e) => filters.executor === e.name);
@@ -106,7 +105,6 @@ const potentialLinksToAdd = computed(() => {
             }
         });
     });
-
     return links;
 });
 
