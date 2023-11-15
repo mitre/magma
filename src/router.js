@@ -100,6 +100,13 @@ const router = createRouter({
     },
     { path: "/:pathMatch(.*)*", name: "NotFound", component: NotFoundView },
   ],
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition;
+    } else {
+      return { top: 0 };
+    }
+  },
 });
 
 router.beforeEach(async (to) => {
