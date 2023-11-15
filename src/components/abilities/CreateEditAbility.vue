@@ -166,7 +166,7 @@ async function deleteAbility() {
                     .field
                         label.label Command
                         .control
-                            CodeEditor(v-model="executor.command" :key="executor.command + index" language="bash" line-numbers)
+                            CodeEditor(v-model="executor.command" :key="index" language="bash" line-numbers)
                     .field
                         label.label Timeout
                         .control
@@ -174,7 +174,7 @@ async function deleteAbility() {
                     label.label Cleanup
                     .field.has-addons(v-for="(cleanup, index) of executor.cleanup")
                         .control.is-expanded
-                            CodeEditor(v-model="executor.cleanup[index]" :key="executor.cleanup[index] + index" language="bash" line-numbers)
+                            CodeEditor(v-model="executor.cleanup[index]" :key="index" language="bash" line-numbers)
                         .control
                             a.button(@click="executor.cleanup.splice(index, 1)")
                                 span.icon
