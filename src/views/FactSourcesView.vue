@@ -16,23 +16,41 @@ let isEditingName = ref(false);
 let newSourceName = ref("");
 
 onMounted(() => {
-    sourceStore.getSources($api);
+  sourceStore.getSources($api);
 });
 
 function saveSource() {
-    selectedSource.value.name = newSourceName.value;
-    sourceStore.saveSource($api, selectedSource);
-    isEditingName.value = false;
+  selectedSource.value.name = newSourceName.value;
+  sourceStore.saveSource($api, selectedSource);
+  isEditingName.value = false;
 }
 
 async function createSource(duplicate) {
-    const newSource = await sourceStore.createSource($api, duplicate);
-    selectedSource.value = newSource;
+  const newSource = await sourceStore.createSource($api, duplicate);
+  selectedSource.value = newSource;
 }
 
 async function deleteSource() {
-    await sourceStore.deleteSource($api);
-    selectedSource.value = {};
+  await sourceStore.deleteSource($api);
+  selectedSource.value = {};
+}
+
+function downloadSource() {
+  $api.get(`/api/v2/sources/${selectedSource.value.id}`)
+    .then((res) => {
+      const dataURL = `data:text/json;charset=utf-8,${encodeURIComponent(
+        JSON.stringify(res, null, 2)
+      )}`;
+      const fileName = `${selectedSource.value.name}.json`;
+      const elem = document.createElement("a");
+      elem.setAttribute("href", dataURL);
+      elem.setAttribute("download", fileName);
+      elem.click();
+      elem.remove();
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 }
 </script>
 
@@ -54,6 +72,10 @@ async function deleteSource() {
                 span New Source
     .column.is-4.m-0
         .buttons.is-justify-content-right(v-if="selectedSource.id")
+            button.button.mr-2(@click="downloadSource" type="button")
+                span.icon
+                    font-awesome-icon(icon="fas fa-save")
+                span Download Report
             button.button.mr-2(type="button" @click="createSource(true)")
                 span.icon
                     font-awesome-icon(icon="far fa-copy")
