@@ -37,6 +37,7 @@ let onHoverUnlocks = ref([]);
 // Table row drag and drop
 let tableDragTarget = ref(null);
 let tableDragEndIndex = ref(null);
+let tableDragTargetIndex = ref(null);
 let tableDragHoverId = ref(null);
 
 // Abilities
@@ -235,19 +236,20 @@ function setAbilityHover(abilityId) {
 
 function startAbilitySwap(event) {
     tableDragTarget.value = event.target.parentNode;
+    tableDragTargetIndex.value = parseInt(tableDragTarget.value.children[1].children[0].children[0].innerHTML, 10);
 }
 
 function swapAbilitiesHover(event) {
+    if (!event.target.parentNode.children[1]) return;
     tableDragEndIndex.value = parseInt(event.target.parentNode.children[1].children[0].children[0].innerHTML, 10);
 }
 
 function swapAbilities() {
-    const fromIndex = parseInt(tableDragTarget.value.children[1].children[0].children[0].innerHTML, 10) - 1;
+    const fromIndex = tableDragTargetIndex.value - 1;
     const toIndex = tableDragEndIndex.value - 1;
-    const temp = selectedAdversaryAbilities.value[fromIndex];
-    selectedAdversaryAbilities.value[fromIndex] = selectedAdversaryAbilities.value[toIndex];
-    selectedAdversaryAbilities.value[toIndex] = temp;
-
+    const temp = selectedAdversaryAbilities.value[fromIndex]; 
+    selectedAdversaryAbilities.value.splice(fromIndex, 1); 
+    selectedAdversaryAbilities.value.splice(toIndex, 0, temp); 
     tableDragHoverId.value = undefined;
     tableDragEndIndex.value = undefined;
 }
@@ -370,13 +372,12 @@ table.table.is-striped.is-fullwidth.is-narrow
     tbody
         tr.pointer(
             v-for="(ability, index) in selectedAdversaryAbilities"
-            :class="{ 'orange-row': needsParser.indexOf(ability.name) > -1, 'row-hover': ability.ability_id === tableDragHoverId && tableDragHoverId != undefined, 'red-row-unclickable': undefinedAbilities.indexOf(ability.ability_id) > -1 }" 
+            :class="{ 'row-hover-above': ability.ability_id === tableDragHoverId && tableDragHoverId != undefined && tableDragEndIndex < tableDragTargetIndex, 'row-hover-below': ability.ability_id === tableDragHoverId && tableDragHoverId != undefined && tableDragEndIndex > tableDragTargetIndex, 'orange-row': needsParser.indexOf(ability.name) > -1, 'row-hover': ability.ability_id === tableDragHoverId && tableDragHoverId != undefined, 'red-row-unclickable': undefinedAbilities.indexOf(ability.ability_id) > -1}" 
             @click="selectAbility(ability)"
             @mouseenter="setAbilityHover(ability.ability_id)"
             @mouseleave="onHoverLocks = []; onHoverUnlocks = [];"
-            @dragenter="tableDragHoverId = ability.ability_id"
             )
-            td.drag.is-flex.is-align-items-center.is-justify-content-center(@click.stop draggable="true" @dragstart="startAbilitySwap" @dragover.prevent="swapAbilitiesHover" @dragend="swapAbilities")
+            td.drag.is-flex.is-align-items-center.is-justify-content-center(@click.stop draggable="true" @dragenter="tableDragHoverId = ability.ability_id" @dragstart="startAbilitySwap" @dragover.prevent="swapAbilitiesHover" @dragend="swapAbilities")
                 span &#9776;
             td 
                 .icon-text 
@@ -461,6 +462,14 @@ DeleteAdversaryConfirmationModal
 
 .row-hover {
     background-color: #484848 !important;
+}
+
+.row-hover-above {
+  border-top: 3px solid green;
+}
+
+.row-hover-below {
+  border-bottom: 3px solid green;
 }
 
 .tactic-breakdown {
