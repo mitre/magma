@@ -53,7 +53,7 @@ onMounted(async () => {
   .column.is-3
     .box
       p.has-text-centered.has-text-weight-bold Server
-      span Your caldera instance is running at <b> localhost:8888 </b>
+      span Your caldera instance is running at <b> {{coreStore.mainConfig["app.contact.http"]}} </b>
       
 
 

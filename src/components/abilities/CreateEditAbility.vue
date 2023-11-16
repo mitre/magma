@@ -27,14 +27,7 @@ let validation = reactive({
   techniqueName: "",
   executors: "",
 });
-const payloads = ref([
-  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-  "3xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-  "4",
-  "4",
-  "5",
-]);
+const payloads = ref([]);
 
 watch(() => props.ability, setAbilityToEdit);
 
