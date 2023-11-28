@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, watch, computed } from "vue";
+import { ref, reactive, watch, computed, inject } from "vue";
 import { storeToRefs } from "pinia";
 import { getLinkStatus } from "@/utils/operationUtil.js";
 
@@ -11,6 +11,8 @@ import graphDataUrl from "@/public/operation_graph.json";
 import { useOperationStore } from "@/stores/operationStore";
 import { useCoreDisplayStore } from "@/stores/coreDisplayStore";
 import { useAgentStore } from "@/stores/agentStore";
+const $api = inject("$api");
+const emit = defineEmits(["scroll"]);
 
 const operationStore = useOperationStore();
 const coreDisplayStore = useCoreDisplayStore();
@@ -71,12 +73,20 @@ const buildGraph = async () => {
     // Get graph data
     // TODO: Change to actual api endpoint
     try {
-      const graphData = graphDataUrl;
+      // const graphData = graphDataUrl;
+      const operationsSummary = await $api.get("/api/v2/operations/summary");
+      const graphData = operationsSummary.data.find(
+        (operation) => operation.id === operationStore.currentOperation.id
+      );
+      if (!graphData) {
+        console.error("Could not find operation graph data");
+        return;
+      }
       for (const hostKey in graphData.hosts) {
         const host = graphData.hosts[hostKey];
         newNodes[host.host] = {
           name: host.host,
-          displayName: host.display_name,
+          displayName: host.host,
           platform: host.platform,
           reachable: host.reachable_hosts,
           ips: host.host_ip_addrs,
@@ -93,9 +103,13 @@ const buildGraph = async () => {
           };
         });
       }
-      graphData.agents.forEach((agent) => {
+      for (const agentKey in graphData.agents) {
+        const agent = graphData.agents[agentKey];
         newNodes[agent.host].agents.push(agent);
-      });
+      }
+      // graphData.agents.forEach((agent) => {
+      //   newNodes[agent.host].agents.push(agent);
+      // });
     } catch (error) {
       console.error(error);
       return;
@@ -161,17 +175,23 @@ const previousHostActions = computed(() => {
   let curLinkIndex = operationStore.currentOperation.chain.length - 1;
   while (previousHostActions.length < 3 && curLinkIndex >= 0) {
     const curLink = operationStore.currentOperation.chain[curLinkIndex];
-    // Remove jamies macbook pro 2 local
-    if (
-      curLink.host === nodes[selectedNodeId.value].name ||
-      curLink.host === "Jamies-MacBook-Pro-2.local"
-    ) {
+    if (curLink.host === nodes[selectedNodeId.value].name) {
       previousHostActions.push(curLink);
     }
     curLinkIndex--;
   }
   return previousHostActions;
 });
+
+const scrollToLink = (link) => {
+  if (!link) return;
+  const linkIndex = operationStore.currentOperation.chain.indexOf(link);
+  if (linkIndex === -1) return;
+  const linkElement = document.getElementById(`link-${linkIndex}`);
+  if (!linkElement) return;
+  linkElement.scrollIntoView({ behavior: "smooth", block: "center" });
+  emit("scroll", linkElement);
+};
 
 const eventHandlers = {
   "node:pointerover": ({ node }) => {
@@ -248,7 +268,7 @@ const eventHandlers = {
           tr
             th Status
             th Ability
-          tr(v-for="action in previousHostActions" :key="action.id")
+          tr.host-action(v-for="action in previousHostActions" :key="action.id" @click="scrollToLink(action)")
             td
               .is-flex.is-align-items-center(style="border-bottom-width: 0px !important")
                 .link-status.mr-2(:style="{ color: getLinkStatus(action).color}")
@@ -261,6 +281,11 @@ const eventHandlers = {
   display: flex;
   flex-direction: row;
   gap: 0.5rem;
+}
+
+.host-action:hover {
+  background-color: #4a4a4a;
+  cursor: pointer;
 }
 
 .graph-header {

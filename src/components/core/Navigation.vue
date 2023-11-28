@@ -127,8 +127,9 @@ function promptToEnablePlugin(pluginName) {
             .dropdown-menu(role="menu")
                 .dropdown-content.ml-2
                     div(v-for="plugin in availablePlugins")
-                        router-link.menu-item(v-if="enabledPlugins.includes(plugin.name)" :to="`/plugins/${plugin.name}`") {{ plugin.name }}
-                        p.menu-item(v-else @click="promptToEnablePlugin(plugin.name)") {{ plugin.name }}
+                        router-link.dropdown-item(v-if="plugin.name === 'fieldmanual'" :to="'/docs/index.html'") {{ plugin.name }}
+                        router-link.dropdown-item(v-else-if="enabledPlugins.includes(plugin.name)" :to="`/plugins/${plugin.name}`") {{ plugin.name }}
+                        p.dropdown-item(v-else-if="plugin.name !== 'magma'" @click="promptToEnablePlugin(plugin.name)") {{ plugin.name }}
         .dropdown.is-hoverable.mb-2
             .dropdown-trigger
                 button.button(aria-haspopup="true" aria-controls="dropdown-menu")
@@ -224,6 +225,15 @@ p.menu-item {
 p.menu-item:hover {
   cursor: pointer;
   border: 1px solid grey;
+}
+
+p.dropdown-item {
+  color: grey;
+}
+p.dropdown-item:hover {
+  cursor: pointer;
+  border: 1px solid grey;
+  border-radius: 8px;
 }
 
 .dropdown-menu {

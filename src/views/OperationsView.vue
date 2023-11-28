@@ -235,6 +235,15 @@ async function addPotentialLinks(links) {
     console.error("Error adding potential links", error);
   }
 }
+
+function highlightLink(linkElement) {
+  console.log("here");
+  console.log(linkElement);
+  linkElement.classList.add("highlight-link");
+  setTimeout(() => {
+    linkElement.classList.remove("highlight-link");
+  }, 2000);
+}
 </script>
 
 <template lang="pug">
@@ -264,7 +273,7 @@ async function addPotentialLinks(links) {
                 span Delete Operation
 hr.mt-2
 
-Graph
+Graph(@scroll="highlightLink")
 //- Control Panel
 .control-panel.p-0.mb-4(v-if="operationStore.selectedOperationID")
     .columns.m-0.p-1
@@ -391,7 +400,7 @@ table.table.is-fullwidth.is-narrow.is-striped.mb-8#link-table(v-if="operationSto
             div.is-flex.is-flex-direction-column.is-justify-content-center
               span.mt-2 Link Output 
     tbody
-        tr(v-for="(link, idx) in filteredChain" :key="link.id")
+        tr(v-for="(link, idx) in filteredChain" :key="link.id" :id="`link-${idx}`")
             td {{ getReadableTime(link.decide) }}
             td
                 .is-flex.is-align-items-center(style="border-bottom-width: 0px !important")
@@ -498,5 +507,9 @@ a.icon {
 
 .table td {
   vertical-align: middle !important;
+}
+
+.highlight-link {
+  border: 2px solid #8b00ff;
 }
 </style>
