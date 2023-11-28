@@ -1,6 +1,7 @@
 <script setup>
 import { ref, reactive, watch, computed } from "vue";
 import { storeToRefs } from "pinia";
+import { getLinkStatus } from "@/utils/operationUtil.js";
 
 import * as vNG from "v-network-graph";
 import configData from "@/utils/graphConfig";
@@ -154,6 +155,24 @@ watch(
   { deep: true }
 );
 
+const previousHostActions = computed(() => {
+  if (!operationStore.selectedOperationID || !selectedNodeId) return [];
+  const previousHostActions = [];
+  let curLinkIndex = operationStore.currentOperation.chain.length - 1;
+  while (previousHostActions.length < 3 && curLinkIndex >= 0) {
+    const curLink = operationStore.currentOperation.chain[curLinkIndex];
+    // Remove jamies macbook pro 2 local
+    if (
+      curLink.host === nodes[selectedNodeId.value].name ||
+      curLink.host === "Jamies-MacBook-Pro-2.local"
+    ) {
+      previousHostActions.push(curLink);
+    }
+    curLinkIndex--;
+  }
+  return previousHostActions;
+});
+
 const eventHandlers = {
   "node:pointerover": ({ node }) => {
     targetNodeId.value = node;
@@ -220,12 +239,30 @@ const eventHandlers = {
           tr
             th Agents ({{nodes[selectedNodeId].agents.length}})
             td
-              ul
+              ul#agent-list
                 li(v-for="agent in nodes[selectedNodeId].agents" :key="agent.id")
                   button.button.is-small(type="button" @click="modals.operations.showAgentDetails = true; agentStore.selectedAgent = agent") {{agent.paw}}
+      span(v-if="isSidebarOpen && isGraphOpen" :style="{opacity: !isSidebarOpen ? 0 : 1}") Recent Actions
+      table.table.sidebar-table(v-if="isSidebarOpen && isGraphOpen" :style="{opacity: !isSidebarOpen ? 0 : 1}")
+        tbody(v-if="selectedNodeId")
+          tr
+            th Status
+            th Ability
+          tr(v-for="action in previousHostActions" :key="action.id")
+            td
+              .is-flex.is-align-items-center(style="border-bottom-width: 0px !important")
+                .link-status.mr-2(:style="{ color: getLinkStatus(action).color}")
+                span(:style="{ color: getLinkStatus(action).color}") {{ getLinkStatus(action).text }}
+            td {{action.ability.name}}
 </template>
 
 <style scoped>
+#agent-list {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
 .graph-header {
   cursor: pointer;
   padding-right: 1rem;
