@@ -237,8 +237,6 @@ async function addPotentialLinks(links) {
 }
 
 function highlightLink(linkElement) {
-  console.log("here");
-  console.log(linkElement);
   linkElement.classList.add("highlight-link");
   setTimeout(() => {
     linkElement.classList.remove("highlight-link");

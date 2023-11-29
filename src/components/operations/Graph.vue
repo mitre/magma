@@ -130,7 +130,15 @@ const buildGraph = async () => {
 
 const getAgentRings = (agents) => {
   if (!agents) return 0;
-  return Math.min(agents.length, 5);
+  const rings = []
+  for(let i = 0; i < Math.min(agents.length, 5); i++){
+    if (agents[i].trusted === true) {
+      rings.push("#c85450")
+    } else {
+      rings.push("#F7DB89")
+    }
+  }
+  return rings;
 };
 
 async function downloadGraphAsSvg() {
@@ -228,7 +236,7 @@ const eventHandlers = {
         template(v-slot:override-node="{ nodeId, scale, config, ...slotProps }")
           circle.face-circle(:r="config.radius * scale" fill="#ffffff" v-bind="slotProps")
           image.face-picture(:x="-config.radius * scale" :y="-config.radius * scale" :width="config.radius * scale * 2" :height="config.radius * scale * 2" :xlink:href="`/src/assets/img/graph/${nodes[nodeId].icon}`" clip-path="url(#faceCircle)")
-          circle.face-circle(v-for="idx in getAgentRings(nodes[nodeId].agents)" :r="config.radius + (8 + ((idx - 1) * 9))" :key="idx" fill="none" stroke="#c85450" :stroke-width="3 * scale" v-bind="slotProps")
+          circle.face-circle(v-for="(stroke, idx) in getAgentRings(nodes[nodeId].agents)" :r="config.radius + (8 + (((idx + 1) - 1) * 9))" :key="idx" fill="none" :stroke="stroke" :stroke-width="3 * scale" v-bind="slotProps")
       .tooltip(ref="tooltip" :style="{...tooltipPos, opacity: tooltipOpacity}")
         span(v-if="targetNodeId") {{ nodes[targetNodeId].displayName }}
         span(v-if="targetNodeId") Platform: {{ nodes[targetNodeId].platform }}
