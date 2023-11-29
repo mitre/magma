@@ -141,6 +141,11 @@ const getAgentRings = (agents) => {
   return rings;
 };
 
+const getHostIcon = (icon) => {
+  if (!icon) return "";
+  return new URL(`../../assets/img/graph/${icon}`, import.meta.url).href;
+};
+
 async function downloadGraphAsSvg() {
   if (!graph.value) return;
   const text = await graph.value.exportAsSvgText();
@@ -235,7 +240,7 @@ const eventHandlers = {
             circle(cx="0.5" cy="0.5" r="0.5")
         template(v-slot:override-node="{ nodeId, scale, config, ...slotProps }")
           circle.face-circle(:r="config.radius * scale" fill="#ffffff" v-bind="slotProps")
-          image.face-picture(:x="-config.radius * scale" :y="-config.radius * scale" :width="config.radius * scale * 2" :height="config.radius * scale * 2" :xlink:href="`/src/assets/img/graph/${nodes[nodeId].icon}`" clip-path="url(#faceCircle)")
+          image.face-picture(:x="-config.radius * scale" :y="-config.radius * scale" :width="config.radius * scale * 2" :height="config.radius * scale * 2" :xlink:href="getHostIcon(nodes[nodeId].icon)" clip-path="url(#faceCircle)")
           circle.face-circle(v-for="(stroke, idx) in getAgentRings(nodes[nodeId].agents)" :r="config.radius + (8 + (((idx + 1) - 1) * 9))" :key="idx" fill="none" :stroke="stroke" :stroke-width="3 * scale" v-bind="slotProps")
       .tooltip(ref="tooltip" :style="{...tooltipPos, opacity: tooltipOpacity}")
         span(v-if="targetNodeId") {{ nodes[targetNodeId].displayName }}
