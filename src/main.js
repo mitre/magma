@@ -32,19 +32,21 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 import { 
   faAngleDown, faAngleRight, faAngleUp, faAnglesLeft, faAnglesRight, faArrowRight, faBan, faBook, faCheck, faCog, faDownload, faExclamationTriangle, 
-  faExternalLinkAlt, faFileExport, faFileImport, faFlag, faKey, faLock, faMinus, faPause, faPencilAlt, faPlay, faPlus, faPuzzlePiece, faRedo, faRunning, faSave, faFilter,
-  faSearch, faSkullCrossbones, faSignOutAlt, faStop, faTimes, faTrash, faUndo, faUnlockAlt, faUpload, faUser, faWeightHanging, faFolderOpen, faFolder, faFile, faDragon, faFolderClosed, faArrowLeft, faArrowUp, faArrowDown
+  faExternalLinkAlt, faFileExport, faFileImport, faFlag as fasFlag, faKey, faLock, faMinus, faPause, faPencilAlt, faPlay, faPlus, faPuzzlePiece, faRedo, faRunning, faSave, faFilter,
+  faSearch, faSkullCrossbones, faSignOutAlt, faStop, faTimes, faTrash, faUndo, faUnlockAlt, faUpload, faUser, faWeightHanging, faFolderOpen, faFolder, faFile, faDragon, faFolderClosed, faArrowLeft, faArrowUp, faArrowDown, 
+  faChevronUp, faChevronDown
 } from '@fortawesome/free-solid-svg-icons';
 library.add(
   faAngleDown, faAngleRight, faAngleUp, faAnglesLeft, faAnglesRight, faArrowRight, faBan, faBook, faCheck, faCog, faDownload, faExclamationTriangle, faFilter,
-  faExternalLinkAlt, faFileExport, faFileImport, faFlag, faKey, faLock, faMinus, faPause, faPencilAlt, faPlay, faPlus, faPuzzlePiece, faRedo, faRunning, faSave, 
-  faSearch, faSkullCrossbones, faSignOutAlt, faStop, faTimes, faTrash, faUndo, faUnlockAlt, faUpload, faUser, faWeightHanging, faFolderOpen, faFolder, faFile, faDragon, faFolderClosed, faArrowLeft, faArrowUp, faArrowDown
+  faExternalLinkAlt, faFileExport, faFileImport, fasFlag, faKey, faLock, faMinus, faPause, faPencilAlt, faPlay, faPlus, faPuzzlePiece, faRedo, faRunning, faSave, 
+  faSearch, faSkullCrossbones, faSignOutAlt, faStop, faTimes, faTrash, faUndo, faUnlockAlt, faUpload, faUser, faWeightHanging, faFolderOpen, faFolder, faFile, faDragon, faFolderClosed, faArrowLeft, faArrowUp, faArrowDown,
+  faChevronUp, faChevronDown
 );
 import { 
-  faCircle, faCircleQuestion, faCopy 
+  faCircle, faCircleQuestion, faCopy, faFlag as farFlag
 } from '@fortawesome/free-regular-svg-icons';
 library.add(
-  faCircle, faCircleQuestion, faCopy
+  faCircle, faCircleQuestion, faCopy, farFlag
 );
 import { 
   faApple, faLinux, faWindows 
