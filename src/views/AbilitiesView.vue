@@ -34,9 +34,9 @@ const filteredAbilities = computed(() => {
     ));
 });
 
-onMounted(() => {
+onMounted(async () => {
+    await abilityStore.getAbilities($api);
     filters.plugin = route.query.plugin || "";
-    abilityStore.getAbilities($api);
 });
 
 function clearFilters() {
@@ -103,7 +103,7 @@ hr
             strong {{ filteredAbilities.length }}&nbsp;
             | / {{ abilities.length }} abilities
     .column.is-10.m-0.is-flex.is-flex-wrap-wrap.is-align-content-flex-start
-        .box.mb-2.mr-2.p-3.ability(v-for="ability in filteredAbilities" @click="selectAbility(ability, false)")
+        .box.mb-2.mr-2.p-3.ability(v-for="ability in filteredAbilities" @click="selectAbility(ability, false)" :key="ability.ability_id")
             .is-flex.is-justify-content-space-between.is-align-items-center.mb-1
                 .is-flex
                     span.tag.is-small.mr-3 {{ ability.tactic }} 

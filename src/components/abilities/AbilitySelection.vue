@@ -58,10 +58,10 @@ function createAbility() {
 <template lang="pug">
 .modal(:class="{ 'is-active': props.active }")
     .modal-background(@click="emit('close')")
-    .modal-card 
-        header.modal-card-head 
+    .modal-card
+        header.modal-card-head
             p.modal-card-title Select Ability
-        .modal-card-body 
+        .modal-card-body
             form
                 .field
                     .control.has-icons-left
