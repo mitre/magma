@@ -413,7 +413,10 @@ table.table.is-fullwidth.is-narrow.is-striped.mb-8#link-table(v-if="operationSto
                 //- button.button(v-tooltip="b64DecodeUnicode(link.command)" @click="handleViewCommand(link)") View Command
                 .dropdown.is-hoverable
                     .dropdown-trigger
-                        button.button(aria-haspopup="true" aria-controls="dropdown-menu") View Command
+                        button.button(aria-haspopup="true" aria-controls="dropdown-menu")
+                          span View Command
+                          span.icon.is-small(v-if="link.cleanup != 0")
+                            font-awesome-icon(icon="fas fa-broom")
                     .dropdown-menu.command-popup(role="menu")
                         .dropdown-content
                             CommandPopup(:link="link")
