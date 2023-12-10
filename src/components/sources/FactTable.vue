@@ -58,6 +58,35 @@ async function addFromAdversary(abilities) {
   abilities.forEach((ability) => addFromAbility(ability));
   showAddFromAdversary.value = false;
 }
+
+const getFactOriginShort = (originType) => {
+  switch (originType) {
+    case "IMPORTED":
+      return "IMP";
+    case "SEEDED":
+      return "SED";
+    case "LEARNED":
+      return "LRN";
+    case "USER":
+      return "USR";
+    case "DOMAIN":
+      return "DOM";
+  }
+};
+const getFactOriginColor = (originType) => {
+  switch (originType) {
+    case "IMPORTED":
+      return "has-background-primary-dark";
+    case "SEEDED":
+      return "is-warning";
+    case "LEARNED":
+      return "is-success";
+    case "USER":
+      return "is-info";
+    case "DOMAIN":
+      return "is-primary";
+  }
+};
 </script>
 
 <template lang="pug">
@@ -90,7 +119,9 @@ table.table.is-striped.is-fullwidth
         tr(v-for="(fact, index) of selectedSource.facts")
             td 
                 input.input(v-if="factIndexToEdit === index" v-model="fact.trait" placeholder="Fact trait")
-                span(v-else) {{ fact.trait || "---" }}
+                div.is-flex.is-flex-direction-row(v-else)
+                  span {{ fact.trait || "---" }}
+                  #fact-source-icon.tag.ml-2(v-if="fact.origin_type" :class="getFactOriginColor(fact.origin_type)" v-tooltip="`Origin: ${fact.origin_type.toLowerCase()}`") {{ getFactOriginShort(fact.origin_type) }}
             td 
                 input.input(v-if="factIndexToEdit === index" v-model="fact.value" placeholder="Fact value")
                 span(v-else) {{ fact.value || "---" }}
@@ -115,3 +146,9 @@ AbilitySelection(:active="showAbilitySelection" @select="addFromAbility" @close=
 AddAbilitiesFromAdversaryModal(:active="showAddFromAdversary" @select="addFromAdversary" @close="showAddFromAdversary = false")
 
 </template>
+
+<style scoped>
+#fact-source-icon {
+  font-size: 0.95em;
+}
+</style>

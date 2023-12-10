@@ -4,6 +4,7 @@ export const useAbilityStore = defineStore("abilityStore", {
     state: () => {
         return {
             abilities: [],
+            payloads: [],
         };
     },
     getters: {
@@ -65,6 +66,14 @@ export const useAbilityStore = defineStore("abilityStore", {
                 this.abilities.splice(this.abilities.findIndex((ability) => ability.ability_id === abilityId), 1);
             } catch(error) {
                 console.error("Error fetching abilities", error);
+            }
+        },
+        async getPayloads($api) {
+            try {
+                const response = await $api.get("/api/payloads");
+                this.payloads = response.data.payloads;
+            } catch(error) {
+                console.error("Error fetching payloads", error);
             }
         }
     },

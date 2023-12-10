@@ -1,5 +1,6 @@
 export {
-    getAbilityFacts
+    getAbilityFacts,
+    getAbilityPlatforms,
 };
 
 function getAbilityFacts(ability) {
@@ -16,4 +17,7 @@ function getAbilityFacts(ability) {
         });
     }
     return [ ...new Set(factTraits) ];
+}
+function getAbilityPlatforms(ability, withName = false) {
+    return [...new Set(ability.executors.map((exec) => withName ? `${exec.platform} (${exec.name})` : exec.platform))];
 }

@@ -16,8 +16,8 @@ const app = createApp(App);
 // Set default API url
 const $api = axios.create({
   withCredentials: true,
-  baseURL: import.meta.env.VITE_CALDERA_URL || "http://localhost:8888/",
 });
+if (import.meta.env.DEV) $api.defaults.baseURL = "http://localhost:8888";
 app.provide("$api", $api);
 
 app.use(createPinia());
@@ -32,19 +32,21 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 import { 
   faAngleDown, faAngleRight, faAngleUp, faAnglesLeft, faAnglesRight, faArrowRight, faBan, faBook, faCheck, faCog, faDownload, faExclamationTriangle, 
-  faExternalLinkAlt, faFileExport, faFileImport, faFlag, faKey, faLock, faMinus, faPause, faPencilAlt, faPlay, faPlus, faPuzzlePiece, faRedo, faRunning, faSave, 
-  faSearch, faSkullCrossbones, faSignOutAlt, faStop, faTimes, faTrash, faUndo, faUnlockAlt, faUpload, faUser, faWeightHanging, faFolderOpen, faFolder, faFile, faDragon, faFolderClosed, faArrowLeft, faArrowUp, faArrowDown
+  faExternalLinkAlt, faFileExport, faFileImport, faFlag as fasFlag, faKey, faLock, faMinus, faPause, faPencilAlt, faPlay, faPlus, faPuzzlePiece, faRedo, faRunning, faSave, faFilter,
+  faSearch, faSkullCrossbones, faSignOutAlt, faStop, faTimes, faTrash, faUndo, faUnlockAlt, faUpload, faUser, faWeightHanging, faFolderOpen, faFolder, faFile, faDragon, faFolderClosed, faArrowLeft, faArrowUp, faArrowDown, 
+  faChevronUp, faChevronDown, faBroom
 } from '@fortawesome/free-solid-svg-icons';
 library.add(
-  faAngleDown, faAngleRight, faAngleUp, faAnglesLeft, faAnglesRight, faArrowRight, faBan, faBook, faCheck, faCog, faDownload, faExclamationTriangle, 
-  faExternalLinkAlt, faFileExport, faFileImport, faFlag, faKey, faLock, faMinus, faPause, faPencilAlt, faPlay, faPlus, faPuzzlePiece, faRedo, faRunning, faSave, 
-  faSearch, faSkullCrossbones, faSignOutAlt, faStop, faTimes, faTrash, faUndo, faUnlockAlt, faUpload, faUser, faWeightHanging, faFolderOpen, faFolder, faFile, faDragon, faFolderClosed, faArrowLeft, faArrowUp, faArrowDown
+  faAngleDown, faAngleRight, faAngleUp, faAnglesLeft, faAnglesRight, faArrowRight, faBan, faBook, faCheck, faCog, faDownload, faExclamationTriangle, faFilter,
+  faExternalLinkAlt, faFileExport, faFileImport, fasFlag, faKey, faLock, faMinus, faPause, faPencilAlt, faPlay, faPlus, faPuzzlePiece, faRedo, faRunning, faSave, 
+  faSearch, faSkullCrossbones, faSignOutAlt, faStop, faTimes, faTrash, faUndo, faUnlockAlt, faUpload, faUser, faWeightHanging, faFolderOpen, faFolder, faFile, faDragon, faFolderClosed, faArrowLeft, faArrowUp, faArrowDown,
+  faChevronUp, faChevronDown, faBroom
 );
 import { 
-  faCircle, faCircleQuestion, faCopy 
+  faCircle, faCircleQuestion, faCopy, faFlag as farFlag
 } from '@fortawesome/free-regular-svg-icons';
 library.add(
-  faCircle, faCircleQuestion, faCopy
+  faCircle, faCircleQuestion, faCopy, farFlag
 );
 import { 
   faApple, faLinux, faWindows 

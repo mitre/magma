@@ -196,12 +196,6 @@ async function createOperation() {
                     input.input.is-small(v-model="minJitter")
                     span /
                     input.input.is-small(v-model="maxJitter")
-            .field.is-horizontal
-                .field-label
-                    label.label Visibility
-                .field-body
-                    input(type="range" min="0" max="100" v-model="visibility")
-                    label.label.ml-2 {{ `${visibility}` }}
         footer.modal-card-foot.is-justify-content-right
             button.button(@click="modals.operations.showCreate = false") Cancel
             button.button.is-primary(@click="createOperation()") Start 

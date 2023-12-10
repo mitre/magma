@@ -13,7 +13,7 @@ const coreStore = useCoreStore();
 const { modals } = storeToRefs(coreDisplayStore);
 const { enabledPlugins, availablePlugins, userSettings } =
   storeToRefs(coreStore);
-const { group } = storeToRefs(authStore);
+const { group, version } = storeToRefs(authStore);
 
 const router = useRouter();
 
@@ -47,10 +47,11 @@ function promptToEnablePlugin(pluginName) {
         img(src="/src/assets/img/caldera-logo.png" alt="Caldera Logo" @click="router.push('/')")
     #logo-collapsed(v-if="userSettings.collapseNavigation")
         img(src="/src/assets/img/caldera-logo-mtn.png" alt="Caldera Logo" @click="router.push('/')")
-    div.team-container
-      span.icon(:class="{ 'is-red': group === 'RED', 'is-blue': group === 'BLUE'}")
-        font-awesome-icon(icon="fas fa-flag")
-      span(:class="{ 'has-text-danger': group === 'RED', 'has-text-info': group === 'BLUE'}" v-text="group.toLowerCase()")
+    #user-info(v-if="!userSettings.collapseNavigation")
+      div.team-container
+        span.icon(:class="{ 'is-red': group === 'RED', 'is-blue': group === 'BLUE'}")
+          font-awesome-icon(icon="fas fa-user")
+        span {{ version }}
     aside.menu(v-if="!userSettings.collapseNavigation")
         
         p.menu-label
@@ -126,8 +127,9 @@ function promptToEnablePlugin(pluginName) {
             .dropdown-menu(role="menu")
                 .dropdown-content.ml-2
                     div(v-for="plugin in availablePlugins")
-                        router-link.menu-item(v-if="enabledPlugins.includes(plugin.name)" :to="`/plugins/${plugin.name}`") {{ plugin.name }}
-                        p.menu-item(v-else @click="promptToEnablePlugin(plugin.name)") {{ plugin.name }}
+                        router-link.dropdown-item(v-if="plugin.name === 'fieldmanual'" :to="'/docs/index.html'") {{ plugin.name }}
+                        router-link.dropdown-item(v-else-if="enabledPlugins.includes(plugin.name)" :to="`/plugins/${plugin.name}`") {{ plugin.name }}
+                        p.dropdown-item(v-else-if="plugin.name !== 'magma'" @click="promptToEnablePlugin(plugin.name)") {{ plugin.name }}
         .dropdown.is-hoverable.mb-2
             .dropdown-trigger
                 button.button(aria-haspopup="true" aria-controls="dropdown-menu")
@@ -165,7 +167,7 @@ PluginModal
 #logo > img {
   max-height: 150px;
   cursor: pointer;
-  padding: 2em 3em;
+  padding: 1.5em 3em;
 }
 #logo-collapsed > img {
   width: auto;
@@ -225,10 +227,26 @@ p.menu-item:hover {
   border: 1px solid grey;
 }
 
+p.dropdown-item {
+  color: grey;
+}
+p.dropdown-item:hover {
+  cursor: pointer;
+  border: 1px solid grey;
+  border-radius: 8px;
+}
+
 .dropdown-menu {
   top: 0;
   left: 100%;
   padding-top: 0;
+}
+
+.team-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .team-container {

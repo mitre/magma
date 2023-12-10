@@ -298,6 +298,230 @@
           "agent_reported_time": "2023-10-19T00:52:53Z"
         }
       ]
+    },
+    {
+      "paw": "gpaczu",
+      "sleep_min": 30,
+      "sleep_max": 60,
+      "watchdog": 0,
+      "group": "red",
+      "architecture": "amd64",
+      "platform": "darwin",
+      "username": "mkouremetis",
+      "location": "/Users/mkouremetis/caldera-exempt/caldera_agent_run/splunkd",
+      "pid": 69068,
+      "ppid": 67660,
+      "trusted": false,
+      "executors": ["proc", "sh"],
+      "privilege": "User",
+      "exe_name": "splunkd",
+      "host": "MM251535-PC",
+      "pending_contact": "HTTP",
+      "proxy_receivers": {},
+      "proxy_chain": [],
+      "origin_link_id": "",
+      "deadman_enabled": true,
+      "available_contacts": ["HTTP"],
+      "created": "2023-10-17T00:09:44Z",
+      "last_seen": "2023-10-17T15:16:21Z",
+      "links": [
+        {
+          "id": "0126c758-225e-4a38-9841-16955383e98f",
+          "paw": "gpaczu",
+          "command": "PiAkSE9NRS8uYmFzaF9oaXN0b3J5ICYmIHVuc2V0IEhJU1RGSUxF",
+          "plaintext_command": "PiAkSE9NRS8uYmFzaF9oaXN0b3J5ICYmIHVuc2V0IEhJU1RGSUxF",
+          "status": 0,
+          "score": 0,
+          "jitter": 0,
+          "decide": "2023-10-17T00:09:45Z",
+          "pin": 0,
+          "pid": "69099",
+          "facts": [],
+          "relationships": [],
+          "used": [],
+          "unique": "0126c758-225e-4a38-9841-16955383e98f",
+          "collect": "2023-10-17T00:09:45Z",
+          "finish": "2023-10-17T00:09:45Z",
+          "ability": {
+            "ability_id": "43b3754c-def4-4699-a673-1d85648fda6a",
+            "tactic": "defense-evasion",
+            "technique_name": "Indicator Removal on Host: Clear Command History",
+            "technique_id": "T1070.003",
+            "name": "Avoid logs",
+            "description": "Stop terminal from logging history",
+            "requirements": [],
+            "privilege": null,
+            "repeatable": false,
+            "buckets": ["defense-evasion"],
+            "additional_info": {},
+            "access": {},
+            "singleton": false,
+            "plugin": "stockpile",
+            "delete_payload": true
+          },
+          "executor": {
+            "name": "sh",
+            "platform": "darwin",
+            "command": "> $HOME/.bash_history && unset HISTFILE",
+            "code": null,
+            "language": null,
+            "build_target": null,
+            "payloads": [],
+            "uploads": [],
+            "timeout": 60,
+            "parsers": [],
+            "cleanup": [],
+            "variations": [],
+            "additional_info": {}
+          },
+          "cleanup": 0,
+          "visibility": {
+            "score": 50,
+            "adjustments": []
+          },
+          "host": "MM251535-PC",
+          "output": "False",
+          "deadman": false,
+          "agent_reported_time": "2023-10-17T00:09:45Z"
+        },
+        {
+          "id": "7016a0b5-9a89-483e-8bf3-c7e96511158c",
+          "paw": "emcsjj",
+          "command": "mkdir -p staged && echo $PWD/staged",
+          "plaintext_command": "mkdir -p staged && echo $PWD/staged",
+          "status": 0,
+          "score": 0,
+          "decide": "2023-10-19T00:51:31Z",
+          "pin": 0,
+          "pid": "44679",
+          "used": [],
+          "unique": "7016a0b5-9a89-483e-8bf3-c7e96511158c",
+          "collect": "2023-10-19T00:51:52Z",
+          "finish": "2023-10-19T00:51:52Z",
+          "ability": {
+            "ability_id": "6469befa-748a-4b9c-a96d-f191fde47d89",
+            "tactic": "collection",
+            "technique_name": "Data Staged: Local Data Staging",
+            "technique_id": "T1074.001",
+            "name": "Create staging directory",
+            "description": "create a directory for exfil staging",
+            "requirements": [],
+            "privilege": null,
+            "repeatable": false,
+            "buckets": ["collection"],
+            "additional_info": {},
+            "access": {},
+            "singleton": false,
+            "plugin": "stockpile",
+            "delete_payload": true
+          },
+          "executor": {
+            "name": "sh",
+            "platform": "darwin",
+            "command": "mkdir -p staged && echo $PWD/staged",
+            "code": null,
+            "language": null,
+            "build_target": null,
+            "payloads": [],
+            "uploads": [],
+            "timeout": 60,
+            "parsers": [
+              {
+                "module": "plugins.stockpile.app.parsers.basic",
+                "parserconfigs": [
+                  {
+                    "source": "host.dir.staged",
+                    "edge": "",
+                    "target": "",
+                    "custom_parser_vals": {}
+                  }
+                ]
+              }
+            ],
+            "cleanup": ["rm -rf staged"],
+            "variations": [],
+            "additional_info": {}
+          },
+          "cleanup": 0,
+          "visibility": {
+            "score": 50,
+            "adjustments": []
+          },
+          "output": "True",
+          "deadman": false,
+          "agent_reported_time": "2023-10-19T00:51:52Z"
+        },
+        {
+          "id": "07cb5c1e-d096-4a6d-bbb8-3e055214ab53",
+          "paw": "emcsjj",
+          "command": "rm -rf staged",
+          "plaintext_command": "",
+          "status": 0,
+          "score": 0,
+          "decide": "2023-10-19T00:51:56Z",
+          "pin": 0,
+          "pid": "46464",
+          "facts": [],
+          "relationships": [],
+          "used": [],
+          "unique": "07cb5c1e-d096-4a6d-bbb8-3e055214ab53",
+          "collect": "2023-10-19T00:52:53Z",
+          "finish": "2023-10-19T00:52:53Z",
+          "ability": {
+            "ability_id": "6469befa-748a-4b9c-a96d-f191fde47d89",
+            "tactic": "collection",
+            "technique_name": "Data Staged: Local Data Staging",
+            "technique_id": "T1074.001",
+            "name": "Create staging directory",
+            "description": "create a directory for exfil staging",
+            "requirements": [],
+            "privilege": null,
+            "repeatable": false,
+            "buckets": ["collection"],
+            "additional_info": {},
+            "access": {},
+            "singleton": false,
+            "plugin": "stockpile",
+            "delete_payload": true
+          },
+          "executor": {
+            "name": "sh",
+            "platform": "darwin",
+            "command": "mkdir -p staged && echo $PWD/staged",
+            "code": null,
+            "language": null,
+            "build_target": null,
+            "payloads": [],
+            "uploads": [],
+            "timeout": 60,
+            "parsers": [
+              {
+                "module": "plugins.stockpile.app.parsers.basic",
+                "parserconfigs": [
+                  {
+                    "source": "host.dir.staged",
+                    "edge": "",
+                    "target": "",
+                    "custom_parser_vals": {}
+                  }
+                ]
+              }
+            ],
+            "cleanup": ["rm -rf staged"],
+            "variations": [],
+            "additional_info": {}
+          },
+          "cleanup": 1,
+          "visibility": {
+            "score": 50,
+            "adjustments": []
+          },
+          "host": "MM251535-PC",
+          "output": "False",
+          "deadman": false,
+          "agent_reported_time": "2023-10-19T00:52:53Z"
+        }
+      ]
     }
   ]
 }

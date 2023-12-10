@@ -7,6 +7,7 @@ export const useAuthStore = defineStore({
     isUserAuthenticated: false,
     returnUrl: null,
     group: "",
+    version: "",
   }),
   actions: {
     async login(username, password, $api) {
@@ -39,6 +40,7 @@ export const useAuthStore = defineStore({
       try {
         const response = await $api.get("/api/v2/health");
         this.group = response.data.access;
+        this.version = response.data.version;
         return response.data.access;
       } catch (error) {
         console.log(error);
