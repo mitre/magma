@@ -1,6 +1,7 @@
  <script setup>
 import { inject, ref, onMounted, reactive, computed, toRaw } from "vue";
 import { storeToRefs } from "pinia";
+import { toast } from 'bulma-toast'
 
 import CodeEditor from "@/components/core/CodeEditor.vue";
 import { useOperationStore } from '@/stores/operationStore';
@@ -155,7 +156,14 @@ function selectPotentialLink(link) {
     });
 
     if (props.operation && props.operation.state === "paused") {
-        // TODO: let user know operation is paused and new link might not be added
+        toast({
+            message: `Operation is paused. New links may not be added.`,
+            type: 'is-warning',
+            dismissible: true,
+            pauseOnHover: true,
+            duration: 2000,
+            position: "bottom-right",
+        });
     }
 }
 </script>

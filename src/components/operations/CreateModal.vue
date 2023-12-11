@@ -1,6 +1,7 @@
 <script setup>
 import { ref, inject, onMounted } from "vue";
 import { storeToRefs } from "pinia";
+import { toast } from 'bulma-toast'
 
 import { useCoreDisplayStore } from "@/stores/coreDisplayStore";
 import { useOperationStore } from '@/stores/operationStore';
@@ -96,8 +97,24 @@ async function createOperation() {
     try {
         await operationStore.createOperation($api, newOperation);
         props.selectInterval();
+        toast({
+            message: `Operation ${operationName.value} created`,
+            type: 'is-success',
+            dismissible: true,
+            pauseOnHover: true,
+            duration: 2000,
+            position: "bottom-right",
+        });
     } catch(error) {
         console.error("Error creating operation", error);
+        toast({
+            message: `Error creating operation`,
+            type: 'is-danger',
+            dismissible: true,
+            pauseOnHover: true,
+            duration: 2000,
+            position: "bottom-right",
+        });
     }
     modals.value.operations.showCreate = false
 }
