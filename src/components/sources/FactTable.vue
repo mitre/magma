@@ -1,6 +1,7 @@
 <script setup>
 import { ref, inject } from "vue";
 import { storeToRefs } from "pinia";
+import { toast } from "bulma-toast";
 
 import AbilitySelection from "@/components/abilities/AbilitySelection.vue";
 import AddAbilitiesFromAdversaryModal from "@/components/adversaries/AddAbilitiesFromAdversaryModal.vue";
@@ -38,7 +39,14 @@ async function saveFacts() {
 async function addFromAbility(ability) {
   const abilityFacts = getAbilityFacts(ability);
   if (!abilityFacts.length) {
-    // TODO: Notify user that ability had no facts to add
+    toast({
+      message: "Ability has no facts to add",
+      position: "bottom-right",
+      type: "is-warning",
+      dismissible: true,
+      pauseOnHover: true,
+      duration: 2000,
+    });
     showAbilitySelection.value = false;
     return;
   }

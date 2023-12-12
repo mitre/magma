@@ -1,6 +1,7 @@
 <script setup>
 import { reactive, inject, ref } from "vue";
 import { storeToRefs } from "pinia";
+import { toast } from "bulma-toast";
 
 import CodeEditor from "@/components/core/CodeEditor.vue";
 import { useOperationStore } from "@/stores/operationStore";
@@ -29,13 +30,27 @@ const handleAgentSelect = (agent) => {
 
 function addManualCommand() {
   if (manualCommand.executor.command.length <= 0) {
-    //TODO tell user to enter manual command
+    toast({
+      message: "Please enter a command",
+      type: "is-danger",
+      dismissible: true,
+      pauseOnHover: true,
+      duration: 2000,
+      position: "bottom-right",
+    });
     return;
   }
   manualCommand.paw = manualCommand.agent.paw;
   manualCommand.executor.platform = manualCommand.agent.platform;
   if (operationStore.currentOperation.state === "paused") {
-    // TODO tell user operation is paused
+    toast({
+      message: "Operation is paused",
+      type: "is-danger",
+      dismissible: true,
+      pauseOnHover: true,
+      duration: 2000,
+      position: "bottom-right",
+    });
     modals.value.operations.showAddManualCommand = false;
     return;
   }
