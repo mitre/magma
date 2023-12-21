@@ -14,6 +14,7 @@ import { toast } from "bulma-toast";
 //Graph imports
 import Graph from "@/components/operations/Graph.vue";
 
+import OutputModal from "@/components/operations/OutputModal.vue";
 import CreateModal from "@/components/operations/CreateModal.vue";
 import DeleteModal from "@/components/operations/DeleteModal.vue";
 import DetailsModal from "@/components/operations/DetailsModal.vue";
@@ -45,6 +46,7 @@ const { modals } = storeToRefs(coreDisplayStore);
 
 let updateInterval = ref();
 let showPotentialLinkModal = ref(false);
+let selectedOutputLink = ref(null);
 
 // START SORTING AND FILTERING
 const tableFilter = reactive({
@@ -254,6 +256,11 @@ function highlightLink(linkElement) {
     linkElement.classList.remove("highlight-link");
   }, 2000);
 }
+
+function handleViewOutput(link) {
+  selectedOutputLink.value = link;
+  modals.value.operations.showOutput = true;
+}
 </script>
 
 <template lang="pug">
@@ -437,7 +444,7 @@ table.table.is-fullwidth.is-narrow.is-striped.mb-8#link-table(v-if="operationSto
                 //- button.button(v-if="link.output === 'True'" @click="handleViewOutput(link)") View Output
                 .dropdown.is-hoverable(v-if="link.output === 'True'")
                     .dropdown-trigger
-                        button.button(aria-haspopup="true" aria-controls="dropdown-menu") View Output
+                        button.button(aria-haspopup="true" aria-controls="dropdown-menu" @click="handleViewOutput(link)") View Output
                     .dropdown-menu.command-popup(role="menu")
                         .dropdown-content
                             OutputPopup(:link="link")
@@ -459,6 +466,7 @@ AddPotentialLinkModal(
     @select="addPotentialLinks" 
     @close="showPotentialLinkModal = false")
 FiltersModal(:filters="tableFilter.filters" :possibleFilters="possibleFilters")
+OutputModal(v-if="selectedOutputLink" :link="selectedOutputLink")
 </template>
 
 <style>
