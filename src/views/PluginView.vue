@@ -1,5 +1,5 @@
 <script setup>
-import { defineAsyncComponent, shallowRef, watch, ref, inject } from "vue";
+import { defineAsyncComponent, shallowRef, watch, ref, inject, onBeforeUnmount } from "vue";
 import PluginErrorView from "./PluginErrorView.vue";
 import PluginLoadingView from "./PluginLoadingView.vue";
 
@@ -33,6 +33,10 @@ const legacyStylePaths = [
 ];
 watch(() => props.pluginName, loadComp);
 
+function isScriptLoaded(src) {
+  return document.querySelector(`script[src="${src}"]`) !== null;
+}
+
 async function loadComp() {
   if (document.getElementById("legacyContainer")) {
     document.getElementById("legacyContainer").innerHTML = "";
@@ -56,6 +60,10 @@ async function loadComp() {
       const scripts = Array.from(newElement.querySelectorAll("script"));
       if (scripts) {
         scripts.forEach((oldScript) => {
+          if (oldScript.src && isScriptLoaded(oldScript.src)) {
+            console.log("script already loaded");
+            return; // Skip this script as it's already loaded
+          }
           const newScript = document.createElement("script");
           Array.from(oldScript.attributes).forEach((attr) =>
             newScript.setAttribute(attr.name, attr.value)
@@ -66,9 +74,11 @@ async function loadComp() {
       }
       legacyScriptPaths.forEach((path) => {
         // Inject a <script> tag
-        let script = document.createElement("script");
-        script.src = path;
-        newElement.appendChild(script);
+        if (!isScriptLoaded(path)){
+          let script = document.createElement("script");
+          script.src = path;
+          newElement.appendChild(script);
+        }
       });
       legacyStylePaths.forEach((path) => {
         let link = document.createElement("link");
@@ -76,10 +86,13 @@ async function loadComp() {
         link.rel = "stylesheet";
         newElement.appendChild(link);
       });
-      let alpineScript = document.createElement("script");
-      alpineScript.src = "/gui/js/lib/alpine.min.js";
-      alpineScript.defer = true;
-      newElement.appendChild(alpineScript);
+      if (!isScriptLoaded("/gui/js/lib/alpine.min.js")){
+        console.log("in alpine");
+        let alpineScript = document.createElement("script");
+        alpineScript.src = "/gui/js/lib/alpine.min.js";
+        alpineScript.defer = true;
+        newElement.appendChild(alpineScript);
+      }
       document.getElementById("legacyContainer").appendChild(newElement);
       isUsingLegacy.value = true;
       return;

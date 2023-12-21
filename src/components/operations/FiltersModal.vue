@@ -53,6 +53,15 @@ const handleHostInput = (event) => {
     filters.host = filters.host.filter((name) => name !== event.target.value);
   }
 };
+const clearFilters = () => {
+  filters.decide = [];
+  filters.status = [];
+  filters.abilityName = [];
+  filters.paw = [];
+  filters.tactic = [];
+  filters.host = [];
+  filters.pid = [];
+};
 </script>
 
 <template lang="pug">
@@ -84,6 +93,7 @@ const handleHostInput = (event) => {
                 input(type="checkbox" @input="handleHostInput" :value="host" :checked="filters.host.includes(host)")
                 span.ml-2 {{ host }}
         footer.modal-card-foot.has-text-right
+            button.button(@click="clearFilters()") Clear Filters 
             button.button(@click="modals.operations.showFilters = false") Close 
 </template>
 
