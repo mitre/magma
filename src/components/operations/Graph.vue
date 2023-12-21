@@ -2,6 +2,7 @@
 import { ref, reactive, watch, computed, inject } from "vue";
 import { storeToRefs } from "pinia";
 import { getLinkStatus } from "@/utils/operationUtil.js";
+import { toast } from "bulma-toast";
 
 import * as vNG from "v-network-graph";
 import configData from "@/utils/graphConfig";
@@ -22,33 +23,18 @@ const { modals } = storeToRefs(coreDisplayStore);
 //Graph stuff
 const graph = ref();
 const tooltip = ref();
+const hasError = ref(false);
 const selectedNodeId = ref();
 const graphConfig = reactive(vNG.defineConfigs(configData));
 let isSidebarOpen = ref(false);
 let isGraphOpen = ref(true);
 
-const nodes = reactive({
-  1: {
-    name: "1",
-    platform: "windows",
-    username: "admin",
-  },
-  2: {
-    name: "2",
-    platform: "windows",
-    username: "admin",
-  },
-});
+const nodes = reactive({});
 const layouts = ref({
   nodes: {},
 });
 
-const edges = reactive({
-  1: {
-    source: "1",
-    target: "2",
-  },
-});
+const edges = reactive({});
 const paths = reactive({
   path1: { edges: [] },
 });
@@ -111,9 +97,21 @@ const buildGraph = async () => {
       //   newNodes[agent.host].agents.push(agent);
       // });
     } catch (error) {
+      if (!hasError.value) {
+        toast({
+          message:
+            "Could not get operation graph data. See console for more information.",
+          type: "is-danger",
+          dismissible: true,
+          pauseOnHover: true,
+          duration: 5000,
+        });
+      }
+      hasError.value = true;
       console.error(error);
       return;
     }
+    hasError.value = false;
     for (const node in nodes) {
       delete nodes[node];
     }
@@ -130,12 +128,12 @@ const buildGraph = async () => {
 
 const getAgentRings = (agents) => {
   if (!agents) return 0;
-  const rings = []
-  for(let i = 0; i < Math.min(agents.length, 5); i++){
+  const rings = [];
+  for (let i = 0; i < Math.min(agents.length, 5); i++) {
     if (agents[i].trusted === true) {
-      rings.push("#c85450")
+      rings.push("#c85450");
     } else {
-      rings.push("#F7DB89")
+      rings.push("#F7DB89");
     }
   }
   return rings;
@@ -225,7 +223,7 @@ const eventHandlers = {
 .graph-wrapper(v-if="operationStore.selectedOperationID")
   .graph-header.is-fullwidth.is-flex.is-flex-direction-row.is-align-items-center.is-justify-content-space-between(@click="isGraphOpen = !isGraphOpen")
     .left-graph-header.is-flex.is-flex-direction-row.is-align-items-center.is-3
-      h3 Graph (WORK IN PROGRESS)
+      h3 Graph
       button.button.ml-4(type="button" @click="downloadGraphAsSvg")
         span Download Graph SVG
     span.icon(v-if="!isGraphOpen")
@@ -274,7 +272,8 @@ const eventHandlers = {
             td
               ul#agent-list
                 li(v-for="agent in nodes[selectedNodeId].agents" :key="agent.id")
-                  button.button.is-small(type="button" @click="modals.operations.showAgentDetails = true; agentStore.selectedAgent = agent") {{agent.paw}}
+                  button.button.is-small(type="button" @click="modals.operations.showAgentDetails = true; agentStore.selectedAgent = agent" 
+                    :class="{'agent-button-trusted': agent.trusted, 'agent-button-untrusted': !agent.trusted}" v-tooltip="'Privilege: ' + agent.privilege") {{agent.paw}}
       span(v-if="isSidebarOpen && isGraphOpen" :style="{opacity: !isSidebarOpen ? 0 : 1}") Recent Actions
       table.table.sidebar-table(v-if="isSidebarOpen && isGraphOpen" :style="{opacity: !isSidebarOpen ? 0 : 1}")
         tbody(v-if="selectedNodeId")
@@ -294,6 +293,16 @@ const eventHandlers = {
   display: flex;
   flex-direction: row;
   gap: 0.5rem;
+}
+
+.agent-button-trusted {
+  color: #c85450;
+  border-color: #c85450;
+}
+
+.agent-button-untrusted {
+  color: #f7db89;
+  border-color: #f7db89;
 }
 
 .host-action:hover {

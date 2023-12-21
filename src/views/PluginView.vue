@@ -105,7 +105,7 @@ loadComp();
 </script>
 
 <template lang="pug">
-component(v-if="pluginComponent" :is="pluginComponent")
+component(v-if="pluginComponent && !isUsingLegacy" :is="pluginComponent")
 .warning(v-if="isUsingLegacy")
   h2 Warning: You're currently using the legacy plugin interface for {{props.pluginName}}. While it might function, we cannot guarantee its full compatibility or stability. For the best experience, we recommend updating to the latest UI version.
 .container(id="legacyContainer")

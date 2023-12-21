@@ -98,6 +98,17 @@ const router = createRouter({
       component: PluginView,
       props: true,
     },
+    {
+      path: '/docs/index.html',
+      beforeEnter: () => {
+        // Redirect to the external docs page
+        if (!import.meta.env.PROD) {
+          window.location.href = (import.meta.env.VITE_CALDERA_URL || 'http://localhost:8888') + '/docs/index.html';
+          return;
+        }
+        window.location.href = '/docs/index.html';
+      }
+    },
     { path: "/:pathMatch(.*)*", name: "NotFound", component: NotFoundView },
   ],
   scrollBehavior(to, from, savedPosition) {

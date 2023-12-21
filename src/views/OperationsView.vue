@@ -9,6 +9,7 @@ import {
   reactive,
 } from "vue";
 import { storeToRefs } from "pinia";
+import { toast } from "bulma-toast";
 
 //Graph imports
 import Graph from "@/components/operations/Graph.vue";
@@ -229,6 +230,17 @@ function displayManualCommand() {
 
 async function addPotentialLinks(links) {
   try {
+    if (operationStore.currentOperation.state !== "running") {
+      toast({
+        message:
+          "Operation is currently paused, and new links might not be added.",
+        type: "is-warning",
+        dismissible: true,
+        pauseOnHover: true,
+        duration: 2000,
+        position: "bottom-right",
+      });
+    }
     await operationStore.addPotentialLinks($api, links);
     showPotentialLinkModal.value = false;
   } catch (error) {
@@ -302,7 +314,7 @@ Graph(@scroll="highlightLink")
                 a.icon.is-medium.ml-3.mr-3(v-if ="!isRerun()" @click="operationStore.updateOperation($api, 'state', 'run_one_link')" v-tooltip="'Run one link'")
                     font-awesome-icon.fa-2x(icon="fas fa-play")
                     span.mt-5 1
-                a.icon.is-medium.ml-3.mr-3(v-if ="isRerun()" @click="operationStore.rerunOperation($api)" v-tooltip="'Re-run Operation'")
+                a.icon.is-medium.ml-3.mr-3(v-if="isRerun()" @click="operationStore.rerunOperation($api)" v-tooltip="'Re-run Operation'")
                     font-awesome-icon.fa-2x(icon="fas fa-redo")
         .column.is-4.is-flex.is-justify-content-right.is-align-items-center.is-flex-wrap-wrap.pt-0.pb-0
             span.is-size-6 Obfuscator: 
@@ -397,6 +409,7 @@ table.table.is-fullwidth.is-narrow.is-striped.mb-8#link-table(v-if="operationSto
           th
             div.is-flex.is-flex-direction-column.is-justify-content-center
               span.mt-2 Link Output 
+          th
     tbody
         tr(v-for="(link, idx) in filteredChain" :key="link.id" :id="`link-${idx}`")
             td {{ getReadableTime(link.decide) }}
@@ -429,6 +442,9 @@ table.table.is-fullwidth.is-narrow.is-striped.mb-8#link-table(v-if="operationSto
                         .dropdown-content
                             OutputPopup(:link="link")
                 span(v-else) No output
+            td(v-if="operationStore.currentOperation.state === 'running'")
+                a.icon(@click="operationStore.rerunLink($api, link)" v-tooltip="'Re-run Link'")
+                    font-awesome-icon(icon="fas fa-redo")
         ManualCommand(v-if="modals.operations.showAddManualCommand")
                 
 //- Modals

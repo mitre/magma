@@ -149,6 +149,17 @@ export const useOperationStore = defineStore("operationStore", {
         console.error("Error adding potential links", error);
       }
     },
+    async rerunLink($api, link) {
+      try {
+        await $api.post(
+          `/api/v2/operations/${this.selectedOperationID}/potential-links`,
+          link
+        );
+        await this.getOperations($api);
+      } catch (error) {
+        console.error("Error rerunning link", error);
+      }
+    },
     async getFacts($api) {
       if (this.selectedOperationID === "") return;
       try {
