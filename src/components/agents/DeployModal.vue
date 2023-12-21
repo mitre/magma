@@ -4,6 +4,7 @@ import { useAgentStore } from '../../stores/agentStore';
 import { useAbilityStore } from '../../stores/abilityStore';
 import { useCoreDisplayStore } from "../../stores/coreDisplayStore";
 import { storeToRefs } from "pinia";
+import { toast } from "bulma-toast";
 
 const $api = inject("$api");
 
@@ -92,6 +93,14 @@ function isSecureContext() {
 
 function copyCommandToClipboard(command) {
     navigator.clipboard.writeText(command.replaceAll('\n', ''));
+    toast({
+        message: "Copied to clipboard",
+        type: "is-success",
+        position: "bottom-right",
+        duration: 2000,
+        dismissible: true,
+        pauseOnHover: true,
+    });
 }
 </script>
 

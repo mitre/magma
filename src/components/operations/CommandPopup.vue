@@ -3,6 +3,7 @@ import { inject, ref, computed } from "vue";
 
 import { useOperationStore } from "@/stores/operationStore";
 import { b64DecodeUnicode } from "@/utils/utils";
+import { toast } from "bulma-toast";
 
 const props = defineProps({
   link: Object,
@@ -39,6 +40,14 @@ function isLinkEditable(currentLink) {
 function copyCommand() {
   if (plaintextCommand.value === "") return;
   navigator.clipboard.writeText(plaintextCommand.value);
+  toast({
+    message: "Copied command to clipboard",
+    type: "is-success",
+    position: "bottom-right",
+    dismissible: true,
+    pauseOnHover: true,
+    duration: 2000,
+  });
 }
 </script>
 
