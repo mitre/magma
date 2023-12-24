@@ -14,6 +14,7 @@ export const useCoreStore = defineStore("coreStore", {
       userSettings: {},
       contacts: [],
       availableContacts: [],
+      hideDisabledPlugins: false,
     };
   },
   getters: {

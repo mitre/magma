@@ -11,7 +11,7 @@ const authStore = useAuthStore();
 const coreDisplayStore = useCoreDisplayStore();
 const coreStore = useCoreStore();
 const { modals } = storeToRefs(coreDisplayStore);
-const { enabledPlugins, availablePlugins, userSettings } =
+const { enabledPlugins, availablePlugins, userSettings, hideDisabledPlugins } =
   storeToRefs(coreStore);
 const { group, version } = storeToRefs(authStore);
 
@@ -71,9 +71,9 @@ function promptToEnablePlugin(pluginName) {
             | Plugins
         ul.menu-list
             li(v-for="plugin in availablePlugins")
-                router-link.menu-item(v-if="plugin.name === 'fieldmanual'" :to="'/docs/index.html'") {{ plugin.name }}
+                a.menu-item(v-if="plugin.name === 'fieldmanual'" target="_blank" :href="'/docs/index.html'") {{ plugin.name }}
                 router-link.menu-item(v-else-if="enabledPlugins.includes(plugin.name)" :to="`/plugins/${plugin.name}`") {{ plugin.name }}
-                p.menu-item(v-else-if="plugin.name !== 'magma'" @click="promptToEnablePlugin(plugin.name)") {{ plugin.name }}
+                p.menu-item(v-else-if="plugin.name !== 'magma' && !hideDisabledPlugins" @click="promptToEnablePlugin(plugin.name)") {{ plugin.name }}
         p.menu-label
             font-awesome-icon(icon="fas fa-cog").pr-2
             | Configuration
@@ -106,6 +106,9 @@ function promptToEnablePlugin(pluginName) {
                     span.icon
                         font-awesome-icon(icon="fas fa-sign-out-alt")
                     span Log out
+            .control.mt-2
+                    input.switch.is-rounded(type="checkbox" id="disabled-plugins" name="disabled-plugins" v-model="hideDisabledPlugins")
+                    label.label(for="disabled-plugins") Hide disabled plugins
 
     .is-flex.is-flex-direction-column.is-align-items-center(v-else)
         .dropdown.is-hoverable.mb-2
@@ -127,7 +130,7 @@ function promptToEnablePlugin(pluginName) {
             .dropdown-menu(role="menu")
                 .dropdown-content.ml-2
                     div(v-for="plugin in availablePlugins")
-                        router-link.dropdown-item(v-if="plugin.name === 'fieldmanual'" :to="'/docs/index.html'") {{ plugin.name }}
+                        a.dropdown-item(v-if="plugin.name === 'fieldmanual'" target="_blank" :href="'/docs/index.html'") {{ plugin.name }}
                         router-link.dropdown-item(v-else-if="enabledPlugins.includes(plugin.name)" :to="`/plugins/${plugin.name}`") {{ plugin.name }}
                         p.dropdown-item(v-else-if="plugin.name !== 'magma'" @click="promptToEnablePlugin(plugin.name)") {{ plugin.name }}
         .dropdown.is-hoverable.mb-2
