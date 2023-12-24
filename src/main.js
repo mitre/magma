@@ -34,13 +34,13 @@ import {
   faAngleDown, faAngleRight, faAngleUp, faAnglesLeft, faAnglesRight, faArrowRight, faBan, faBook, faCheck, faCog, faDownload, faExclamationTriangle, 
   faExternalLinkAlt, faFileExport, faFileImport, faFlag as fasFlag, faKey, faLock, faMinus, faPause, faPencilAlt, faPlay, faPlus, faPuzzlePiece, faRedo, faRunning, faSave, faFilter,
   faSearch, faSkullCrossbones, faSignOutAlt, faStop, faTimes, faTrash, faUndo, faUnlockAlt, faUpload, faUser, faWeightHanging, faFolderOpen, faFolder, faFile, faDragon, faFolderClosed, faArrowLeft, faArrowUp, faArrowDown, 
-  faChevronUp, faChevronDown, faBroom
+  faChevronUp, faChevronDown, faBroom, faForward, faFastForward, faBackward, faFastBackward
 } from '@fortawesome/free-solid-svg-icons';
 library.add(
   faAngleDown, faAngleRight, faAngleUp, faAnglesLeft, faAnglesRight, faArrowRight, faBan, faBook, faCheck, faCog, faDownload, faExclamationTriangle, faFilter,
   faExternalLinkAlt, faFileExport, faFileImport, fasFlag, faKey, faLock, faMinus, faPause, faPencilAlt, faPlay, faPlus, faPuzzlePiece, faRedo, faRunning, faSave, 
   faSearch, faSkullCrossbones, faSignOutAlt, faStop, faTimes, faTrash, faUndo, faUnlockAlt, faUpload, faUser, faWeightHanging, faFolderOpen, faFolder, faFile, faDragon, faFolderClosed, faArrowLeft, faArrowUp, faArrowDown,
-  faChevronUp, faChevronDown, faBroom
+  faChevronUp, faChevronDown, faBroom, faForward, faFastForward, faBackward, faFastBackward
 );
 import { 
   faCircle, faCircleQuestion, faCopy, faFlag as farFlag
