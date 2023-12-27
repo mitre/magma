@@ -32,7 +32,7 @@ const config = {
     selectable: 1,
     normal: {
       type: "circle",
-      radius: 20,
+      radius: 30,
       color: "#6C63FF",
     },
     hover: {

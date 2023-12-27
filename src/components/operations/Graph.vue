@@ -3,6 +3,7 @@ import { ref, reactive, watch, computed, inject } from "vue";
 import { storeToRefs } from "pinia";
 import { getLinkStatus } from "@/utils/operationUtil.js";
 import { toast } from "bulma-toast";
+import { getAgentStatus } from "@/utils/agentUtil.js";
 
 import * as vNG from "v-network-graph";
 import configData from "@/utils/graphConfig";
@@ -77,7 +78,7 @@ const buildGraph = async () => {
           reachable: host.reachable_hosts,
           ips: host.host_ip_addrs,
           agents: [],
-          icon: `${host.platform}-icon.svg`,
+          icon: `${host.platform}-icon`,
         };
         host.reachable_hosts.forEach((reachableHost) => {
           newEdges[`${host.host}-${reachableHost}`] = {
@@ -131,7 +132,7 @@ const getAgentRings = (agents) => {
   const rings = [];
   for (let i = 0; i < Math.min(agents.length, 5); i++) {
     if (agents[i].trusted === true) {
-      rings.push("#c85450");
+      rings.push("#4a9");
     } else {
       rings.push("#F7DB89");
     }
@@ -139,9 +140,17 @@ const getAgentRings = (agents) => {
   return rings;
 };
 
-const getHostIcon = (icon) => {
-  if (!icon) return "";
-  return new URL(`../../assets/img/graph/${icon}`, import.meta.url).href;
+const getHostIcon = (node) => {
+  if (!node.icon) return "";
+  for (const agent of node.agents) {
+    if (agent.privilege !== "User") {
+      return new URL(
+        `../../assets/img/graph/${node.icon}-privileged.svg`,
+        import.meta.url
+      ).href;
+    }
+  }
+  return new URL(`../../assets/img/graph/${node.icon}.svg`, import.meta.url).href;
 };
 
 async function downloadGraphAsSvg() {
@@ -217,6 +226,13 @@ const eventHandlers = {
     isSidebarOpen.value = true;
   },
 };
+
+const getAgentTooltipContent = (agent) => {
+  return `<span>Privilege: ${agent.privilege}</span> </br> 
+    <span>Status: ${getAgentStatus(agent)},</span>
+    <span"> ${ agent.trusted ? 'trusted' : 'untrusted' } </span>
+`
+}
 </script>
 
 <template lang="pug">
@@ -238,7 +254,7 @@ const eventHandlers = {
             circle(cx="0.5" cy="0.5" r="0.5")
         template(v-slot:override-node="{ nodeId, scale, config, ...slotProps }")
           circle.face-circle(:r="config.radius * scale" fill="#ffffff" v-bind="slotProps")
-          image.face-picture(:x="-config.radius * scale" :y="-config.radius * scale" :width="config.radius * scale * 2" :height="config.radius * scale * 2" :xlink:href="getHostIcon(nodes[nodeId].icon)" clip-path="url(#faceCircle)")
+          image.face-picture(:x="-config.radius * scale" :y="-config.radius * scale" :width="config.radius * scale * 2" :height="config.radius * scale * 2" :xlink:href="getHostIcon(nodes[nodeId])" clip-path="url(#faceCircle)")
           circle.face-circle(v-for="(stroke, idx) in getAgentRings(nodes[nodeId].agents)" :r="config.radius + (8 + (((idx + 1) - 1) * 9))" :key="idx" fill="none" :stroke="stroke" :stroke-width="3 * scale" v-bind="slotProps")
       .tooltip(ref="tooltip" :style="{...tooltipPos, opacity: tooltipOpacity}")
         span(v-if="targetNodeId") {{ nodes[targetNodeId].displayName }}
@@ -273,7 +289,7 @@ const eventHandlers = {
               ul#agent-list
                 li(v-for="agent in nodes[selectedNodeId].agents" :key="agent.id")
                   button.button.is-small(type="button" @click="modals.operations.showAgentDetails = true; agentStore.selectedAgent = agent" 
-                    :class="{'agent-button-trusted': agent.trusted, 'agent-button-untrusted': !agent.trusted}" v-tooltip="'Privilege: ' + agent.privilege") {{agent.paw}}
+                    :class="{'agent-button-trusted': agent.trusted, 'agent-button-untrusted': !agent.trusted}" v-tooltip="{ content: getAgentTooltipContent(agent), html: true }") {{agent.paw}}
       span(v-if="isSidebarOpen && isGraphOpen" :style="{opacity: !isSidebarOpen ? 0 : 1}") Recent Actions
       table.table.sidebar-table(v-if="isSidebarOpen && isGraphOpen" :style="{opacity: !isSidebarOpen ? 0 : 1}")
         tbody(v-if="selectedNodeId")
@@ -296,8 +312,8 @@ const eventHandlers = {
 }
 
 .agent-button-trusted {
-  color: #c85450;
-  border-color: #c85450;
+  color: #4a9;
+  border-color: #4a9;
 }
 
 .agent-button-untrusted {
