@@ -32,7 +32,7 @@ const config = {
     selectable: 1,
     normal: {
       type: "circle",
-      radius: 20,
+      radius: 30,
       color: "#6C63FF",
     },
     hover: {
@@ -44,10 +44,20 @@ const config = {
 
     label: {
       visible: true,
-      color: "#fff",
+      color: "white",
       fontFamily: "inherit",
       fontSize: 12,
       text: "name",
+      margin: 8,
+      background: {
+        visible: true,
+        color: "black",
+        padding: {
+          vertical: 2,
+          horizontal: 4,
+        },
+        borderRadius: 5,
+      },
     },
     focusring: {
       visible: true,

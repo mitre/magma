@@ -6,9 +6,7 @@ The future of CALDERA's UI/UX.
 * Caldera (v4.0.0+)
 
 ## Installation
-Checkout the magma branch in core Caldera. Caldera needs to be running in the background, so be sure to start it up
-beforehand and make sure it's accessible at http://localhost:8888.
-
+Checkout the magma branch in core Caldera. 
 If you are going to run Magma without developing on it, all you have to do is run Caldera with an extra flag once. To do so:
 
 In the Caldera directory:

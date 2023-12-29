@@ -3,6 +3,7 @@ import { inject, ref, computed } from "vue";
 
 import { useOperationStore } from "@/stores/operationStore";
 import { b64DecodeUnicode } from "@/utils/utils";
+import { toast } from "bulma-toast";
 
 const props = defineProps({
   link: Object,
@@ -35,6 +36,19 @@ function isLinkEditable(currentLink) {
     !(currentLink.finish.length > 0 || currentLink.output === "True")
   );
 }
+
+function copyCommand() {
+  if (plaintextCommand.value === "") return;
+  navigator.clipboard.writeText(plaintextCommand.value);
+  toast({
+    message: "Copied command to clipboard",
+    type: "is-success",
+    position: "bottom-right",
+    dismissible: true,
+    pauseOnHover: true,
+    duration: 2000,
+  });
+}
 </script>
 
 <template lang="pug">
@@ -48,6 +62,10 @@ section(v-if="isLinkEditable(props.link)")
         label.label.mt-2 Plaintext
         pre.m-0.pt-2.pb-2 {{ plaintextCommand }}
     pre.m-0.pt-2.pb-2(v-else) {{ plaintextCommand }}
+    a.button.is-outlined.is-fullwidth(v-if="!isLinkEditable(props.link)" @click="copyCommand()")
+        span.icon
+            font-awesome-icon(icon="far fa-copy").fa-lg
+        span Copy
     
 .buttons.p-2(v-if="isLinkEditable(props.link)")
     button.button.is-primary(@click="operationStore.updateLink($api, -3, editableCommand, props.link)") Approve

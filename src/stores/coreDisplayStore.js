@@ -29,6 +29,7 @@ export const useCoreDisplayStore = defineStore("coreDisplayStore", {
           showDownload: false,
           showAddManualCommand: false,
           showFilters: false,
+          showOutput: false,
         },
       },
     };
