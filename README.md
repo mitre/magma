@@ -1,5 +1,5 @@
-# Magma
-The future of CALDERA's UI/UX.
+# MITRE Caldera Plugin: Magma
+The future of Caldera's UI/UX.
 
 ## Dependencies
 * NodeJS (v16+ recommended)
