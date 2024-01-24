@@ -33,7 +33,7 @@ async function enablePlugin() {
         .modal-card-body 
             br
             p.block "{{ coreDisplayStore.modals.core.selectedPlugin }}" plugin is currently disabled. Would you like to enable it?
-            p Note: Enabling the plugin will require you to restart CALDERA
+            p Note: Enabling the plugin will require you to restart Caldera
             br
 
         footer.modal-card-foot.is-flex.is-justify-content-flex-end 
