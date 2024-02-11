@@ -71,7 +71,7 @@ export const useAbilityStore = defineStore("abilityStore", {
         async getPayloads($api) {
             try {
                 const response = await $api.get("/api/v2/payloads");
-                this.payloads = response.data.payloads;
+                this.payloads = response.data;
             } catch(error) {
                 console.error("Error fetching payloads", error);
             }
