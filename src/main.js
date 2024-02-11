@@ -25,7 +25,11 @@ app.use(router);
 app.use(VueScrollTo);
 app.use(FloatingVue);
 app.use(VNetworkGraph);
-
+app.directive('focus', {
+  mounted(el) {
+    el.focus();
+  }
+});
 // Font awesome icons, add more icons here as needed
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';

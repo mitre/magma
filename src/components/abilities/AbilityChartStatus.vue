@@ -41,7 +41,9 @@ async function initChart() {
 function setChartOption() {
   chart.value.setOption({
     title: {
-      text: `${Object.keys(abilityStore.abilities).length} Abilities`,
+      text: `${Object.keys(abilityStore.abilities).length} ${
+        Object.keys(abilityStore.abilities).length == 1 ? "Ability" : "Abilities"
+      }`,
       textStyle: {
         color: "white",
       },

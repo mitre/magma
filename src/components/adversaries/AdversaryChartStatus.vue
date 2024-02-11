@@ -41,7 +41,7 @@ async function initChart() {
 function setChartOption() {
   chart.value.setOption({
     title: {
-      text: `${Object.keys(adversaryStore.adversaries).length} Adversaries`,
+      text: `${Object.keys(adversaryStore.adversaries).length} ${Object.keys(adversaryStore.adversaries).length == 1 ? "Adversary" : "Adversaries"}`,
       textStyle: {
         color: "white",
       },

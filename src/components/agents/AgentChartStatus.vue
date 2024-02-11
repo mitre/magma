@@ -42,7 +42,7 @@ async function initChart() {
 function setChartOption() {
   chart.value.setOption({
     title: {
-      text: `${agents.value.length} Agent${agents.value.length > 1 ? "s" : ""}`,
+      text: `${agents.value.length} Agent${agents.value.length == 1 ? "" : "s"}`,
       textStyle: {
         color: "white",
       },

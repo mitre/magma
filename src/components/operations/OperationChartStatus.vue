@@ -47,7 +47,7 @@ function setChartOption() {
   chart.value.setOption({
     title: {
       text: `${Object.keys(operationStore.operations).length} Operation${
-        Object.keys(operationStore.operations).length > 1 ? "s" : ""
+        Object.keys(operationStore.operations).length == 1 ? "" : "s"
       }`,
       textStyle: {
         color: "white",

@@ -177,9 +177,9 @@ async function deleteAbility() {
                     .field.is-grouped.is-grouped-multiline
                         label.label Payloads
                         br
-                        .control(v-if="executor.payloads.length === 0")
+                        .control(v-if="executor.payloads.length === 0" class="ml-4")
                             span.tag.is-light No payloads
-                        .control(v-for="(payload, idx) in executor.payloads")
+                        .control(v-for="(payload, idx) in executor.payloads" class="ml-4")
                           .tags.has-addons
                             span.tag.is-primary {{ payload }}
                             a.tag.is-delete(@click="executor.payloads.splice(idx, 1)")

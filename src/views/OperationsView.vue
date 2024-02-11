@@ -513,6 +513,7 @@ OutputModal(v-if="selectedOutputLink" :link="selectedOutputLink")
   top: 0;
   left: initial;
   right: 90%;
+  max-width: 75vw;
   max-height: 300px;
   border-radius: 8px;
   padding: 0;

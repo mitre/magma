@@ -239,14 +239,14 @@ const getAgentTooltipContent = (agent) => {
 .graph-wrapper(v-if="operationStore.selectedOperationID")
   .graph-header.is-fullwidth.is-flex.is-flex-direction-row.is-align-items-center.is-justify-content-space-between(@click="isGraphOpen = !isGraphOpen")
     .left-graph-header.is-flex.is-flex-direction-row.is-align-items-center.is-3
-      h3 Graph
+      h3 {{operationStore.currentOperation.name}}
       button.button.ml-4(type="button" @click="downloadGraphAsSvg")
         span Download Graph SVG
     span.icon(v-if="!isGraphOpen")
       font-awesome-icon(icon="fas fa-plus")
     span.icon(v-if="isGraphOpen")
       font-awesome-icon(icon="fas fa-minus")
-  .graph-container(:style="{height: isGraphOpen ? '30rem' : '0px'}")
+  .graph-container(:style="{height: isGraphOpen ? '34rem' : '0px'}")
     .tooltip-wrapper()
       v-network-graph.graph(ref="graph" :nodes="nodes" :edges="edges" :paths="paths" :event-handlers="eventHandlers" :configs="graphConfig" :layouts="layouts")
         defs
@@ -389,6 +389,8 @@ const getAgentTooltipContent = (agent) => {
 .sidebar {
   padding: 1rem;
   transition: width 0.5s;
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar-table {
@@ -397,6 +399,7 @@ const getAgentTooltipContent = (agent) => {
   border-radius: 8px;
   box-shadow: 0 0 5px #121212;
   width: 350px;
+  flex-grow: 1;
 }
 
 .sidebar-header {
