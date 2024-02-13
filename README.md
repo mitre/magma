@@ -1,12 +1,11 @@
 # MITRE Caldera Plugin: Magma
-The future of Caldera's UI/UX.
+The UI/UX Vue.js framework of Caldera v5.
 
 ## Dependencies
 * NodeJS (v16+ recommended)
 * Caldera (v4.0.0+)
 
 ## Installation
-Checkout the magma branch in core Caldera. 
 If you are going to run Magma without developing on it, all you have to do is run Caldera with an extra flag once. To do so:
 
 In the Caldera directory:
