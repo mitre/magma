@@ -59,7 +59,7 @@ const router = createRouter({
     },
     {
       path: "/factsources",
-      name: "factsources",
+      name: "fact sources",
       component: FactSourcesView,
     },
     {
@@ -89,7 +89,7 @@ const router = createRouter({
     },
     {
       path: "/exfilledfiles",
-      name: "exfilledfiles",
+      name: "exfilled files",
       component: ExfilledFilesView,
     },
     {
