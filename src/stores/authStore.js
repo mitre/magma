@@ -21,6 +21,7 @@ export const useAuthStore = defineStore({
         await this.getGroup($api);
         router.push({ name: this.returnUrl || "home" });
       } catch (error) {
+        if (!error.response) throw "The server encountered an error";
         if (error.response.status == 401) {
           throw "Incorrect username or password";
         }
