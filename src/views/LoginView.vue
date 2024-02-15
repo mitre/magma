@@ -6,7 +6,8 @@ let password = ref("");
 let loginError = ref("");
 const $api = inject("$api");
 
-async function handleLogin() {
+async function handleLogin(e) {
+    e.preventDefault();
     const authStore = useAuthStore();
     try {
         await authStore.login(username, password, $api);
@@ -33,7 +34,7 @@ async function handleLogin() {
                     input.input(v-model="password" type="password" placeholder="password")
                     span.icon.is-small.is-left
                         font-awesome-icon(icon="fas fa-lock")
-            button.button.fancy-button.is-fullwidth(type="submit" @click="handleLogin()") Log In
+            button.button.fancy-button.is-fullwidth(type="submit" @click="handleLogin") Log In
         .has-text-danger
             p {{ loginError }}
 </template>
