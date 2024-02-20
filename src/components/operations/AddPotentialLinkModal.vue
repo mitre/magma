@@ -65,7 +65,7 @@ const potentialLinksToAdd = computed(() => {
     Object.keys(selectedPotentialLinkFacts.value).forEach((factName, i) => {
         combinations.push(selectedPotentialLinkFacts.value[factName].facts.filter((fact) => fact.selected).map((fact) => `${factName.length}|${factName}${fact.value}`));
         if (selectedPotentialLinkFacts.value[factName].customValue) {
-            combinations[i].push(`${factName}|${selectedPotentialLinkFacts.value[factName].customValue}`);
+            combinations[i].push(`${factName.length}|${factName}${selectedPotentialLinkFacts.value[factName].customValue}`);
         }
     });
     combinations = cartesian(combinations);
