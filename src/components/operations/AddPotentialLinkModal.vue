@@ -63,7 +63,7 @@ const potentialLinksToAdd = computed(() => {
 
     let combinations = [];
     Object.keys(selectedPotentialLinkFacts.value).forEach((factName, i) => {
-        combinations.push(selectedPotentialLinkFacts.value[factName].facts.filter((fact) => fact.selected).map((fact) => `${factName}|${fact.value}`));
+        combinations.push(selectedPotentialLinkFacts.value[factName].facts.filter((fact) => fact.selected).map((fact) => `${factName.length}|${factName}${fact.value}`));
         if (selectedPotentialLinkFacts.value[factName].customValue) {
             combinations[i].push(`${factName}|${selectedPotentialLinkFacts.value[factName].customValue}`);
         }
@@ -89,8 +89,8 @@ const potentialLinksToAdd = computed(() => {
     combinations.forEach((factGroup) => {
         let command = potentialLinkCommand.value;
         factGroup.forEach((fact) => {
-            let split = fact.split('|');
-            command = command.replaceAll(`#{${split[0]}}`, split[1])
+            let factNameLength = fact.split('|', 1)[0], restOfFact = fact.slice(1+factNameLength.length);
+            command = command.replaceAll(`#{${restOfFact.slice(0, parseInt(factNameLength))}}`, restOfFact.slice(parseInt(factNameLength)));
         });
 
         links.push({
