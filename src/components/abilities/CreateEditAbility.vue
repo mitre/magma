@@ -245,15 +245,17 @@ async function deleteAbility() {
                               .control
                                 input.input(type="text" v-model="executor.parsers[index].module" placeholder="Parser Module")
                             .field
-                              span Output Source
-                              .control
-                                input.input(type="text" v-model="executor.parsers[index].parserconfigs[0].source" placeholder="Output Source")
-                            .field
-                              .control
-                                input.input(type="text" v-model="executor.parsers[index].parserconfigs[0].edge" placeholder="Output Edge [optional]")
-                            .field
-                              .control
-                                input.input(type="text" v-model="executor.parsers[index].parserconfigs[0].target" placeholder="Output Target [optional]")
+                              span Output Source(s)
+                                .field.has-addons(v-for="(parserconfig, pc_index) of executor.parsers[index].parserconfigs")
+                                    .field
+                                      .control
+                                        input.input(type="text" v-model="executor.parsers[index].parserconfigs[pc_index].source" placeholder="Output Source")
+                                    .field
+                                      .control
+                                        input.input(type="text" v-model="executor.parsers[index].parserconfigs[pc_index].edge" placeholder="Output Edge [optional]")
+                                    .field
+                                      .control
+                                        input.input(type="text" v-model="executor.parsers[index].parserconfigs[pc_index].target" placeholder="Output Target [optional]")
                           .control
                               a.button(@click="executor.parsers.splice(index, 1)")
                                   span.icon
