@@ -21,7 +21,7 @@ watch(route, (route, prevRoute) => {
         );
     } else {
         activeTab = route.name;
-        coreDisplayStore.addTab(route.name, `/${route.name}`);
+        coreDisplayStore.addTab(route.name, `${route.path}`);
     }
 });
 
