@@ -48,6 +48,8 @@ let showAbilitySelection = ref(false);
 let showCreateEditAbilityModal = ref(false);
 let showAddFromAdversary = ref(false);
 
+findAbilityDependencies();
+
 watch(selectedAdversaryAbilities, () => {
     findAbilityDependencies();
 });
