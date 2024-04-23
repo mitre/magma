@@ -40,7 +40,8 @@ export const useAgentStore = defineStore("agentStore", {
         },
         async saveSelectedAgent($api) {
             try {
-                const response = await $api.patch(`/api/v2/agents/${this.selectedAgent.paw}`, this.selectedAgent);
+                let subset = (({group, trusted, sleep_min, sleep_max, watchdog, pending_contact}) => ({group, trusted, sleep_min, sleep_max, watchdog, pending_contact}))(this.selectedAgent);
+                const response = await $api.patch(`/api/v2/agents/${this.selectedAgent.paw}`, subset);
                 return response.data;
             } catch(error) {
                 throw error;
