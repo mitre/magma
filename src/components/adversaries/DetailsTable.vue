@@ -279,6 +279,20 @@ function exportAdversary() {
     yaml += `objective: ${selectedAdversary.value.objective}\n`;
     yaml += `atomic_ordering:\n`;
     selectedAdversaryAbilities.value.forEach((ability) => yaml += `- ${ability.ability_id}\n`);
+    yaml += `abilities:\n`;
+    selectedAdversaryAbilities.value.forEach((ability) => {
+        yaml += ` ${ability.ability_id}:\n`;
+        yaml += `  name:  ${ability.name}\n`;
+        yaml += `  tactic:  ${ability.tactic}\n`;
+        yaml += `  technique_name:  "${ability.technique_name}"\n`;
+        yaml += `  technique_id:  ${ability.technique_id}\n`;
+        yaml += `  executors: \n`;
+        ability.executors.forEach((executor) => {
+            yaml += `   - ${executor.name}:\n`;
+            yaml += `     platform: ${executor.platform}\n`;
+            yaml += `     command: |\n       ${executor.command.replaceAll("\n", "\n       ")}\n`;
+        });
+    });
 
     const blob = new Blob([yaml], { type: 'application/x-yaml' })
     const url = window.URL.createObjectURL(blob);
