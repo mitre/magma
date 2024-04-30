@@ -32,7 +32,7 @@ function isLinkEditable(currentLink) {
   return (
     operationStore.isOperationRunning() &&
     currentLink.status === -1 &&
-    !(currentLink.finish.length > 0 || currentLink.output === "True")
+    !(currentLink.finish || currentLink.output === "True")
   );
 }
 
