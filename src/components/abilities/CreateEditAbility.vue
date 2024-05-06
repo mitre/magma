@@ -224,7 +224,7 @@ async function deleteAbility() {
                                 input.input(type="text" v-model="abilityToEdit.requirements[index].relationship_match[0].source" placeholder="Source")
                             .field
                               .control
-                                input.input(type="text" v-model="abilityToEdit.requirements[index].relationship_match[0].edge" placeholder="Edge")
+                                input.input(type="text" v-model="abilityToEdit.requirements[index].relationship_match[0].edge" placeholder="Edge [optional]")
                             .field
                               .control
                                 input.input(type="text" v-model="abilityToEdit.requirements[index].relationship_match[0].target" placeholder="Target [optional]")
