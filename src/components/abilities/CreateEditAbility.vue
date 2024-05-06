@@ -220,6 +220,16 @@ async function deleteAbility() {
                                 input.input(type="text" v-model="abilityToEdit.requirements[index].module" placeholder="Requirement Module")
                             .field
                               span Source
+                              .field.has-addons(v-for="(relationship, r_index) of abilityToEdit.requirements[index].relationship_match")
+                                .field
+                                  .control
+                                    input.input(type="text" v-model="abilityToEdit.requirements[index].relationship_match[r_index].source" placeholder="Source")
+                                .field
+                                  .control
+                                    input.input(type="text" v-model="abilityToEdit.requirements[index].relationship_match[r_index].edge" placeholder="Edge [optional]")
+                                .field 
+                                  .control
+                                    input.input(type="text" v-model="abilityToEdit.requirements[index].relationship_match[r_index].target" placeholder="Target [optional]")
                               .control
                                 input.input(type="text" v-model="abilityToEdit.requirements[index].relationship_match[0].source" placeholder="Source")
                             .field
