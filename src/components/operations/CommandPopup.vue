@@ -28,12 +28,11 @@ const isCommandObfuscated = computed(() => {
 
 function isLinkEditable(currentLink) {
   if (!currentLink) return false;
-  if (!currentLink.finish) return false;
   // Link can only be editable if operation is running, and if link is paused, queued, or completed
   return (
     operationStore.isOperationRunning() &&
     currentLink.status === -1 &&
-    !(currentLink.finish.length > 0 || currentLink.output === "True")
+    !(currentLink.finish || currentLink.output === "True")
   );
 }
 
