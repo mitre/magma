@@ -109,7 +109,7 @@ export const useOperationStore = defineStore("operationStore", {
     async updateLink($api, status, command = null, currentLink) {
       const updatedLink = {
         ...currentLink,
-        command: b64DecodeUnicode(currentLink.command),
+        command: currentLink.command,
       };
       if (command) updatedLink.command = command;
       updatedLink.status = status;
