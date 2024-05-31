@@ -191,6 +191,8 @@ const resetFilter = () => {
 
 function selectOperation() {
   //TODO: Stop updating if operation is finished
+  //TODO: update the interval back to every 3 seconds.
+  // Increased this value due to https://github.com/mitre/magma/issues/51
   if (updateInterval) clearInterval(updateInterval);
   if (operationStore.selectedOperationID === "") return;
   resetFilter();
@@ -200,7 +202,7 @@ function selectOperation() {
     } else {
       clearInterval(updateInterval);
     }
-  }, "3000");
+  }, 30000);
 }
 
 async function updateAuto(event) {
