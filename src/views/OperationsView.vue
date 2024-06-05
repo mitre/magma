@@ -196,7 +196,7 @@ function selectOperation() {
   resetFilter();
   updateInterval = setInterval(async () => {
     if (operationStore.selectedOperationID !== "") {
-      await operationStore.getOperations($api);
+      await operationStore.getOperation($api, operationStore.selectedOperationID);
     } else {
       clearInterval(updateInterval);
     }
