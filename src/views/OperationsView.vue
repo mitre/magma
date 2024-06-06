@@ -190,12 +190,13 @@ const resetFilter = () => {
 };
 
 function selectOperation() {
-  //TODO: Stop updating if operation is finished
   if (updateInterval) clearInterval(updateInterval);
   if (operationStore.selectedOperationID === "") return;
   resetFilter();
   updateInterval = setInterval(async () => {
-    if (operationStore.selectedOperationID !== "") {
+    if (operationStore.selectedOperationID !== "" &&
+        operationStore.operations[operationStore.selectedOperationID].state !== "finished")
+    {
       await operationStore.getOperation($api, operationStore.selectedOperationID);
     } else {
       clearInterval(updateInterval);
