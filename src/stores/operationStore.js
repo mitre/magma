@@ -27,6 +27,15 @@ export const useOperationStore = defineStore("operationStore", {
         console.error("Error fetching operations", error);
       }
     },
+    async getOperation($api, operationID) {
+        try {
+          const response = await $api.get(`/api/v2/operations/${operationID}`);
+          let operation = response.data;
+          this.operations[operation.id] = operation;
+        } catch (error) {
+          console.error("Error fetching operations", error);
+        }
+      },
     async createOperation($api, operation) {
       try {
         const response = await $api.post("/api/v2/operations", operation);
