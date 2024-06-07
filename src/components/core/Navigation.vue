@@ -61,6 +61,8 @@ function promptToEnablePlugin(pluginName) {
             li
                 router-link.menu-item(to="/agents") agents
             li
+                router-link.menu-item(to="/payloads") payloads
+            li
                 router-link.menu-item(to="/abilities") abilities
             li
                 router-link.menu-item(to="/adversaries") adversaries
@@ -119,6 +121,7 @@ function promptToEnablePlugin(pluginName) {
             .dropdown-menu(role="menu")
                 .dropdown-content.ml-2
                     router-link.dropdown-item(to="/agents") agents
+                    router-link.dropdown-item(to="/payloads") payloads
                     router-link.dropdown-item(to="/abilities") abilities
                     router-link.dropdown-item(to="/adversaries") adversaries
                     router-link.dropdown-item(to="/operations") operations

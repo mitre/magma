@@ -5,6 +5,7 @@ import axios from "axios";
 import HomeView from "./views/HomeView.vue";
 import LoginView from "./views/LoginView.vue";
 import AgentsView from "./views/AgentsView.vue";
+import PayloadsView from "./views/PayloadsView.vue";
 import AbilitiesView from "./views/AbilitiesView.vue";
 import AdversariesView from "./views/AdversariesView.vue";
 import OperationsView from "./views/OperationsView.vue";
@@ -41,6 +42,11 @@ const router = createRouter({
       path: "/agents",
       name: "agents",
       component: AgentsView,
+    },
+    {
+      path: "/payloads",
+      name: "payloads",
+      component: PayloadsView,
     },
     {
       path: "/abilities",
