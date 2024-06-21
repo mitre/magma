@@ -70,6 +70,12 @@ const possibleFilters = reactive({
   host: [],
 });
 const updatePossibleFilters = (chain) => {
+  possibleFilters.abilityName.splice(0);
+  possibleFilters.tactic.splice(0);
+  possibleFilters.pid.splice(0);
+  possibleFilters.paw.splice(0);
+  possibleFilters.host.splice(0);
+
   chain.forEach((chain) => {
     if (!possibleFilters.abilityName.includes(chain.ability.name)) {
       possibleFilters.abilityName.push(chain.ability.name);
