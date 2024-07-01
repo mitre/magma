@@ -85,13 +85,13 @@ export const useOperationStore = defineStore("operationStore", {
       let { id, start, state, chain, host_group, ...newOp } =
         this.operations[this.selectedOperationID];
       let dateMatches = newOp.name.match(
-        /[(]\d{1,2}\/\d{1,2}\/\d{2,4}, \d{1,2}:\d{2}:\d{2} [A|P]M[)]$/g
+        /[(]\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{1,3}Z[)]$/g
       );
       let stringToReplace =
         dateMatches && dateMatches.length
           ? dateMatches[dateMatches.length - 1]
           : "";
-      let date = `(${new Date().toLocaleString()})`;
+      let date = `(${new Date().toISOString()})`;
       newOp.name = stringToReplace
         ? newOp.name.replace(stringToReplace, date)
         : `${newOp.name} ${date}`;
