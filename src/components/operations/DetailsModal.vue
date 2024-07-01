@@ -28,7 +28,7 @@ const operationStore = useOperationStore();
                         td {{`${operationStore.operations[operationStore.selectedOperationID].source.name}`}}
                     tr
                         th Group
-                        td {{operationStore.operations[operationStore.selectedOperationID].autonomous ? "all" : "red"}}
+                        td {{operationStore.operations[operationStore.selectedOperationID].group || "all"}}
                     tr
                         th Planner
                         td {{`${operationStore.operations[operationStore.selectedOperationID].planner.name}`}}
