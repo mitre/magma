@@ -71,7 +71,7 @@ const potentialLinksToAdd = computed(() => {
     combinations = cartesian(combinations);
     let executor;
     if (selectedPotentialLink.value.executors) {
-        executor = selectedPotentialLink.value.executors.find((e) => filters.executor === e.name);
+        executor = selectedPotentialLink.value.executors.find((e) => filters.executor === e.name && filters.agent.platform === e.platform);
     }
 
     if (!combinations.length) {
@@ -130,7 +130,7 @@ function selectPotentialLink(link) {
     selectedPotentialLinkFacts.value = {};
     if (!selectedPotentialLink.value.ability_id) return;
 
-    let executor = link.executors.find((e) => filters.executor === e.name);
+    let executor = link.executors.find((e) => filters.executor === e.name && filters.agent.platform === e.platform);
     potentialLinkCommand.value = executor.command;
     potentialLinkFields.value = [...new Set([...executor.command.matchAll(/#{(.*?)}/gm)].map((field) => field[1]))];
 
