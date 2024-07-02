@@ -23,7 +23,10 @@ onMounted(async () => {
 //- Header
 .content
     h2 Payloads
-    p Payloads are any files that you can reference in ability executors. They are transferred to an agent which can then use them.
+    p
+        | Payloads are any files that you can reference in ability executors.
+        | They are transferred to an agent which can then use them.<br/>
+        | You can only add or delete local payloads, not plugin ones.
 hr
 
 //- Button row
