@@ -26,7 +26,7 @@ async function updateFileName($event) {
 
 async function submitFile($event) {
     const file = input.value.files[0];
-    await abilityStore.savePayload($api, file);
+    await abilityStore.savePayload($api, file, true, true);
 
     fileName.value = fileUploadPlaceholder;
     isFileSelected.value = false;
