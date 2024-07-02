@@ -100,10 +100,11 @@ export const useAbilityStore = defineStore("abilityStore", {
                 console.error("Error uploading payload.", error);
             }
         },
-        async deletePayload($api, payloadName) {
+        async deletePayload($api, payloadName, addPath=false) {
             try {
                 await $api.delete(`/api/v2/payloads/${payloadName}`);
-                this.payloads.splice(this.payloads.findIndex((payload) => payload === payloadName), 1);
+                this.payloads.splice(this.payloads.findIndex((payload) =>
+                    (addPath ? payload.replace(/^data\/payloads\//, '') : payload) === payloadName), 1);
             } catch(error) {
                 console.error("Error deleting payload.", error);
             }
