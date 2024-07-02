@@ -11,6 +11,9 @@ export const useCoreDisplayStore = defineStore("coreDisplayStore", {
           showConfig: false,
           showDetails: false,
         },
+        payloads: {
+          showUpload: false,
+        },
         adversaries: {
           showFactBreakdown: false,
           showImport: false,

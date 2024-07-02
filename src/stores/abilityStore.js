@@ -68,13 +68,46 @@ export const useAbilityStore = defineStore("abilityStore", {
                 console.error("Error fetching abilities", error);
             }
         },
-        async getPayloads($api) {
+        async getPayloads($api, sort=false, excludePlugins=false, addPath=false) {
             try {
-                const response = await $api.get("/api/v2/payloads");
+                const response = await $api.get("/api/v2/payloads", {params: {sort: sort, exclude_plugins: excludePlugins, add_path: addPath}});
                 this.payloads = response.data;
             } catch(error) {
                 console.error("Error fetching payloads", error);
             }
-        }
+        },
+        async savePayload($api, file, sort=false, addPath=false) {
+            try {
+                let formData = new FormData();
+                formData.append("file", file);
+                const response = await $api.post(`/api/v2/payloads`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+                let name = response.data["payloads"][0]
+                if (addPath) {
+                    name = "data/payloads/" + name;
+                }
+                let index = sort ?
+                    this.payloads.findIndex((payload) => name.localeCompare(payload) < 0) : -1;
+                if (index === -1) {
+                    this.payloads.push(name);
+                } else {
+                    this.payloads.splice(index, 0, name);
+                }
+            } catch(error) {
+                console.error("Error uploading payload.", error);
+            }
+        },
+        async deletePayload($api, payloadName, addPath=false) {
+            try {
+                await $api.delete(`/api/v2/payloads/${payloadName}`);
+                this.payloads.splice(this.payloads.findIndex((payload) =>
+                    (addPath ? payload.replace(/^data\/payloads\//, '') : payload) === payloadName), 1);
+            } catch(error) {
+                console.error("Error deleting payload.", error);
+            }
+        },
     },
 });
