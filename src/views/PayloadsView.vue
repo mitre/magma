@@ -46,7 +46,7 @@ table.table.is-striped.is-fullwidth.is-narrow
         tr.pointer(v-for="(payload, index) in payloads")
             td.is-four-fifths {{ payload }}
             td.has-text-centered
-                button.delete.is-white(@click.stop="abilityStore.deletePayload($api, payload, index)")
+                button.delete.is-white(@click.stop="abilityStore.deletePayload($api, payload, false)")
 
 //- Modals
 UploadModal
