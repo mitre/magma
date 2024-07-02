@@ -76,7 +76,7 @@ export const useAbilityStore = defineStore("abilityStore", {
                 console.error("Error fetching payloads", error);
             }
         },
-        async savePayload($api, file, sort=false) {
+        async savePayload($api, file, sort=false, addPath=false) {
             try {
                 let formData = new FormData();
                 formData.append("file", file);
@@ -86,6 +86,9 @@ export const useAbilityStore = defineStore("abilityStore", {
                     }
                 });
                 let name = response.data["payloads"][0]
+                if (addPath) {
+                    name = "data/payloads/" + name;
+                }
                 let index = sort ?
                     this.payloads.findIndex((payload) => name.localeCompare(payload) < 0) : -1;
                 if (index === -1) {
