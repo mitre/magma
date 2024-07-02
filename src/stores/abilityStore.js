@@ -76,7 +76,7 @@ export const useAbilityStore = defineStore("abilityStore", {
                 console.error("Error fetching payloads", error);
             }
         },
-        async savePayload($api, file) {
+        async savePayload($api, file, sort=false) {
             try {
                 let formData = new FormData();
                 formData.append("file", file);
@@ -85,7 +85,14 @@ export const useAbilityStore = defineStore("abilityStore", {
                         'Content-Type': 'multipart/form-data'
                     }
                 });
-                this.payloads.push(response.data["payloads"][0]);
+                let name = response.data["payloads"][0]
+                let index = sort ?
+                    this.payloads.findIndex((payload) => name.localeCompare(payload) < 0) : -1;
+                if (index === -1) {
+                    this.payloads.push(name);
+                } else {
+                    this.payloads.splice(index, 0, name);
+                }
             } catch(error) {
                 console.error("Error uploading payload.", error);
             }
