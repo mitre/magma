@@ -34,6 +34,10 @@ export const useCoreDisplayStore = defineStore("coreDisplayStore", {
           showFilters: false,
           showOutput: false,
         },
+        schedules: {
+          showCreate: false,
+          showDelete: false,
+        },
       },
     };
   },
