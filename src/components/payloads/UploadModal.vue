@@ -56,3 +56,9 @@ async function submitFile($event) {
         footer.modal-card-foot.is-flex.is-justify-content-flex-end
             button.button(@click="modals.payloads.showUpload = false") Close
 </template>
+
+<style scoped>
+.modal-card{
+    width: 80%;
+}
+</style>
