@@ -58,9 +58,9 @@ hr
     h2 Local Payloads
     .columns.mb-4
         .column.is-one-quarter.is-flex.buttons.mb-0
-            button.button.is-primary.level-item(@click="modals.payloads.showUpload = true")
+            button.button(@click="modals.payloads.showUpload = true")
                 span.icon
-                    font-awesome-icon(icon="fas fa-plus")
+                    font-awesome-icon(icon="fas fa-file-import")
                 span Upload a payload
         .column.is-half.is-flex.is-justify-content-center
             span.tag.is-medium.m-0

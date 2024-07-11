@@ -41,24 +41,24 @@ async function submitFile($event) {
         header.modal-card-head
             p.modal-card-title Upload a payload
         .modal-card-body
-            .columns.is-vcentered
-                .column
-                    .file.has-name.is-fullwidth
-                        label.file-label
-                            input.file-input(type="file", ref="input", @change="updateFileName")
-                            span.file-cta
-                                span.file-icon
-                                    i.fas.fa-upload
-                                span.file-label Choose a file…
-                            span.file-name {{ fileName }}
-                .column.is-narrow
-                    button.button.is-primary(:disabled="!isFileSelected", @click="submitFile($event)") Upload
+            .file.has-name.is-fullwidth
+                label.file-label
+                    input.file-input(type="file", ref="input", @change="updateFileName")
+                    span.file-cta
+                        span.file-icon
+                            font-awesome-icon(icon="fas fa-upload")
+                        span.file-label Choose a file...
+                    span.file-name {{ fileName }}
         footer.modal-card-foot.is-flex.is-justify-content-flex-end
             button.button(@click="modals.payloads.showUpload = false") Close
+            button.button.is-primary(:disabled="!isFileSelected", @click="submitFile($event)")
+                span.icon
+                    font-awesome-icon(icon="fas fa-save")
+                span Upload
 </template>
 
 <style scoped>
 .modal-card{
-    width: 80%;
+    width: 70%;
 }
 </style>
