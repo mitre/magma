@@ -61,8 +61,6 @@ function promptToEnablePlugin(pluginName) {
             li
                 router-link.menu-item(to="/agents") agents
             li
-                router-link.menu-item(to="/payloads") payloads
-            li
                 router-link.menu-item(to="/abilities") abilities
             li
                 router-link.menu-item(to="/adversaries") adversaries
@@ -90,6 +88,8 @@ function promptToEnablePlugin(pluginName) {
                 router-link.menu-item(to="/contacts") contacts
             li
                 router-link.menu-item(to="/exfilledfiles") exfilled files
+            li
+                router-link.menu-item(to="/payloads") payloads
         p.menu-label
             font-awesome-icon(icon="fas fa-book").pr-2
             | Resources
@@ -121,7 +121,6 @@ function promptToEnablePlugin(pluginName) {
             .dropdown-menu(role="menu")
                 .dropdown-content.ml-2
                     router-link.dropdown-item(to="/agents") agents
-                    router-link.dropdown-item(to="/payloads") payloads
                     router-link.dropdown-item(to="/abilities") abilities
                     router-link.dropdown-item(to="/adversaries") adversaries
                     router-link.dropdown-item(to="/operations") operations
@@ -148,6 +147,7 @@ function promptToEnablePlugin(pluginName) {
                     router-link.dropdown-item(to="/objectives") objectives
                     router-link.dropdown-item(to="/contacts") contacts
                     router-link.dropdown-item(to="/exfilledfiles") exfilled files
+                    router-link.dropdown-item(to="/payloads") payloads
         .dropdown.is-hoverable.mb-2
             .dropdown-trigger
                 button.button(aria-haspopup="true" aria-controls="dropdown-menu")
