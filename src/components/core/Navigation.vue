@@ -53,7 +53,7 @@ function promptToEnablePlugin(pluginName) {
           font-awesome-icon(icon="fas fa-user")
         span {{ version }}
     aside.menu(v-if="!userSettings.collapseNavigation")
-        
+
         p.menu-label
             font-awesome-icon(icon="fas fa-flag").pr-2
             | Campaigns
@@ -88,6 +88,8 @@ function promptToEnablePlugin(pluginName) {
                 router-link.menu-item(to="/contacts") contacts
             li
                 router-link.menu-item(to="/exfilledfiles") exfilled files
+            li
+                router-link.menu-item(to="/payloads") payloads
         p.menu-label
             font-awesome-icon(icon="fas fa-book").pr-2
             | Resources
@@ -97,7 +99,7 @@ function promptToEnablePlugin(pluginName) {
             li
                 router-link.menu-item(to="/obfuscators") obfuscators
             li
-                a.menu-item(href="/api/docs" target="_blank") 
+                a.menu-item(href="/api/docs" target="_blank")
                     | api docs
                     font-awesome-icon(icon="fas fa-external-link-alt").pl-1.is-size-7
         ul.menu-list.has-text-centered.mt-2
@@ -145,6 +147,7 @@ function promptToEnablePlugin(pluginName) {
                     router-link.dropdown-item(to="/objectives") objectives
                     router-link.dropdown-item(to="/contacts") contacts
                     router-link.dropdown-item(to="/exfilledfiles") exfilled files
+                    router-link.dropdown-item(to="/payloads") payloads
         .dropdown.is-hoverable.mb-2
             .dropdown-trigger
                 button.button(aria-haspopup="true" aria-controls="dropdown-menu")
@@ -154,7 +157,7 @@ function promptToEnablePlugin(pluginName) {
                 .dropdown-content.ml-2
                     router-link.dropdown-item(to="/planners") planners
                     router-link.dropdown-item(to="/obfuscators") obfuscators
-                    a.dropdown-item(href="/api/docs" target="_blank") 
+                    a.dropdown-item(href="/api/docs" target="_blank")
                         | api docs
                         font-awesome-icon(icon="fas fa-external-link-alt").pl-1.is-size-7
 
