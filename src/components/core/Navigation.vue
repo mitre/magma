@@ -66,6 +66,8 @@ function promptToEnablePlugin(pluginName) {
                 router-link.menu-item(to="/adversaries") adversaries
             li
                 router-link.menu-item(to="/operations") operations
+            li
+              router-link.menu-item(to="/schedules") schedules
         p.menu-label
             font-awesome-icon(icon="fas fa-puzzle-piece").pr-2
             | Plugins
@@ -124,6 +126,7 @@ function promptToEnablePlugin(pluginName) {
                     router-link.dropdown-item(to="/abilities") abilities
                     router-link.dropdown-item(to="/adversaries") adversaries
                     router-link.dropdown-item(to="/operations") operations
+                    router-link.dropdown-item(to="/schedules") schedules
         .dropdown.is-hoverable.mb-2
             .dropdown-trigger
                 button.button(aria-haspopup="true" aria-controls="dropdown-menu")
