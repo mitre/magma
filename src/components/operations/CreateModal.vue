@@ -189,7 +189,7 @@ async function createOperation() {
                         input.is-checkradio(type="radio" id="defaultparser" :checked="isDefParser" @click="isDefParser = true")
                         label.label.ml-3.mt-1(for="defaultparser") Use Default Parser
                         input.is-checkradio.ml-3(type="radio" id="nondefaultparser" :checked="!isDefParser" @click="isDefParser = false")
-                        label.label.ml-3.mt-1(for="nondefaultparser") Require manual approval
+                        label.label.ml-3.mt-1(for="nondefaultparser") Don't use default learning parsers
             .field.is-horizontal
                 .field-label 
                     label.label Auto Close
