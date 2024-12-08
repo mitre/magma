@@ -8,6 +8,7 @@ import { useOperationStore } from '@/stores/operationStore';
 import { useAgentStore } from "@/stores/agentStore";
 import { useAbilityStore } from "@/stores/abilityStore";
 import { useSourceStore } from "@/stores/sourceStore";
+import { cartesian } from "@/utils/utils";
 
 const props = defineProps({ 
     active: Boolean,
@@ -47,21 +48,8 @@ const filteredAbilities = computed(() => {
 
 const potentialLinksToAdd = computed(() => {
     let links = [];    
-    function cartesian(args) {
-        if (!args.length) return [];
-        let r = [], max = args.length - 1;
-        function helper(arr, i) {
-            for (let j = 0; j < args[i].length; j++) {
-                let a = arr.slice(0);
-                a.push(args[i][j]);
-                (i === max) ? r.push(a) : helper(a, i + 1);
-            }
-        }
-        helper([], 0);
-        return r;
-    }
-
     let combinations = [];
+
     Object.keys(selectedPotentialLinkFacts.value).forEach((factName, i) => {
         combinations.push(selectedPotentialLinkFacts.value[factName].facts.filter((fact) => fact.selected).map((fact) => `${factName.length}|${factName}${fact.value}`));
         if (selectedPotentialLinkFacts.value[factName].customValue) {
