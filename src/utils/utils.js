@@ -127,3 +127,21 @@ export function b64DecodeUnicode(str) {
     }
   } else return "";
 }
+
+export function cartesian(args) {
+  // Remove empty arrays from the input
+  const filteredArgs = args.filter(arr => arr.length > 0);
+  if (!filteredArgs.length) return [];
+  let r = [], max = filteredArgs.length - 1;
+  
+  function helper(arr, i) {
+      for (const element of filteredArgs[i]) {
+          let a = arr.slice(0);
+          a.push(element);
+          (i === max) ? r.push(a) : helper(a, i + 1);
+      }
+  }
+  
+  helper([], 0);
+  return r;
+}
