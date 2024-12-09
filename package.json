@@ -7,6 +7,7 @@
     "preview": "vite preview --port 5050",
     "lint": "npx eslint \"./**\"",
     "lintfix": "npx eslint \"./**\" --fix",
+    "test": "jest --config jest.config.js",
     "test-all": "jest --config jest.config.js && npx eslint \"./**\"",
     "test-accessibility": "jest -t=accessibility --config jest.config.js"
   },
