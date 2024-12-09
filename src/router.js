@@ -9,6 +9,7 @@ import PayloadsView from "./views/PayloadsView.vue";
 import AbilitiesView from "./views/AbilitiesView.vue";
 import AdversariesView from "./views/AdversariesView.vue";
 import OperationsView from "./views/OperationsView.vue";
+import SchedulesView from "@/views/SchedulesView.vue";
 import FactSourcesView from "./views/FactSourcesView.vue";
 import ObjectivesView from "./views/ObjectivesView.vue";
 import PlannersView from "./views/PlannersView.vue";
@@ -62,6 +63,11 @@ const router = createRouter({
       path: "/operations",
       name: "operations",
       component: OperationsView,
+    },
+    {
+      path: "/schedules",
+      name: "schedules",
+      component: SchedulesView,
     },
     {
       path: "/factsources",
