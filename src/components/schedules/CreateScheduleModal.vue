@@ -250,7 +250,7 @@ async function callApi() {
         .field-label.is-normal
           label.label Schedule
         .field-body
-          input.input(placeholder="Schedule" v-model="schedule")
+          input.input(placeholder="* * * * *    <minute> <hour> <day-of-month> <month> <day-of-week>" v-model="schedule")
           label.label.ml-3.mt-1.has-text-danger {{ `${validation.schedule}` }}
       .field.is-horizontal
         .field-label.is-normal
