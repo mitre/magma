@@ -48,7 +48,7 @@ function downloadSelectedFiles() {
     let filename = filePath.split(/[\/\\]/);
     filename = filename[filename.length - 1];
     let uri = `${
-      import.meta.env.VITE_CALDERA_URL || "http://localhost:8888"
+      window.location.origin
     }/file/download_exfil?file=${btoa(filePath)}`;
     let downloadAnchorNode = document.createElement("a");
     downloadAnchorNode.setAttribute("href", uri);

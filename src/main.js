@@ -17,7 +17,6 @@ const app = createApp(App);
 const $api = axios.create({
   withCredentials: true,
 });
-if (import.meta.env.DEV) $api.defaults.baseURL = "http://localhost:8888";
 app.provide("$api", $api);
 
 app.use(createPinia());
