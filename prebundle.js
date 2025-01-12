@@ -1,4 +1,4 @@
-const fs = require('fs-extra');
+import fs from 'fs-extra';
 
 console.log('Copying all plugin GUI source files to magma');
 
