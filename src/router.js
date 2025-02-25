@@ -23,7 +23,7 @@ import NotFoundView from "./views/NotFoundView.vue";
 // Cant use global API variable because we aren't in a component
 const $api = axios.create({
   withCredentials: true,
-  baseURL: import.meta.env.VITE_CALDERA_URL || "http://localhost:8888",
+  baseURL: process.env.VITE_CALDERA_URL || "http://localhost:8888",
 });
 
 const router = createRouter({
