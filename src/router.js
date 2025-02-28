@@ -23,7 +23,7 @@ import NotFoundView from "./views/NotFoundView.vue";
 // Cant use global API variable because we aren't in a component
 const $api = axios.create({
   withCredentials: true,
-  baseURL: import.meta.env.VITE_CALDERA_URL || "http://localhost:8888",
+  baseURL: window.location.origin,
 });
 
 const router = createRouter({
@@ -113,11 +113,6 @@ const router = createRouter({
     {
       path: '/docs/index.html',
       beforeEnter: () => {
-        // Redirect to the external docs page
-        if (!import.meta.env.PROD) {
-          window.location.href = (import.meta.env.VITE_CALDERA_URL || 'http://localhost:8888') + '/docs/index.html';
-          return;
-        }
         window.location.href = '/docs/index.html';
       }
     },
