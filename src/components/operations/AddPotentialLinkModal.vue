@@ -1,5 +1,5 @@
  <script setup>
-import { inject, ref, onMounted, reactive, computed, toRaw } from "vue";
+import { inject, ref, onMounted, reactive, computed } from "vue";
 import { storeToRefs } from "pinia";
 import { toast } from 'bulma-toast'
 
@@ -99,6 +99,8 @@ const potentialLinksToAdd = computed(() => {
 
 const canSelectAgent = computed(() => !props.agent || !props.agent.paw);
 
+const operationSourceFacts = computed(() => props.operation?.source?.facts || []);
+
 onMounted(async () => {
     await agentStore.getAgents($api);
     if (agentStore.agents.length > 0 && canSelectAgent) {
@@ -110,10 +112,9 @@ onMounted(async () => {
     }
     await abilityStore.getAbilities($api);
     await sourceStore.getSources($api);
-    await operationStore.getFacts($api);
 });
 
-function selectPotentialLink(link) {
+const selectPotentialLink = async (link) => {
     selectedPotentialLink.value = link;
     selectedPotentialLinkFacts.value = {};
     if (!selectedPotentialLink.value.ability_id) return;
@@ -122,25 +123,23 @@ function selectPotentialLink(link) {
     potentialLinkCommand.value = executor.command;
     potentialLinkFields.value = [...new Set([...executor.command.matchAll(/#{(.*?)}/gm)].map((field) => field[1]))];
 
+    // Update collected facts
+    await operationStore.getFacts($api);
+    const facts = operationSourceFacts.value.concat(operationStore.facts);
+
     potentialLinkFields.value.forEach((field) => {
         selectedPotentialLinkFacts.value[field] = {
             customValue: "",
             facts: []
         };
 
-        if (props.operation && props.operation.id) {
-            const opSource = sources.value.find((s) => s.id === props.operation.source.id);
-            const opSourceCollected = sources.value.find((source) => source.name === props.operation.name);
-            const facts = (opSource.facts.concat(opSourceCollected ? opSourceCollected.facts : [])).concat(operationStore.facts);
-            
-            facts.filter((fact) => fact.name === field).forEach((fact) => {
-                selectedPotentialLinkFacts.value[field].facts.push({
-                    value: fact.value,
-                    origin: fact.origin_type,
-                    selected: false
-                });
+        facts.filter((fact) => fact.name === field).forEach((fact) => {
+            selectedPotentialLinkFacts.value[field].facts.push({
+                value: fact.value,
+                origin: fact.origin_type,
+                selected: false
             });
-        }
+        });
     });
 
     if (props.operation && props.operation.state === "paused") {
