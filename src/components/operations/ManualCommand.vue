@@ -24,9 +24,9 @@ const manualCommand = reactive({
 });
 const selectedAgent = ref(operationStore.currentOperation.host_group[0].paw);
 
-const handleAgentSelect = (agent) => {
+function handleAgentSelect(agent) {
   manualCommand.agent = agent;
-};
+}
 
 function addManualCommand() {
   if (manualCommand.executor.command.length <= 0) {
@@ -67,7 +67,7 @@ tr(id="manual-input-command")
             .select
                 select(v-model="selectedAgent")
                     option(disabled default value="") Select an agent
-                    option(v-for="(agent, idx) in operationStore.currentOperation.host_group" :key="agent.paw" :value="agent.paw" @change="handleAgentSelect(agent)") {{ `${agent.display_name} - ${agent.paw}` }}
+                    option(v-for="(agent, idx) in operationStore.currentOperation.host_group" :key="agent.paw" :value="agent.paw" @click="handleAgentSelect(agent)") {{ `${agent.display_name} - ${agent.paw}` }}
     td
         .control
             .select 
