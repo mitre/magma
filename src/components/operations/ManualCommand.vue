@@ -14,18 +14,21 @@ const { modals } = storeToRefs(coreDisplayStore);
 const $api = inject("$api");
 
 const manualCommand = reactive({
-  agent: operationStore.currentOperation.host_group[0],
+  agent: null,
   executor: {
-    name: operationStore.currentOperation.host_group[0].executors[0],
+    name: "",
     command: "",
     platform: "",
   },
-  paw: "",
+  paw: operationStore.currentOperation.host_group[0].paw,
 });
-const selectedAgent = ref(operationStore.currentOperation.host_group[0].paw);
 
-function handleAgentSelect(agent) {
-  manualCommand.agent = agent;
+function getExecutorsByPaw(targetPaw) {
+  var agent = operationStore.currentOperation.host_group.find(({ paw }) => paw === targetPaw);
+  if (!manualCommand.executor.name || !agent.executors.includes(manualCommand.executor.name)) {
+    manualCommand.executor.name = agent.executors[0];
+  }
+  return agent.executors;
 }
 
 function addManualCommand() {
@@ -40,7 +43,7 @@ function addManualCommand() {
     });
     return;
   }
-  manualCommand.paw = manualCommand.agent.paw;
+  manualCommand.agent = operationStore.currentOperation.host_group.find(({ paw }) => paw === manualCommand.paw);
   manualCommand.executor.platform = manualCommand.agent.platform;
   if (operationStore.currentOperation.state === "paused") {
     toast({
@@ -65,19 +68,17 @@ tr(id="manual-input-command")
     td(colspan="2")
         .control
             .select
-                select(v-model="selectedAgent")
-                    option(disabled default value="") Select an agent
-                    option(v-for="(agent, idx) in operationStore.currentOperation.host_group" :key="agent.paw" :value="agent.paw" @click="handleAgentSelect(agent)") {{ `${agent.display_name} - ${agent.paw}` }}
+                select(v-model="manualCommand.paw")
+                    option(v-for="(agent, idx) in operationStore.currentOperation.host_group" :key="agent.paw" :value="agent.paw") {{ `${agent.display_name} - ${agent.paw}` }}
     td
         .control
             .select 
                 select(v-model="manualCommand.executor.name")
-                    option(disabled default value="") Select an executor
-                    option(v-for="(executor) in manualCommand.agent.executors" :key="executor" :value="executor") {{`${executor}`}}
+                    option(v-for="(executor) in getExecutorsByPaw(manualCommand.paw)" :key="executor" :value="executor") {{`${executor}`}}
     td(colspan="3")
         CodeEditor(v-model="manualCommand.executor.command" language="bash" line-numbers)
     td
         .is-flex.is-flex-direction-column.is-justify-content-center
-            button.button.is-primary(@click="addManualCommand()" :disabled="!manualCommand.agent || !manualCommand.executor.command || !manualCommand.executor.name") Add Command 
+            button.button.is-primary(@click="addManualCommand()" :disabled="!manualCommand.paw || !manualCommand.executor.command || !manualCommand.executor.name") Add Command 
             button.button.mt-2(@click="modals.operations.showAddManualCommand = false") Cancel 
 </template>
