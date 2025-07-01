@@ -1,7 +1,8 @@
 <script setup>
 import { ref, inject, onMounted } from "vue";
 import { storeToRefs } from "pinia";
-import { toast } from 'bulma-toast'
+import { toast } from 'bulma-toast';
+import { sanitizeInput, validateInput } from "@/utils/sanitize";
 
 import { useCoreDisplayStore } from "@/stores/coreDisplayStore";
 import { useOperationStore } from '@/stores/operationStore';
@@ -72,8 +73,11 @@ async function getPlanners() {
 }
 
 async function createOperation() {
-    if(!operationName.value){
-        validation.value.name = "Name cannot be empty";
+    operationName.value = sanitizeInput(operationName.value);
+    selectedGroup.value = sanitizeInput(selectedGroup.value);
+
+    if (!validateInput(operationName.value, "string")) {
+        validation.value.name = "Name cannot be empty or invalid";
         return;
     }
     validation.value.name = "";
@@ -89,10 +93,10 @@ async function createOperation() {
         state: isPause ? "running" : "paused",
         visibility: visibility.value,
         obfuscator: selectedObfuscator.value.name,
-        source: {id: JSON.parse(JSON.stringify(selectedSource.value.id))},
-        planner: {id: JSON.parse(JSON.stringify(selectedPlanner.value.id))},
-        adversary: {adversary_id: JSON.parse(JSON.stringify(selectedAdversary.value.adversary_id))},
-        group: selectedGroup.value,
+        source: { id: sanitizeInput(selectedSource.value.id) },
+        planner: { id: sanitizeInput(selectedPlanner.value.id) },
+        adversary: { adversary_id: sanitizeInput(selectedAdversary.value.adversary_id) },
+        group: sanitizeInput(selectedGroup.value),
     };
     try {
         await operationStore.createOperation($api, newOperation);
