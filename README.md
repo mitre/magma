@@ -2,8 +2,8 @@
 The UI/UX Vue.js framework of Caldera v5.
 
 ## Dependencies
-* NodeJS (v16+ recommended)
-* Caldera (v4.0.0+)
+* NodeJS (v20.19+ recommended)
+* Caldera (v5.0.0+)
 
 ## Installation
 If you are going to run Magma without developing on it, all you have to do is run Caldera with an extra flag once. To do so:
