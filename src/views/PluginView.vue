@@ -51,7 +51,7 @@ async function loadComp() {
   if (!requestedPluginLoader) {
     try {
       const res = await $api.get(
-        `http://localhost:8888/plugin/${props.pluginName}/gui`
+        `${window.location.origin}/plugin/${props.pluginName}/gui`
       );
       const html = res.data;
       const newElement = document.createElement("div");
