@@ -1,9 +1,3 @@
-<!-- #In certain instances the browser for access and the server running Caldera were on two machines thus creating a delta in time. In my testing it actually represented minutes and if the beacon window for an agent was less than that delta it would always show that agent as dead.
-
-I rewrote the logic for the alive, dead, and pending kill to be solely calculated browser side. 
-
-This is purely ... I think a UI, user interaction bug fix and does not mess the actual functionality of the agent.  -->
-
 <script setup>
 import { inject, onMounted, onBeforeUnmount, ref, computed } from "vue";
 import { storeToRefs } from "pinia";
