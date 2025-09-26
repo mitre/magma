@@ -40,16 +40,9 @@ onBeforeUnmount(() => {
     chart.value = null;
   }
 });
-
-watch(() => {
-    if (chart.value) {
-      setChartOption();
-    } else {
-      console.log("[watch] chart not ready yet, skipping setOption");
-    }
-  }
-);
-
+watch(agents, () => {
+  if (chart.value) setChartOption();
+});
 async function initChart() {
   chart.value = echarts.init(agentChartStatus.value);
   chart.value.showLoading("default", {

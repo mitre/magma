@@ -92,7 +92,6 @@ export const useAgentStore = defineStore("agentStore", {
 
     async killAgent($api, agentPaw) {
       try {
-        const reqBody = { pending_kill: true };
             const idx = this.agents.findIndex(a => a.paw === agentPaw);
             if (idx !== -1) {
                 // WTF is this API voodoo?  Setting watchdog to 1 and sleep to 3 forces an agent to check in almost immediately and then die because of pending_kill flag
