@@ -41,9 +41,7 @@ onBeforeUnmount(() => {
   }
 });
 
-watch(
-  agents,
-  (newVal, oldVal) => {
+watch(() => {
     if (chart.value) {
       setChartOption();
     } else {

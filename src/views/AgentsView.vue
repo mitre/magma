@@ -1,3 +1,9 @@
+<!-- #In certain instances the browser for access and the server running Caldera were on two machines thus creating a delta in time. In my testing it actually represented minutes and if the beacon window for an agent was less than that delta it would always show that agent as dead.
+
+I rewrote the logic for the alive, dead, and pending kill to be solely calculated browser side. 
+
+This is purely ... I think a UI, user interaction bug fix and does not mess the actual functionality of the agent.  -->
+
 <script setup>
 import { inject, onMounted, onBeforeUnmount, ref, computed } from "vue";
 import { storeToRefs } from "pinia";
@@ -36,10 +42,15 @@ const rows = computed(() => {
     .map(a => ({ ...a, _status: getAgentStatus(a, now, cfg) }));
 });
 
-const aliveCount     = computed(() => rows.value.filter(Boolean).filter(r => r._status === 'alive' || r._status === 'pending kill').length);
-const trustedCount   = computed(() => rows.value.filter(Boolean).filter(r => r.trusted).length);
-const deadCount      = computed(() => rows.value.filter(Boolean).filter(r => r._status === 'dead').length);
-const untrustedCount = computed(() => rows.value.filter(Boolean).filter(r => !r.trusted).length);
+const isAlive = r => r && (r._status === 'alive' || r._status === 'pending kill');
+const isDeadLike = r => r && (r._status === 'dead' || r._status === 'killed');
+const isCountableForTrust = r => r && r._status !== 'killed'; // exclude killed from trust buckets
+
+const aliveCount     = computed(() => rows.value.filter(isAlive).length);
+const deadCount      = computed(() => rows.value.filter(isDeadLike).length);
+const trustedCount   = computed(() => rows.value.filter(r => isCountableForTrust(r) && r.trusted).length);
+const untrustedCount = computed(() => rows.value.filter(r => isCountableForTrust(r) && !r.trusted).length);
+
 
 // row handlers
 function onRowClick(r) {
@@ -100,7 +111,7 @@ hr
       span.mr-4.has-text-success
         span.has-text-weight-bold.mr-3 {{ aliveCount }} alive
         span.has-text-weight-bold {{ trustedCount }} trusted
-      strong.mr-4 {{ rows.length }} agent{{ rows.length > 1 ? 's' : '' }}
+      strong.mr-4 {{ rows.filter(r => r._status !== 'killed').length }} agent{{ rows.filter(r => r._status !== 'killed').length > 1 ? 's' : '' }}
       span.mr-4.has-text-warning
         span.has-text-weight-bold.mr-3 {{ deadCount }} dead
         span.has-text-weight-bold {{ untrustedCount }} untrusted
@@ -142,8 +153,10 @@ table.table.is-striped.is-hoverable.is-fullwidth(v-if="rows.length")
       td {{ r.privilege }}
       td
         span(:class="statusClass(r && r._status)") {{ r && r._status }}
-        span , 
-        span(:class="{ 'has-text-success': r && r.trusted, 'has-text-warning': !(r && r.trusted) }") {{ r && r.trusted ? 'trusted' : 'untrusted' }}
+        span(v-if="r && r._status !== 'killed'") , 
+        span(v-if="r && r._status !== 'killed'"
+            :class="{ 'has-text-success': r && r.trusted, 'has-text-warning': !(r && r.trusted) }"
+        ) {{ r && r.trusted ? 'trusted' : 'untrusted' }}
       td {{ new Date(r.last_seen).toLocaleString() }}
       td.has-text-centered
         button.delete.is-white(@click.stop="onDeleteClick(r)")
