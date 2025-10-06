@@ -83,9 +83,9 @@ export const useAdversaryStore = defineStore("adversaryStore", {
           `/api/v2/adversaries/${this.selectedAdversary.adversary_id}`,
           reqBody
         );
-	if (response.status != 200) {
+	    if (response.status != 200) {
           throw new Error(`Non-200 HTTP response code from /api/v2/adversaries/${this.selectedAdversary.adversary_id}: ${response.status}`);
-	}
+	    }
         const index = this.adversaries.findIndex(
           (adversary) =>
             adversary.adversary_id === this.selectedAdversary.adversary_id
