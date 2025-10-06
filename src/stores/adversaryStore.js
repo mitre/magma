@@ -83,11 +83,14 @@ export const useAdversaryStore = defineStore("adversaryStore", {
           `/api/v2/adversaries/${this.selectedAdversary.adversary_id}`,
           reqBody
         );
+	if (response.status != 200) {
+          throw new Error(`Non-200 HTTP response code from /api/v2/adversaries/${this.selectedAdversary.adversary_id}: ${response.status}`);
+	}
         const index = this.adversaries.findIndex(
           (adversary) =>
             adversary.adversary_id === this.selectedAdversary.adversary_id
         );
-        this.adversaries[index] = this.selectedAdversary;
+        this.adversaries[index] = response.data;
         return response.data;
       } catch (error) {
         console.error("Error saving adversary", error);
