@@ -329,7 +329,7 @@ form.mb-4(v-else)
         .control
             input.input(v-model="selectedAdversary.description" placeholder="Adversary description")
     p.help.has-text-danger.mb-3(v-if="validation.name") {{ validation.name }}
-    button.button.is-primary(@click="isEditingName = false") Done
+    button.button.is-primary(type="button" @click="isEditingName = false") Done
 
 //- Button row
 .is-flex.is-align-items-center
