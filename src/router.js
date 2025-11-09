@@ -6,7 +6,7 @@ import HomeView from "./views/HomeView.vue";
 import LoginView from "./views/LoginView.vue";
 import AgentsView from "./views/AgentsView.vue";
 import PayloadsView from "./views/PayloadsView.vue";
-import AbilitiesView from "./views/AbilitiesView.vue";
+import AbilitiesView from "./components/abilities/CreateEditAbility.vue";
 import AdversariesView from "./views/AdversariesView.vue";
 import OperationsView from "./views/OperationsView.vue";
 import SchedulesView from "@/views/SchedulesView.vue";
