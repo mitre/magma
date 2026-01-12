@@ -123,14 +123,36 @@ function addExecutor() {
   else abilityToEdit.value.executors.push(baseExecutor);
 }
 function setAbilityToEdit() {
-  console.info('[Ability.vue] setAbilityToEdit() with props.ability:', JSON.stringify(props.ability, null, 2));
-  abilityToEdit.value = cloneDeep(props.ability);
-  if (!abilityToEdit.value.requirements) abilityToEdit.value.requirements = [];
-  for (const executor of abilityToEdit.value.executors || []) {
-    if (executor.showPayloadDropdown === undefined) executor.showPayloadDropdown = false;
-    if (executor.payloadSearch === undefined) executor.payloadSearch = '';
-    if (!Array.isArray(executor.payloads)) executor.payloads = [];
+  console.info(
+    '[Ability.vue] setAbilityToEdit() with props.ability:',
+    JSON.stringify(props.ability ?? null, null, 2)
+  );
+
+  // HARD GUARD: abilities view may mount with no selected ability
+  if (!props.ability) {
+    abilityToEdit.value = {
+      requirements: [],
+      executors: [],
+      metadata: {}
+    };
+    return;
   }
+
+  const cloned = cloneDeep(props.ability) || {};
+
+  cloned.requirements = Array.isArray(cloned.requirements) ? cloned.requirements : [];
+  cloned.executors = Array.isArray(cloned.executors) ? cloned.executors : [];
+  cloned.metadata = cloned.metadata || {};
+
+  for (const executor of cloned.executors) {
+    executor.showPayloadDropdown ??= false;
+    executor.payloadSearch ??= '';
+    executor.payloads = Array.isArray(executor.payloads) ? executor.payloads : [];
+    executor.cleanup = Array.isArray(executor.cleanup) ? executor.cleanup : [];
+    executor.parsers = Array.isArray(executor.parsers) ? executor.parsers : [];
+  }
+
+  abilityToEdit.value = cloned;
   initializeUserFacts();
 }
 function initializeUserFacts() {
@@ -237,11 +259,14 @@ onMounted(async () => {
   await abilityStore.getPayloads($api);
   setAbilityToEdit();
   console.log('Payloads loaded:', payloads.value);
-});
-watch(() => props.ability, () => {
-  setAbilityToEdit();
-});
-
+})
+watch(
+  () => props.ability,
+  () => {
+    setAbilityToEdit(),
+  { immediate: true }
+  }
+)
 </script>
 
 <template>
