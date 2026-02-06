@@ -117,6 +117,9 @@ CreateEditAbility(
   :ability="selectedAbility"
   :active="showAbilityModal"
   :creating="isCreatingAbility"
+  :allow-command-edit="true"
+  :allow-trait-edit="false"
+  delete-mode="ability"
   @close="showAbilityModal = false"
 )
 </template>
