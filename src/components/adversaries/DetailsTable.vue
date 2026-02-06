@@ -78,25 +78,44 @@ const localAbilities = ref([]);
  * Decide whether to show a warning icon on an executor because required #{trait}
  * placeholders in the command are not satisfied by provided facts.
  */
+// /mnt/data/DetailsTable.vue (around L81)
 const shouldShowWarningIcon = (ability, executor) => {
-  const executorCmd = executor?.command || '';
-  const requiredTraits = [...executorCmd.matchAll(/#\{([^}]+)\}/g)]
-    .map(m => m[1]);
+  if (!selectedSource.value || !selectedSource.value.facts) return null;
+  const cmd = String(executor?.command || "");
+  const requiredTraits = [...cmd.matchAll(/#\{([^}]+)\}/g)].map(m => m[1]);
+  if (!requiredTraits.length) return null;
 
-  if (!requiredTraits.length) return false;
-
-  const executorFacts = Array.isArray(executor.executor_facts)
-    ? executor.executor_facts
-    : [];
-
+  // executor-provided facts
+  const executorFacts = ability?.metadata?.executor_facts?.[executor.platform] || [];
   const providedTraits = new Set(
-    executorFacts
-      .filter(f => f.value?.trim())
-      .map(f => f.trait)
+    executorFacts.filter(f => f.value?.trim()).map(f => f.trait)
   );
 
-  return requiredTraits.some(trait => !providedTraits.has(trait));
+  // fact source traits
+  const source = selectedSource.value;
+  const sourceTraits = new Set(
+    (source?.facts || []).map(f => f.trait)
+  );
+
+  // ❌ missing entirely → warning
+  if (requiredTraits.some(
+    trait => !providedTraits.has(trait) && !sourceTraits.has(trait)
+  )) {
+    return "warning";
+  }
+
+  // 🧩 source-backed but not yet satisfied
+  if (requiredTraits.some(
+    trait => !providedTraits.has(trait) && sourceTraits.has(trait)
+  )) {
+    return "source";
+  }
+
+  // ✅ fully satisfied
+  return null;
 };
+
+
 /**
  * Compute ability dependencies and fact coverage across the list.
  * Populates:
@@ -264,20 +283,19 @@ function getExecutorDetail(detail, ability) {
     case "requirements":
       return Array.isArray(ability.requirements) && ability.requirements.length > 0;
 
+    // /mnt/data/DetailsTable.vue (replace case "platforms")
     case "platforms": {
-      const builtExecutors = buildExecutorsFromFacts(
-        ability.executors,
-        ability.metadata?.executor_facts || {}
-      );
-      return builtExecutors
+      const executors = ability.executors || [];
+      return executors
         .map((executor) => ({
           platform: executor.platform,
           name: executor.name,
-          key: executor.key,
+          key: executor.key, // already step_uuid-scoped by the store
           hasWarning: shouldShowWarningIcon(ability, executor),
         }))
         .filter((e) => e.platform && e.name);
     }
+
     default:
       return false;
   }
@@ -692,9 +710,14 @@ watch(
               class="executor-icon"
             )
             font-awesome-icon(
-              v-if="executor.hasWarning"
-              icon="fa-exclamation-triangle"
+              v-if="executor.hasWarning === 'warning'"
+              icon="fas fa-exclamation-triangle"
               class="warning-icon"
+            )
+            font-awesome-icon(
+              v-else-if="executor.hasWarning === 'source'"
+              icon="fas fa-puzzle-piece"
+              class="source-icon"
             )
         td.has-text-centered(:class="{ 'unlock': onHoverUnlocks.indexOf(ability.step_uuid) > -1 }")
           span(
@@ -736,7 +759,11 @@ watch(
 
   //- Modals
   AbilitySelection(:active="showAbilitySelection" @select="addAbilityToAdversary" @close="showAbilitySelection = false" :canCreate="true")
-  FactBreakdownModal(:breakdown="factBreakdown")
+  FactBreakdownModal(
+    v-if="selectedSource && selectedSource.id && localAbilities.length"
+    :abilities="localAbilities"
+    :selectedSource="selectedSource"
+  )
   AddAbilitiesFromAdversaryModal(:active="showAddFromAdversary" @select="addAbilitiesFromAdversary" @close="showAddFromAdversary = false")
   DeleteAdversaryConfirmationModal
 </template>
@@ -796,6 +823,15 @@ watch(
   right: 0;
   font-size: 0.7rem;
   color: orange;
+  z-index: 2;
+  pointer-events: none;
+}
+.source-icon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 0.7rem;
+  color: #a77dff;
   z-index: 2;
   pointer-events: none;
 }
