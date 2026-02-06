@@ -142,6 +142,15 @@ function getStepUuid() {
   return created;
 }
 
+
+// /mnt/data/CreateEditAbility.vue (script setup, near initializeUserFacts)
+function ensureTraitSlot(executor, trait) {
+  const key = getExecutorKey(executor);
+  userFactsMap[key] ??= {};
+  userFactsMap[key][trait] ??= { customValue: '', selected: [] };
+  return userFactsMap[key][trait];
+}
+
 /**
  * getExecutorKey
  * - Single source of truth for executor identity in the UI.
@@ -152,14 +161,6 @@ function getStepUuid() {
 function getExecutorKey(executor) {
   const stepUuid = ensureStepUuid();
   const key = `${stepUuid}::${executor.name}::${executor.platform}`;
-
-  console.log('[Ability.vue] executor UI key:', {
-    stepUuid,
-    name: executor.name,
-    platform: executor.platform,
-    key
-  });
-
   return key;
 }
 
@@ -331,19 +332,27 @@ function initializeUserFacts() {
 
     const platformFacts = executorFacts[executor.platform] || [];
 
-    platformFacts.forEach(({ trait, value }) => {
-      userFactsMap[key][trait] ??= { customValue: '', selected: [] };
-      if (!userFactsMap[key][trait].selected.includes(value)) {
-        userFactsMap[key][trait].selected.push(value);
-      }
-    });
+    // ✅ group persisted facts by trait
+    const byTrait = {};
+    for (const { trait, value } of platformFacts) {
+      (byTrait[trait] ??= []).push(String(value ?? ''));
+    }
 
+    // ✅ hydrate into customValue + selected
+    for (const [trait, values] of Object.entries(byTrait)) {
+      userFactsMap[key][trait] ??= { customValue: '', selected: [] };
+
+      const trimmed = values.map(v => v.trim()).filter(Boolean);
+      userFactsMap[key][trait].customValue = trimmed[0] ?? '';
+      userFactsMap[key][trait].selected = trimmed.slice(1);
+    }
+
+    // ensure trait slots exist for all placeholders
     getCommandFields(executor.command || '').forEach(trait => {
       userFactsMap[key][trait] ??= { customValue: '', selected: [] };
     });
   }
 }
-
 
 /**
  * validateAndSaveAbility
@@ -360,51 +369,51 @@ function validateAndSaveAbility() {
 
   validation.executors =
     abilityToEdit.value.executors?.length &&
-    abilityToEdit.value.executors.every(ex => ex.platform && ex.name && ex.command && ex.timeout >= 0)
+    abilityToEdit.value.executors.every(
+      ex => ex.platform && ex.name && ex.command && ex.timeout >= 0
+    )
       ? ''
       : 'Executors are invalid or missing.';
 
   if (!Object.values(validation).every(v => !v)) return;
 
-  // Build platform-keyed executor_facts (backwards compatible)
+  // ✅ Build platform-keyed executor_facts from userFactsMap
   const executorFacts = {};
 
-(abilityToEdit.value.executors || []).forEach(executor => {
-  const key = getExecutorKey(executor);
-  const byTrait = userFactsMap[key] || {};
-  const platform = executor.platform;
+  (abilityToEdit.value.executors || []).forEach((executor) => {
+    const key = getExecutorKey(executor);
+    const platform = executor.platform;
 
-  executorFacts[platform] ??= [];
+    const traitMap = userFactsMap[key] || {};
+    executorFacts[platform] ??= [];
 
-  Object.entries(byTrait).forEach(([trait, data]) => {
-    if (data.customValue) {
-      executorFacts[platform].push({ trait, value: data.customValue });
-    }
-    data.selected.forEach(v => {
-      executorFacts[platform].push({ trait, value: v });
+    Object.entries(traitMap).forEach(([trait, data]) => {
+      const custom = (data?.customValue ?? '').trim();
+      if (custom) {
+        executorFacts[platform].push({ trait, value: custom });
+      }
+
+      (data?.selected ?? []).forEach((v) => {
+        const val = String(v ?? '').trim();
+        if (val) {
+          executorFacts[platform].push({ trait, value: val });
+        }
+      });
     });
   });
-});
 
-  // Update local
+  // Update local ability
   abilityToEdit.value.step_uuid = getStepUuid();
   abilityToEdit.value.metadata = {
     ...(abilityToEdit.value.metadata || {}),
     executor_facts: executorFacts
   };
 
-  // Emit updated object back to parent
-  emit('update', {
-    ...cloneDeep(abilityToEdit.value),
-    step_uuid: abilityToEdit.value.step_uuid,
-    metadata: {
-      ...(abilityToEdit.value.metadata || {}),
-      executor_facts: executorFacts
-    }
-  });
-
+  // Emit updated object
+  emit('update', cloneDeep(abilityToEdit.value));
   emit('close');
 }
+
 
 function ensureStepUuid() {
   if (!abilityToEdit.value.step_uuid) {
@@ -699,12 +708,7 @@ watch(
                       class="input mb-2"
                       :disabled="!props.allowTraitEdit"
                       placeholder="Enter a custom value"
-                      @input="(e) => {
-                        const key = getExecutorKey(executor, index);
-                        userFactsMap[key] ??= {};
-                        userFactsMap[key][trait] ??= { customValue: '', selected: [] };
-                        userFactsMap[key][trait].customValue = e.target.value;
-                      }"
+                      v-model="ensureTraitSlot(executor, trait).customValue"
                     />
 
                     <!-- Suggested facts -->
