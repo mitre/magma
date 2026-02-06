@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+
 import { useAbilityStore as abilityStore } from "@/stores/abilityStore";
 import { useObjectiveStore } from "@/stores/objectiveStore";
 import {
@@ -77,13 +78,25 @@ export const useAdversaryStore = defineStore("adversaryStore", {
      */
     async saveSelectedAdversary($api) {
       const buildAtomicOrdering = () =>
-        this.selectedAdversaryAbilities.map(({ ability_id, metadata = {} }) => {
-          const normalizedFacts = normalizeExecutorFactsForSave(
-            metadata.executor_facts || {}
+        this.selectedAdversaryAbilities.map((step) => {
+          const executorFactsFromExecutors = {};
+
+          const facts = step.metadata?.executor_facts || {};
+          Object.assign(executorFactsFromExecutors, facts);
+
+          // 🚨 FINAL NORMALIZATION (UI → backend)
+          const sanitizedFacts =
+            normalizeExecutorFactsForSave(executorFactsFromExecutors);
+          console.debug(
+            "[FE] sanitizedFacts",
+            JSON.stringify(sanitizedFacts, null, 2)
           );
+
           return {
-            ability_id,
-            metadata: { executor_facts: normalizedFacts },
+            ability_id: step.ability_id,
+            metadata: {
+              executor_facts: sanitizedFacts,
+            },
           };
         });
 
@@ -96,9 +109,18 @@ export const useAdversaryStore = defineStore("adversaryStore", {
           this.selectedAdversary.objective ??
           null,
         atomic_ordering: buildAtomicOrdering(),
+        tags: this.selectedAdversary.tags ?? [],
+        has_repeatable_abilities: this.selectedAdversary.has_repeatable_abilities ?? false,
+        plugin: this.selectedAdversary.plugin ?? '',
       };
+      console.log("[AdversaryStore] Saving adversary with payload:", reqBody);
 
       try {
+        console.debug(
+          "[FE] PATCH payload atomic_ordering",
+          JSON.stringify(reqBody.atomic_ordering, null, 2)
+        );
+
         const response = await $api.patch(
           `/api/v2/adversaries/${reqBody.adversary_id}`,
           reqBody
@@ -180,38 +202,48 @@ export const useAdversaryStore = defineStore("adversaryStore", {
 
           const stepId = stepObj.ability_id;
           const abilityTemplate = abilitiesStore.abilities.find(
-            (a) => a.ability_id === stepId
+            (a) => a.id === stepId || a.ability_id === stepId
           );
+
           if (!abilityTemplate) {
             console.warn(
-              `[Automation] Ability not found for step ${index}: ${stepId}`
+              `[Automation] Ability not found in abilityStore for step ${index}: ${stepId} — using step data`
             );
-            return null;
+            // Fallback: use step itself as the ability
+            
           }
 
           const clonedAbility = cloneDeep(abilityTemplate);
           const stepUuid = stepObj.step_uuid || uuidv4();
+          stepObj.step_uuid = stepUuid;
 
-          // Merge metadata (step overrides template)
+          // 1️⃣ Merge metadata (step overrides template)
           const metadata = {
             ...(clonedAbility.metadata || {}),
             ...(stepObj.metadata || {}),
           };
           metadata.executor_facts ??= {};
 
-          // Normalize and rebuild executors
+          // 2️⃣ 🔒 FIRST: establish stable executor keys
+          clonedAbility.executors.forEach(exec => {
+            exec.key = `${stepUuid}::${exec.name}::${exec.platform}`;
+          });
+
+          // 3️⃣ THEN normalize executor_facts (now keys match)
           const normalizedStep = normalizeStepExecutorFacts(
             { ...stepObj, metadata },
             clonedAbility.executors
           );
+
           const normalizedExecutorFacts =
             normalizedStep.metadata.executor_facts ?? {};
-          const rebuiltExecutors = buildExecutorsFromFacts(
+
+          // 4️⃣ Rebuild executors with correct facts
+          clonedAbility.executors = buildExecutorsFromFacts(
             clonedAbility.executors,
             normalizedExecutorFacts
           );
 
-          clonedAbility.executors = rebuiltExecutors;
           clonedAbility.metadata = {
             ...clonedAbility.metadata,
             ...metadata,
@@ -248,6 +280,7 @@ export const useAdversaryStore = defineStore("adversaryStore", {
       // Ensure abilities are available
       if (!abilityStoreInstance.abilities.length) {
         await abilityStoreInstance.getAbilities($api);
+        
       }
 
       // Selected adversary shell
@@ -314,21 +347,29 @@ export const useAdversaryStore = defineStore("adversaryStore", {
      * Update a single step (by step_uuid) in selectedAdversaryAbilities.
      * Uses shallow merge to preserve reactivity.
      */
-    updateAbilityInstance(updatedStep) {
+    updateAbilityInstance(updatedAbility) {
       const idx = this.selectedAdversaryAbilities.findIndex(
-        (s) => s.step_uuid === updatedStep.step_uuid
+        a => a.step_uuid === updatedAbility.step_uuid
       );
-      if (idx !== -1) {
-        this.selectedAdversaryAbilities[idx] = {
-          ...this.selectedAdversaryAbilities[idx],
-          ...updatedStep,
-        };
-      } else {
-        console.warn(
-          "[Automation] Could not find ability with step_uuid:",
-          updatedStep.step_uuid
-        );
-      }
-    },
+      if (idx === -1) return;
+
+      const existing = this.selectedAdversaryAbilities[idx];
+
+      this.selectedAdversaryAbilities[idx] = {
+        ...existing,
+        ...updatedAbility,
+        metadata: {
+          ...(existing.metadata || {}),
+          ...(updatedAbility.metadata || {}),
+          executor_facts:
+            updatedAbility.metadata?.executor_facts ??
+            existing.metadata?.executor_facts ??
+            {}
+        }
+      };
+
+    }
+
+
   },
 });

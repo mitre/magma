@@ -160,28 +160,24 @@ async function handleImportedProfile(profile) {
  * Merges metadata and executor facts into a complete editable object.
  */
 function handleAbilityClick(step) {
-  console.debug("[handleAbilityClick]", new Date().toISOString(), step?.ability_id);
+  const stepUuid = step?.step_uuid;
+  if (!stepUuid) return;
 
-  const full = abilities.value.find(a => a.ability_id === step.ability_id);
-  if (!full) {
-    console.warn("Missing ability:", step.ability_id);
-    return;
-  }
+  const live = selectedAdversaryAbilities.value.find(
+    a => a.step_uuid === stepUuid
+  );
 
-  const built = {
-    ...cloneDeep(full),
-    step_uuid: step.step_uuid || crypto.randomUUID(),
-    metadata: {
-      ...(full.metadata || {}),
-      ...(step.metadata || {}),
-      executor_facts: step.metadata?.executor_facts || full.metadata?.executor_facts || {},
-    },
-  };
+  const built = cloneDeep(live || step);
 
-  built.executors = buildExecutorsFromFacts(built.executors, built.metadata.executor_facts);
+  built.executors = Array.isArray(built.executors) ? built.executors : [];
+  built.metadata = built.metadata || {};
+  built.metadata.executor_facts = built.metadata.executor_facts || {};
+
   selectedAbility.value = built;
   showEditModal.value = true;
 }
+
+
 
 /** Close the edit ability modal. */
 function closeEditModal() {
@@ -191,6 +187,18 @@ function closeEditModal() {
 /** Apply updates to an ability instance within the adversary store. */
 function onUpdateAbility(updatedAbility) {
   adversaryStore.updateAbilityInstance(updatedAbility);
+
+  // ✅ force new array ref so DetailsTable watcher fires
+  adversaryStore.selectedAdversaryAbilities = [
+    ...adversaryStore.selectedAdversaryAbilities
+  ];
+
+  selectedAbility.value = cloneDeep(updatedAbility);
+}
+
+function removeAbilityFromAdversary(stepUuid) {
+  selectedAdversaryAbilities.value =
+    selectedAdversaryAbilities.value.filter(a => a.step_uuid !== stepUuid);
 }
 
 
@@ -277,14 +285,18 @@ onMounted(async () => {
 
     <!-- Ability Edit Modal -->
     <EditAbilityModal
-            v-if="showEditModal"
-            :active="showEditModal"
-            :ability="selectedAbility"
-            :agent="selectedAgent"
-            :operationFacts="operationFacts"
-            @close="closeEditModal"
-            @update="onUpdateAbility"
-            />
+      v-if="showEditModal"
+      :active="showEditModal"
+      :ability="selectedAbility"
+      :agent="selectedAgent"
+      :operationFacts="operationFacts"
+      @remove="removeAbilityFromAdversary"
+      :allow-command-edit="false"
+      :allow-trait-edit="true"
+      delete-mode="adversary"
+      @close="closeEditModal"
+      @update="onUpdateAbility"
+    />
     <!-- Modal & Details -->
     <ImportAutomationModal
       v-if="modals.automationImport"

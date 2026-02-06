@@ -79,18 +79,24 @@ const localAbilities = ref([]);
  * placeholders in the command are not satisfied by provided facts.
  */
 const shouldShowWarningIcon = (ability, executor) => {
-  const key = executor?.key;
-  if (!key) return false;
+  const executorCmd = executor?.command || '';
+  const requiredTraits = [...executorCmd.matchAll(/#\{([^}]+)\}/g)]
+    .map(m => m[1]);
 
-  const facts = ability.metadata?.executor_facts?.[key] || [];
-  const executorCmd = executor.command || "";
-  const requiredTraits = [...executorCmd.matchAll(/#\{([^}]+)\}/g)].map((m) => m[1]);
-  if (requiredTraits.length === 0) return false;
+  if (!requiredTraits.length) return false;
 
-  const providedTraits = new Set(facts.map((f) => f.trait).filter(Boolean));
-  return requiredTraits.some((t) => !providedTraits.has(t));
+  const executorFacts = Array.isArray(executor.executor_facts)
+    ? executor.executor_facts
+    : [];
+
+  const providedTraits = new Set(
+    executorFacts
+      .filter(f => f.value?.trim())
+      .map(f => f.trait)
+  );
+
+  return requiredTraits.some(trait => !providedTraits.has(trait));
 };
-
 /**
  * Compute ability dependencies and fact coverage across the list.
  * Populates:
@@ -380,6 +386,25 @@ function selectAbility(ability) {
  * Persist the selected adversary profile via store.
  */
 async function validateAndSaveAdversary() {
+  console.debug(
+    "[DetailsTable] localAbilities → store sync preview",
+    localAbilities.value.map((a, i) => ({
+      index: i,
+      step_uuid: a.step_uuid,
+      ability_id: a.ability_id,
+      executor_facts: a.metadata?.executor_facts,
+    }))
+  );
+  adversaryStore.selectedAdversaryAbilities = cloneDeep(localAbilities.value);
+  console.debug(
+    "[DetailsTable] selectedAdversaryAbilities before save",
+    adversaryStore.selectedAdversaryAbilities.map((a, i) => ({
+      index: i,
+      step_uuid: a.step_uuid,
+      ability_id: a.ability_id,
+      executor_facts: a.metadata?.executor_facts,
+    }))
+  );
   await adversaryStore.saveSelectedAdversary($api);
 }
 
@@ -425,8 +450,17 @@ function exportAdversary() {
  * Append a single ability to the local list and notify parent.
  */
 function addAbilityToAdversary(ability) {
-  if (!ability.step_uuid) ability.step_uuid = uuidv4();
-  localAbilities.value.push(ability);
+  // ✅ clone so instances never share state
+  const inst = cloneDeep(ability);
+
+  // ✅ always new frontend instance id
+  inst.step_uuid = uuidv4();
+
+  // ✅ instance-scoped metadata
+  inst.metadata = inst.metadata || {};
+  inst.metadata.executor_facts = inst.metadata.executor_facts || {};
+
+  localAbilities.value.push(inst);
   emit("update:abilities", [...localAbilities.value]);
   showAbilitySelection.value = false;
 }
@@ -435,10 +469,7 @@ function addAbilityToAdversary(ability) {
  * Append multiple abilities (from another adversary) and notify parent.
  */
 function addAbilitiesFromAdversary(abilities) {
-  abilities.forEach((ability) => {
-    if (!ability.step_uuid) ability.step_uuid = uuidv4();
-    addAbilityToAdversary(ability);
-  });
+  abilities.forEach(a => addAbilityToAdversary(a));
   showAddFromAdversary.value = false;
 }
 
@@ -457,10 +488,13 @@ function deleteAbility(index) {
 function rebuildExecutors() {
   try {
     localAbilities.value.forEach((ability) => {
-      const executorFacts = ability?.metadata?.executor_facts;
-      if (!executorFacts) return;
+      const executorFacts = ability?.metadata?.executor_facts || {};
+      if (!executorFacts || !Object.keys(executorFacts).length) return;
 
-      const rebuiltExecutors = buildExecutorsFromFacts(ability.executors, executorFacts);
+      const rebuiltExecutors = buildExecutorsFromFacts(
+        ability.executors,
+        executorFacts
+      );
       if (Array.isArray(rebuiltExecutors)) {
         ability.executors = rebuiltExecutors;
       }
@@ -622,7 +656,7 @@ watch(
         th
     tbody
       tr.pointer(
-        v-for="(ability, index) in abilities"
+        v-for="(ability, index) in localAbilities"
         :class="getRowClass(ability)"
         @click="selectAbility(ability)"
         @mouseenter="setAbilityHover(ability.step_uuid)"
