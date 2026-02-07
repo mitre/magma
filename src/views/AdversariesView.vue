@@ -309,6 +309,7 @@ onMounted(async () => {
         :abilities="selectedAdversaryAbilities"
         @ability-click="handleAbilityClick"
         @update:abilities="adversaryStore.selectedAdversaryAbilities = $event"
+        :isCreatingNewAdversary="isCreatingNewAdversary"
         />
 
     </section>

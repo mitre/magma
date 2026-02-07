@@ -7,7 +7,7 @@
  */
 
 import { storeToRefs } from "pinia";
-import { ref, reactive, watch, inject, onMounted } from "vue";
+import { ref, reactive, watch, inject, onMounted, computed } from "vue";
 import cloneDeep from "lodash/cloneDeep";
 import { v4 as uuidv4 } from "uuid";
 
@@ -20,13 +20,21 @@ import AddAbilitiesFromAdversaryModal from "@/components/adversaries/AddAbilitie
 import AbilitySelection from "@/components/abilities/AbilitySelection.vue";
 import DeleteAdversaryConfirmationModal from "./DeleteAdversaryConfirmationModal.vue";
 import { buildExecutorsFromFacts } from "@/utils/executorUtils";
+defineOptions({
+  components: {
+    AbilitySelection,
+    FactBreakdownModal,
+    AddAbilitiesFromAdversaryModal,
+    DeleteAdversaryConfirmationModal,
+  },
+});
 
 const $api = inject("$api");
 const emit = defineEmits(["ability-click", "update:abilities"]);
 
 const adversaryStore = useAdversaryStore();
-const { selectedAdversary } = storeToRefs(adversaryStore);
-
+const selectedAdversary = computed(() => adversaryStore.selectedAdversary);
+const isCreatingNewAdversary = computed(() => false);
 const objectiveStore = useObjectiveStore();
 const { objectives } = storeToRefs(objectiveStore);
 
@@ -62,15 +70,16 @@ const tableDragHoverId = ref(null);
 const showAbilitySelection = ref(false);
 const showAddFromAdversary = ref(false);
 
-// Template references this flag; define it locally
-const isCreatingNewAdversary = ref(false);
-
 // Props
 const props = defineProps({
   abilities: {
     type: Array,
     required: true,
   },
+  isCreatingNewAdversary: {
+    type: Boolean,
+    default: false,
+ },
 });
 const localAbilities = ref([]);
 
@@ -577,7 +586,7 @@ watch(
 </script>
 
 <template lang="pug">
-.automation-editor( v-if="selectedAdversary?.adversary_id || isCreatingNewAdversary" )
+.automation-editor
   //- Header
   .content(v-if="selectedAdversary && !isEditingName")
     h3.pointer(@click="isEditingName = true") {{ selectedAdversary.name }} {{ selectedAdversary.name === "New adversary" ? "(click to edit)" : "" }}
