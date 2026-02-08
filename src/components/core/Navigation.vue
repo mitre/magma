@@ -1,5 +1,5 @@
 <script setup>
-import { inject } from "vue";
+import { inject, onMounted, watch, ref, computed } from "vue";
 import { storeToRefs } from "pinia";
 import { useRoute, useRouter } from "vue-router";
 import { useCoreStore } from "@/stores/coreStore";
@@ -18,14 +18,7 @@ const { group, version } = storeToRefs(authStore);
 const router = useRouter();
 
 const $api = inject("$api");
-
-try {
-  await coreStore.getAvailablePlugins($api);
-  await coreStore.getMainConfig($api);
-  await authStore.getGroup($api);
-} catch (error) {
-  console.log(error);
-}
+const { restarting } = storeToRefs(coreDisplayStore);
 
 function handleLogout() {
   coreDisplayStore.removeAllTabs();
@@ -33,9 +26,22 @@ function handleLogout() {
 }
 
 function promptToEnablePlugin(pluginName) {
-  this.modals.core.selectedPlugin = pluginName;
-  this.modals.core.showPluginPopup = true;
+  if (!modals.value?.core) return;
+
+  modals.value.core.selectedPlugin = pluginName;
+  modals.value.core.showPluginPopup = true;
 }
+
+function openDisablePlugins() {
+  if (!modals.value?.core) return;
+
+  modals.value.core.mode = "disable";
+  modals.value.core.availableToDisable =
+    enabledPlugins.value.map(p => typeof p === "string" ? p : p.name);
+  modals.value.core.selectedPlugins = [];
+  modals.value.core.showPluginPopup = true;
+}
+
 </script>
 
 <template lang="pug">
@@ -74,8 +80,14 @@ function promptToEnablePlugin(pluginName) {
         ul.menu-list
             li(v-for="plugin in availablePlugins")
                 a.menu-item(v-if="plugin.name === 'fieldmanual'" target="_blank" :href="'/docs/index.html'") {{ plugin.name }}
-                router-link.menu-item(v-else-if="enabledPlugins.includes(plugin.name)" :to="`/plugins/${plugin.name}`") {{ plugin.name }}
+                router-link.menu-item(v-else-if="enabledPlugins && enabledPlugins.includes(plugin.name)" :to="`/plugins/${plugin.name}`") {{ plugin.name }}
                 p.menu-item(v-else-if="plugin.name !== 'magma' && !hideDisabledPlugins" @click="promptToEnablePlugin(plugin.name)") {{ plugin.name }}
+            // Disable plugins button
+            li(v-if="enabledPlugins && enabledPlugins.length && !restarting")
+                .menu-item.is-clickable.disable-plugins(@click="openDisablePlugins()")
+                    span.icon
+                        font-awesome-icon(icon="fas fa-puzzle-piece")
+                    span Disable a Plugin
         p.menu-label
             font-awesome-icon(icon="fas fa-cog").pr-2
             | Configuration
@@ -136,7 +148,7 @@ function promptToEnablePlugin(pluginName) {
                 .dropdown-content.ml-2
                     div(v-for="plugin in availablePlugins")
                         a.dropdown-item(v-if="plugin.name === 'fieldmanual'" target="_blank" :href="'/docs/index.html'") {{ plugin.name }}
-                        router-link.dropdown-item(v-else-if="enabledPlugins.includes(plugin.name)" :to="`/plugins/${plugin.name}`") {{ plugin.name }}
+                        router-link.dropdown-item(v-else-if="enabledPlugins && enabledPlugins.includes(plugin.name)" :to="`/plugins/${plugin.name}`") {{ plugin.name }}
                         p.dropdown-item(v-else-if="plugin.name !== 'magma'" @click="promptToEnablePlugin(plugin.name)") {{ plugin.name }}
         .dropdown.is-hoverable.mb-2
             .dropdown-trigger
@@ -165,7 +177,7 @@ function promptToEnablePlugin(pluginName) {
                         font-awesome-icon(icon="fas fa-external-link-alt").pl-1.is-size-7
 
 //- Modals
-PluginModal
+PluginModal(v-if="modals && modals.core")
 </template>
 
 <style scoped>
@@ -272,4 +284,11 @@ p.dropdown-item:hover {
 .is-blue {
   color: hsl(204, 86%, 53%);
 }
+.menu-item.disable-plugins {
+  color: #bbb;
+}
+.menu-item.disable-plugins:hover {
+  color: white;
+}
+
 </style>

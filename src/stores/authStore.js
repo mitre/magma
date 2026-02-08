@@ -32,8 +32,11 @@ export const useAuthStore = defineStore({
     async getAuthStatus($api) {
       try {
         await $api.head("/api/v2/config/main");
+        this.isUserAuthenticated = true;
         return true;
       } catch (error) {
+        // 401 before login is normal — do nothing
+        this.isUserAuthenticated = false;
         return false;
       }
     },

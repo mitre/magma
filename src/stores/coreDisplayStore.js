@@ -1,10 +1,10 @@
 import { defineStore } from "pinia";
-
 export const useCoreDisplayStore = defineStore("coreDisplayStore", {
   state: () => {
     return {
       openTabs: [],
       activeTab: "",
+      restarting: false,
       modals: {
         agents: {
           showDeploy: false,
@@ -23,6 +23,9 @@ export const useCoreDisplayStore = defineStore("coreDisplayStore", {
         core: {
           showPluginPopup: false,
           selectedPlugin: "",
+          mode: "enable",
+          selectedPlugins: [],
+          availableToDisable: []
         },
         operations: {
           showCreate: false,

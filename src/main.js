@@ -6,6 +6,8 @@ import FloatingVue from "floating-vue";
 import VNetworkGraph from "v-network-graph"
 import "v-network-graph/lib/style.css"
 
+import { useCoreDisplayStore } from "@/stores/coreDisplayStore";
+
 import App from "@/App.vue";
 import router from "@/router.js";
 
@@ -17,6 +19,43 @@ const app = createApp(App);
 const $api = axios.create({
   withCredentials: true,
 });
+$api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // connection lost (restart)
+    if (!error.response) {
+      const displayStore = useCoreDisplayStore(pinia);
+
+      // ignore connection loss during restart
+      if (displayStore?.restarting) {
+        return Promise.reject(error);
+      }
+
+      window.location.href = "/login";
+      return Promise.reject(error);
+    }
+
+    // auth invalid AFTER login
+    if (error.response?.status === 401 &&
+  !   error.config?.url?.includes("/api/v2/health")) {
+
+  // ignore auth status probe
+  if (
+      error.config?.method === "head" &&
+      error.config?.url?.includes("/api/v2/config/main")
+    ) {
+      return Promise.reject(error);
+    }
+
+    console.log("[caldera] auth invalid");
+
+    if (window.location.pathname !== "/login") {
+      window.location.href = "/login";
+    }
+  }
+    return Promise.reject(error);
+  }
+);
 app.provide("$api", $api);
 
 app.use(createPinia());
@@ -37,13 +76,13 @@ import {
   faAngleDown, faAngleRight, faAngleUp, faAnglesLeft, faAnglesRight, faArrowRight, faBan, faBook, faCheck, faCog, faDownload, faExclamationTriangle, 
   faExternalLinkAlt, faFileExport, faFileImport, faFlag as fasFlag, faKey, faLock, faMinus, faPause, faPencilAlt, faPlay, faPlus, faPuzzlePiece, faRedo, faRunning, faSave, faFilter,
   faSearch, faSkullCrossbones, faSignOutAlt, faStop, faTimes, faTrash, faUndo, faUnlockAlt, faUpload, faUser, faWeightHanging, faFolderOpen, faFolder, faFile, faDragon, faFolderClosed, faArrowLeft, faArrowUp, faArrowDown, 
-  faChevronUp, faChevronDown, faBroom, faForward, faFastForward, faBackward, faFastBackward
+  faChevronUp, faChevronDown, faBroom, faForward, faFastForward, faBackward, faFastBackward, faSpinner
 } from '@fortawesome/free-solid-svg-icons';
 library.add(
   faAngleDown, faAngleRight, faAngleUp, faAnglesLeft, faAnglesRight, faArrowRight, faBan, faBook, faCheck, faCog, faDownload, faExclamationTriangle, faFilter,
   faExternalLinkAlt, faFileExport, faFileImport, fasFlag, faKey, faLock, faMinus, faPause, faPencilAlt, faPlay, faPlus, faPuzzlePiece, faRedo, faRunning, faSave, 
   faSearch, faSkullCrossbones, faSignOutAlt, faStop, faTimes, faTrash, faUndo, faUnlockAlt, faUpload, faUser, faWeightHanging, faFolderOpen, faFolder, faFile, faDragon, faFolderClosed, faArrowLeft, faArrowUp, faArrowDown,
-  faChevronUp, faChevronDown, faBroom, faForward, faFastForward, faBackward, faFastBackward
+  faChevronUp, faChevronDown, faBroom, faForward, faFastForward, faBackward, faFastBackward, faSpinner
 );
 import { 
   faCircle, faCircleQuestion, faCopy, faFlag as farFlag

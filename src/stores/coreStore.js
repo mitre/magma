@@ -14,7 +14,7 @@ export const useCoreStore = defineStore("coreStore", {
       userSettings: {},
       contacts: [],
       availableContacts: [],
-      hideDisabledPlugins: false,
+      hideDisabledPlugins: true,
     };
   },
   getters: {
@@ -34,8 +34,8 @@ export const useCoreStore = defineStore("coreStore", {
       try {
         const response = await $api.get("/api/v2/plugins");
         this.availablePlugins = response.data;
-      } catch (error) {
-        throw error;
+      } catch {
+        return;
       }
     },
     async updateMainConfigSetting($api, key, value) {

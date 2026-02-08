@@ -21,17 +21,28 @@ async function handleLogin(e) {
 #login.container.content.fullwh.is-flex.is-flex-direction-column.is-align-items-center.is-justify-content-center()
     img(src="/src/assets/img/caldera-logo.png" alt="Caldera Logo")
     .p-6
-        form
+        form(@submit.prevent="handleLogin")
             .field
                 label.label Username
                 .control.has-icons-left
-                    input.input(v-focus v-model="username" type="text" placeholder="username")
+                    input.input(
+                    v-focus
+                    v-model="username"
+                    type="text"
+                    placeholder="username"
+                    autocomplete="username"
+                    )
                     span.icon.is-small.is-left
                         font-awesome-icon(icon="fas fa-user")
             .field
                 label.label Password
                 .control.has-icons-left
-                    input.input(v-model="password" type="password" placeholder="password")
+                    input.input(
+                    v-model="password"
+                    type="password"
+                    placeholder="password"
+                    autocomplete="current-password"
+                    )
                     span.icon.is-small.is-left
                         font-awesome-icon(icon="fas fa-lock")
             button.button.fancy-button.is-fullwidth(type="submit" @click="handleLogin") Log In
