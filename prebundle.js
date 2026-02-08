@@ -1,4 +1,5 @@
 const fs = require('fs-extra');
+const yaml = require('js-yaml');
 
 console.log('Copying plugin GUI source files to magma');
 
@@ -6,26 +7,33 @@ if (fs.existsSync('./src/plugins/')) {
     fs.removeSync('./src/plugins/');
 }
 
-// arguments passed from backend
 const requestedPlugins = process.argv.slice(2);
-if (requestedPlugins.length === 0) {
-    console.log("No plugins specified — skipping copy phase");
-    process.exit(0);
-}
 
 let plugins = [];
 
 if (requestedPlugins.length > 0) {
-    // targeted build
+    // runtime targeted build
     plugins = requestedPlugins;
     console.log("Building selected plugins:", plugins.join(', '));
+
 } else {
-    // full build (server.py --build or manual build)
-    plugins = fs.readdirSync('../');
-    console.log("Building ALL plugins");
+    // server --build mode
+    try {
+        const conf = yaml.load(
+            fs.readFileSync('../../conf/default.yml', 'utf8')
+        );
+
+        plugins = conf.plugins || [];
+        console.log("Building enabled plugins from config:", plugins.join(', '));
+
+    } catch (e) {
+        // fallback for dev mode
+        plugins = fs.readdirSync('../');
+        console.log("Building ALL plugins (fallback)");
+    }
 }
 
-plugins.forEach((plugin) => {
+plugins.forEach(plugin => {
     if (!fs.existsSync(`../${plugin}/gui`)) return;
 
     console.log(`Copying "${plugin}" files...`);
