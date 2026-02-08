@@ -8,6 +8,10 @@ if (fs.existsSync('./src/plugins/')) {
 
 // arguments passed from backend
 const requestedPlugins = process.argv.slice(2);
+if (requestedPlugins.length === 0) {
+    console.log("No plugins specified — skipping copy phase");
+    process.exit(0);
+}
 
 let plugins = [];
 

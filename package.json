@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite --host '0.0.0.0'",
-    "build": "node prebundle.js && vite build",
+    "build": "vite build",
     "preview": "vite preview --port 5050",
     "lint": "npx eslint \"./**\"",
     "lintfix": "npx eslint \"./**\" --fix",
