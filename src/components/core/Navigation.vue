@@ -41,6 +41,14 @@ function openDisablePlugins() {
   modals.value.core.selectedPlugins = [];
   modals.value.core.showPluginPopup = true;
 }
+const disableablePlugins = computed(() => {
+  if (!enabledPlugins.value) return []
+
+  return enabledPlugins.value.filter(p => {
+    const name = typeof p === "string" ? p : p.name
+    return name && name !== "magma"
+  })
+})
 
 </script>
 
@@ -83,7 +91,7 @@ function openDisablePlugins() {
                 router-link.menu-item(v-else-if="enabledPlugins && enabledPlugins.includes(plugin.name)" :to="`/plugins/${plugin.name}`") {{ plugin.name }}
                 p.menu-item(v-else-if="plugin.name !== 'magma' && !hideDisabledPlugins" @click="promptToEnablePlugin(plugin.name)") {{ plugin.name }}
             // Disable plugins button
-            li(v-if="enabledPlugins && enabledPlugins.length && !restarting")
+            li(v-if="disableablePlugins.length && !restarting")
                 .menu-item.is-clickable.disable-plugins(@click="openDisablePlugins()")
                     span.icon
                         font-awesome-icon(icon="fas fa-puzzle-piece")

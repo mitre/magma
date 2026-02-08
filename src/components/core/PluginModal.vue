@@ -84,9 +84,6 @@ watch(
 
       // ---------- ENABLE VIEW ----------
       template(v-if="modals.core.mode === 'enable'")
-        p.has-text-centered.has-text-weight-semibold.mb-4
-            | Enable {{ modals.core.selectedPlugin }} plugin?
-
         hr.modal-divider
 
         .plugin-enable-info

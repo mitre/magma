@@ -8,32 +8,30 @@ import { useAuthStore } from "@/stores/authStore";
 
 import Navigation from "@/components/core/Navigation.vue";
 import PageTabs from "@/components/core/PageTabs.vue";
+
 const route = useRoute();
 const authStore = useAuthStore();
 const coreStore = useCoreStore();
 const coreDisplayStore = useCoreDisplayStore();
+
 const { restarting } = storeToRefs(coreDisplayStore);
-const showReconnect = ref(false);
 
 const $api = inject("$api");
 
-const restartMessage = ref("Caldera is restarting. You will be redirected shortly.");
+const restartMessage = ref("Caldera is restarting…");
 const showSpinner = ref(true);
 
-let restartTimer = null;
-let pollTimer = null;
-let pollDelayTimer = null;
-let reconnectTimer = null;
-
-const POLL_DELAY_MS = 25000;
+let buildPollTimer = null;
+let healthPollTimer = null;
 
 function forceReconnect() {
   window.location.reload();
 }
 
 onMounted(() => {
-    coreStore.getUserSettings();
+  coreStore.getUserSettings();
 });
+
 watch(
   () => route.name,
   async (name) => {
@@ -47,58 +45,73 @@ watch(
   },
   { immediate: true }
 );
+
 watch(restarting, (value) => {
-    if (!value) {
-        clearTimeout(restartTimer);
-        clearTimeout(pollDelayTimer);
-        clearInterval(pollTimer);
-        clearTimeout(reconnectTimer);
-        return;
-    }
-
-  // reset UI
-restartMessage.value = "Caldera is Re-Building.";
-showSpinner.value = true;
-showReconnect.value = false;
-
-// 1️⃣ message change at 10s
-restartTimer = setTimeout(() => {
-  restartMessage.value =
-    "Still Re-Building this may take a little longer.\nYou will be redirected shortly.";
-}, 10000);
-
-// 2️⃣ reconnect button at 20s
-reconnectTimer = setTimeout(() => {
-  showReconnect.value = true;
-}, 20000);
-
-// 3️⃣ START POLLING AFTER UI HAS UPDATED
-pollDelayTimer = setTimeout(() => {
-
-  pollTimer = setInterval(async () => {
-  try {
-    await $api.get("/api/v2/health", {
-      params: { t: Date.now() },
-      validateStatus: () => true
-    });
-
-    clearInterval(pollTimer);
-    window.location.reload();
-
-  } catch {
-    // backend still down
+  if (!value) {
+    clearInterval(buildPollTimer);
+    clearInterval(healthPollTimer);
+    return;
   }
-}, 2000);
 
-}, POLL_DELAY_MS); // polling starts AFTER message + button timing
+  startBuildPolling();
 });
+
+function startBuildPolling() {
+  clearInterval(buildPollTimer);
+
+  buildPollTimer = setInterval(async () => {
+    try {
+      const res = await $api.get("/api/v2/plugins/build-status");
+      const state = res.data;
+
+      switch (state.status) {
+        case "installing":
+          restartMessage.value =
+            `Installing dependencies for ${state.plugin}…`;
+          break;
+
+        case "building":
+          restartMessage.value =
+            `Building plugin interface for ${state.plugin}…`;
+          break;
+
+        case "restarting":
+          restartMessage.value = "Restarting Caldera…";
+          clearInterval(buildPollTimer);
+          startHealthPolling();
+          break;
+
+        default:
+          restartMessage.value = "Preparing plugin…";
+      }
+    } catch {
+      // backend may be restarting
+    }
+  }, 1000);
+}
+
+function startHealthPolling() {
+  clearInterval(healthPollTimer);
+
+  healthPollTimer = setInterval(async () => {
+    try {
+      await $api.get("/api/v2/health", {
+        params: { t: Date.now() },
+        validateStatus: () => true
+      });
+
+      clearInterval(healthPollTimer);
+      window.location.reload();
+    } catch {
+      // still restarting
+    }
+  }, 2000);
+}
+
 onUnmounted(() => {
-  clearTimeout(restartTimer);
-  clearTimeout(pollDelayTimer);
-  clearInterval(pollTimer);
-  clearTimeout(reconnectTimer);
+  clearInterval(buildPollTimer);
+  clearInterval(healthPollTimer);
 });
-
 </script>
 <template lang="pug">
 //- GLOBAL restart overlay (ALWAYS FIRST)
