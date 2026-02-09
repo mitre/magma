@@ -88,11 +88,18 @@ const breakdown = computed(() => {
           };
           entry.usage.push(usageRow);
         }
+        const execKey = `${exec.platform}::${exec.name}`;
+        if (!usageRow._executorKeys) {
+            usageRow._executorKeys = new Set();
+            }
 
-        usageRow.executors.push({
-          platform: exec.platform,
-          name: exec.name
+        if (!usageRow._executorKeys.has(execKey)) {
+            usageRow._executorKeys.add(execKey);
+            usageRow.executors.push({
+                platform: exec.platform,
+                name: exec.name
         });
+        }
       });
     });
   });
