@@ -220,9 +220,9 @@ onMounted(async () => {
 
 <template>
   <div class="content">
-  <h2 class="title is-3">Automation</h2>
+  <h2 class="title is-3">Adversary</h2>
   <p>
-    Build and run automated sequences by chaining abilities together. Import an automation profile, or start by selecting an adversary to preload abilities.
+    Adversary Profiles are collections of ATT&CK TTPs, designed to create specific effects on a host or network. Profiles can be used for offensive or defensive use cases.
   </p>
   <hr />
 
