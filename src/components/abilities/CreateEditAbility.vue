@@ -160,8 +160,7 @@ function ensureTraitSlot(executor, trait) {
  */
 function getExecutorKey(executor) {
   const stepUuid = ensureStepUuid();
-  const key = `${stepUuid}::${executor.name}::${executor.platform}`;
-  return key;
+  return `${stepUuid}::${executor.ui_uuid}`;
 }
 
 /**
@@ -251,6 +250,7 @@ function togglePayload(executor, payloadId) {
  */
 function addExecutor() {
   const baseExecutor = {
+    ui_uuid: uuidv4(), 
     cleanup: [],
     timeout: 60,
     platform: 'darwin',
@@ -264,10 +264,11 @@ function addExecutor() {
     payloadSearch: ''
   };
 
-  if (!abilityToEdit.value.executors) abilityToEdit.value.executors = [baseExecutor];
-  else abilityToEdit.value.executors.push(baseExecutor);
-
-  
+  if (!abilityToEdit.value.executors) {
+    abilityToEdit.value.executors = [baseExecutor];
+  } else {
+    abilityToEdit.value.executors.push(baseExecutor);
+  }
 }
 
 /**
