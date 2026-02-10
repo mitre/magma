@@ -24,6 +24,7 @@ import { useSourceStore } from '@/stores/sourceStore';
 
 const sourceStore = useSourceStore();
 const { sources } = storeToRefs(sourceStore);
+const newAbility = ref(null);
 
 const props = defineProps({
   ability: Object,
@@ -46,13 +47,11 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['close', 'update', 'remove']);
+const emit = defineEmits(['close', 'save', 'remove']);
 
 const $api = inject('$api');
 const abilityStore = useAbilityStore();
 const { tactics, techniqueIds, techniqueNames, platforms, payloads } = storeToRefs(abilityStore);
-
-const abilityToEdit = ref({});
 
 /**
  * validation
@@ -250,7 +249,8 @@ function togglePayload(executor, payloadId) {
  */
 function addExecutor() {
   const baseExecutor = {
-    ui_uuid: uuidv4(), 
+    ui_uuid: uuidv4(),
+    command: '',
     cleanup: [],
     timeout: 60,
     platform: 'darwin',
@@ -363,6 +363,7 @@ function initializeUserFacts() {
  * - Always includes step_uuid in emitted object for stable UI references.
  */
 function validateAndSaveAbility() {
+  console.log('[SAVE] clicked');
   validation.name = abilityToEdit.value.name ? '' : 'Name cannot be empty';
   validation.tactic = abilityToEdit.value.tactic ? '' : 'Tactic cannot be empty';
   validation.techniqueId = abilityToEdit.value.technique_id ? '' : 'Technique ID cannot be empty';
@@ -375,7 +376,11 @@ function validateAndSaveAbility() {
     )
       ? ''
       : 'Executors are invalid or missing.';
-
+  console.log('[SAVE] validation state', JSON.parse(JSON.stringify(validation)));
+  if (!Object.values(validation).every(v => !v)) {
+    console.log('[SAVE] blocked by validation');
+    return;
+  }
   if (!Object.values(validation).every(v => !v)) return;
 
   // ✅ Build platform-keyed executor_facts from userFactsMap
@@ -402,6 +407,8 @@ function validateAndSaveAbility() {
       });
     });
   });
+  console.log('[SAVE] executor_facts', executorFacts);
+
 
   // Update local ability
   abilityToEdit.value.step_uuid = getStepUuid();
@@ -409,10 +416,9 @@ function validateAndSaveAbility() {
     ...(abilityToEdit.value.metadata || {}),
     executor_facts: executorFacts
   };
-
+  console.log('[SAVE] emitting save');
   // Emit updated object
-  emit('update', cloneDeep(abilityToEdit.value));
-  emit('close');
+  emit('save', cloneDeep(abilityToEdit.value));
 }
 
 
@@ -432,13 +438,6 @@ async function deleteAbility() {
     return;
   }
 
-  if (props.deleteMode === 'adversary') {
-    // LOCAL DELETE (UI only)
-    emit('remove', abilityToEdit.value.step_uuid);
-    emit('close');
-    return;
-  }
-
   console.warn('[CreateEditAbility] Delete blocked: deleteMode=none');
 }
 
@@ -451,16 +450,15 @@ onMounted(async () => {
 // When ability changes, re-normalize + hydrate
 watch(
   () => props.ability,
-  (val) => {
-    if (!val || !val.ability_id) return;
-    setAbilityToEdit();
+   () =>  {
+      setAbilityToEdit();
   },
   { immediate: true }
 );
 </script>
 
 <template>
-  <div class="modal" :class="{ 'is-active': props.active }">
+  <div class="modal is-active">
     <div class="modal-background" @click="$emit('close')"></div>
     <div class="modal-card" style="width: 80%;">
       <header class="modal-card-head">
@@ -834,7 +832,7 @@ watch(
 
           <div class="is-flex">
             <button class="button" @click="emit('close')">Cancel</button>
-            <button class="button is-primary" @click="validateAndSaveAbility">
+            <button type="button" class="button is-primary" @click="validateAndSaveAbility">
               <span class="icon">
                 <font-awesome-icon icon="fas fa-save" />
               </span>

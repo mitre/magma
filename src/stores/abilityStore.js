@@ -47,12 +47,26 @@ export const useAbilityStore = defineStore("abilityStore", {
             }
         },
         async saveAbility($api, ability, create) {
+            console.log("Saving ability", ability, "create?", create);
             try {
+                const sanitized = {
+                    ...ability,
+                    executors: (ability.executors || []).map(ex => ({
+                    name: ex.name,
+                    platform: ex.platform,
+                    command: ex.command,
+                    timeout: ex.timeout,
+                    cleanup: ex.cleanup || [],
+                    parsers: ex.parsers || [],
+                    payloads: ex.payloads || []
+                    }))
+                };
+                console.log("sanitized ability", sanitized);
                 if (create) {
-                    const response = await $api.post(`/api/v2/abilities`, ability);
+                    const response = await $api.post(`/api/v2/abilities`, sanitized);
                     this.abilities.push(response.data);
                 } else {
-                    const response = await $api.patch(`/api/v2/abilities/${ability.ability_id}`, ability);
+                    const response = await $api.patch(`/api/v2/abilities/${ability.ability_id}`, sanitized);
                     const index = this.abilities.findIndex((a) => a.ability_id === response.data.ability_id);
                     this.abilities[index] = response.data;
                 }
