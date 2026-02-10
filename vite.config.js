@@ -17,7 +17,6 @@ export default defineConfig(({ mode }) => {
         allow: ["../"],
       },
       proxy: {
-        // 🔐 Auth
         "/enter": {
           target: backend,
           changeOrigin: true,
@@ -26,14 +25,10 @@ export default defineConfig(({ mode }) => {
           target: backend,
           changeOrigin: true,
         },
-
-        // 🔌 Core API
         "/api": {
           target: backend,
           changeOrigin: true,
         },
-
-        // 🧩 Plugins
         "/plugins": {
           target: backend,
           changeOrigin: true,
