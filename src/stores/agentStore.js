@@ -57,13 +57,8 @@ export const useAgentStore = defineStore("agentStore", {
             }
         },
         async killAgent($api, agentPaw) {
-            const reqBody = {
-                watchdog: 1,
-                sleep_min: 3,
-                sleep_max: 3
-            };
             try {
-                const response = await $api.patch(`/api/v2/agents/${agentPaw}`, reqBody);
+                const response = await $api.post(`/api/v2/agents/kill/${agentPaw}`);
                 return response.data;
             } catch(error) {
                 throw error;
