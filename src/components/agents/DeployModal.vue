@@ -149,7 +149,9 @@ function copyCommandToClipboard(command) {
                             label.label {{ field.name }}
                         .field-body
                             .field.has-addons
-                                .control.is-expanded
+                                .control.is-expanded(v-if="field.name === 'agents.architecture'")
+                                    input.input(type="text" v-tooltip="'e.g. 386, amd64, arm64, wasm, etc.'" v-model="field.value")
+                                .control.is-expanded(v-else)
                                     input.input(type="text" v-model="field.value")
                                 .control 
                                     a.button.has-tooltip-arrow(title="Reset to default" @click="field.value = agentFieldConfig[field.name]")
