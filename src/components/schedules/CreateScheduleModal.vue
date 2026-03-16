@@ -42,19 +42,26 @@ let validation = ref({
   name: "",
 });
 
+async function refreshDropdownData() {
+  await Promise.all([
+    agentStore.getAgents($api),
+    adversaryStore.getAdversaries($api),
+    getSources(),
+    coreStore.getObfuscators($api),
+    getPlanners(),
+  ]);
+}
+
 onMounted(async () => {
-  await agentStore.getAgents($api);
-  agentStore.updateAgentGroups();
-  await adversaryStore.getAdversaries($api);
-  await getSources();
-  await coreStore.getObfuscators($api);
-  await getPlanners();
+  await refreshDropdownData();
 });
 
+// Re-fetch all dropdown data and reset fields when the modal is opened
 watch(
   () => modals.value.schedules.showCreate,
-  (newValue) => {
+  async (newValue) => {
     if (newValue) {
+      await refreshDropdownData();
       resetFields();
     }
   }

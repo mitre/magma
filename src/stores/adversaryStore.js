@@ -63,7 +63,7 @@ export const useAdversaryStore = defineStore("adversaryStore", {
         this.adversaries.push(response.data);
         this.adversaries.sort((a, b) => a.name > b.name);
         this.selectedAdversary = response.data;
-        this.updateSelectedAdversaryAbilities();
+        this.updateSelectedAdversaryAbilities($api);
       } catch (error) {
         console.error("Error creating an adversary", error);
       }
@@ -112,19 +112,24 @@ export const useAdversaryStore = defineStore("adversaryStore", {
         console.error("Error deleting adversary", error);
       }
     },
-    updateSelectedAdversaryAbilities() {
+    async updateSelectedAdversaryAbilities($api) {
       if (!this.selectedAdversary.atomic_ordering) {
         this.selectedAdversaryAbilities = [];
-      } else {
-        this.selectedAdversaryAbilities =
-          this.selectedAdversary.atomic_ordering.map((ability_id) => {
-            return {
-              ...abilityStore().abilities.find(
-                (ability) => ability.ability_id === ability_id
-              ),
-            };
-          });
+        return;
       }
+      // Re-fetch abilities to ensure we have the latest data
+      if ($api) {
+        await abilityStore().getAbilities($api);
+      }
+      this.selectedAdversaryAbilities =
+        this.selectedAdversary.atomic_ordering
+          .map((ability_id) => {
+            const found = abilityStore().abilities.find(
+              (ability) => ability.ability_id === ability_id
+            );
+            return found ? { ...found } : null;
+          })
+          .filter((ability) => ability !== null);
     },
   },
 });

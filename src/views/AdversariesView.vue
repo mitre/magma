@@ -33,7 +33,7 @@ onMounted(async () => {
 
 function selectAdversary(adversary) {
     selectedAdversary.value = adversary; 
-    adversaryStore.updateSelectedAdversaryAbilities();
+    adversaryStore.updateSelectedAdversaryAbilities($api);
     isAdversaryDropdownOpen.value = false;
     adversarySearchQuery.value = "";
 }

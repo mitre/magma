@@ -30,7 +30,7 @@ onMounted(async () => {
   await scheduleStore.getSchedules($api);
   await coreStore.getObfuscators($api);
   await agentStore.getAgents($api);
-  agentStore.updateAgentGroups();
+  // agentGroups is now a computed getter, no manual update needed
 });
 </script>
 

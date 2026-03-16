@@ -1,5 +1,5 @@
  <script setup>
-import { inject, ref, onMounted, reactive, computed } from "vue";
+import { inject, ref, onMounted, reactive, computed, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { toast } from 'bulma-toast'
 
@@ -10,7 +10,7 @@ import { useAbilityStore } from "@/stores/abilityStore";
 import { useSourceStore } from "@/stores/sourceStore";
 import { cartesian } from "@/utils/utils";
 
-const props = defineProps({ 
+const props = defineProps({
     active: Boolean,
     operation: Object,
     agent: Object
@@ -24,6 +24,20 @@ const agentStore = useAgentStore();
 const abilityStore = useAbilityStore();
 const sourceStore = useSourceStore();
 const { sources } = storeToRefs(sourceStore);
+
+// Re-fetch abilities and agents when the modal is opened
+watch(
+    () => props.active,
+    async (newValue) => {
+        if (newValue) {
+            await Promise.all([
+                abilityStore.getAbilities($api),
+                agentStore.getAgents($api),
+                sourceStore.getSources($api),
+            ]);
+        }
+    }
+);
 
 let selectedPotentialLink = ref({});
 let selectedPotentialLinkFacts = ref({});
