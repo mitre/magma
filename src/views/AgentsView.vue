@@ -1,5 +1,5 @@
 <script setup>
-import { inject, onMounted, onBeforeUnmount, ref } from "vue";
+import { inject, onMounted, onActivated, onDeactivated, ref } from "vue";
 import { storeToRefs } from "pinia";
 
 import { useAgentStore } from '@/stores/agentStore';
@@ -26,9 +26,16 @@ onMounted(async () => {
     }, 3000);
 });
 
-onBeforeUnmount(() => {
+onActivated(async () => {
+    await agentStore.getAgents($api);
+    agentRefreshInterval.value = setInterval(async () => {
+        await agentStore.getAgents($api);
+    }, 3000);
+});
+
+onDeactivated(() => {
     clearInterval(agentRefreshInterval.value);
-})
+});
 
 function removeDeadAgents() {
     agents.value.forEach((agent, index) => {

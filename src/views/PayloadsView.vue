@@ -1,5 +1,5 @@
 <script setup>
-import { inject, onMounted, computed } from "vue";
+import { inject, onMounted, onActivated, computed } from "vue";
 import { storeToRefs } from "pinia";
 
 import { useCoreDisplayStore } from "@/stores/coreDisplayStore";
@@ -40,6 +40,10 @@ const nonPluginStructuredPayloads = computed(() => {
 });
 
 onMounted(async () => {
+    await abilityStore.getPayloads($api, true, false, true);
+});
+
+onActivated(async () => {
     await abilityStore.getPayloads($api, true, false, true);
 });
 

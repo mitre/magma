@@ -28,7 +28,9 @@ onMounted(() => {
         PageTabs
 
         .p-4#router
-            router-view
+            router-view(v-slot="{ Component }")
+                KeepAlive
+                    component(:is="Component")
 </template>
 
 <style scoped>

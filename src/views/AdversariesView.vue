@@ -1,5 +1,5 @@
 <script setup>
-import { inject, reactive, ref, onMounted, computed } from "vue";
+import { inject, reactive, ref, onMounted, onActivated, computed } from "vue";
 import { storeToRefs } from "pinia";
 
 import { useAdversaryStore } from "@/stores/adversaryStore";
@@ -26,6 +26,12 @@ let filteredAdversaries = computed(() => {
 });
 
 onMounted(async () => {
+    await abilityStore.getAbilities($api);
+    await adversaryStore.getAdversaries($api);
+    await objectiveStore.getObjectives($api);
+});
+
+onActivated(async () => {
     await abilityStore.getAbilities($api);
     await adversaryStore.getAdversaries($api);
     await objectiveStore.getObjectives($api);
