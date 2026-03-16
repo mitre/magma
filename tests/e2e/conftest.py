@@ -26,6 +26,7 @@ import os
 import shutil
 import socket
 import subprocess
+import sys
 import tempfile
 import time
 
@@ -136,7 +137,7 @@ def caldera_server():
     proc = subprocess.Popen(
         # -E local → uses conf/local.yml we just wrote
         # -l ERROR  → suppress startup noise in test output
-        ['python', 'server.py', '-E', 'local', '-l', 'ERROR'],
+        [sys.executable, 'server.py', '-E', 'local', '-l', 'ERROR'],
         cwd=CALDERA_ROOT,
         env=env,
         stdout=subprocess.DEVNULL,
