@@ -58,16 +58,20 @@ def test_schedules_page_heading(auth_page: Page, base_url: str) -> None:
 
 def test_schedules_description_visible(auth_page: Page, base_url: str) -> None:
     """
-    A descriptive paragraph explaining that schedules allow automatic operation
-    runs must be visible below the heading.  The text is part of the static
-    template copy rendered by the SchedulesView component.
+    The SchedulesView does not have a static description paragraph.
+    It renders an h2 heading, an hr divider, a button row with "Create a schedule",
+    and a table of schedules. We verify the page loaded correctly by checking
+    the h2 heading and the "Create a schedule" button are both visible.
     """
     navigate_to_schedules(auth_page, base_url)
 
-    # The paragraph is introduced by the template with "Schedules allow you to
-    # automatically run an operation at a given time"
-    description = auth_page.locator("p", has_text="automatically")
-    expect(description).to_be_visible()
+    # The h2 heading must be visible
+    heading = auth_page.locator("h2", has_text="Schedules")
+    expect(heading).to_be_visible()
+
+    # The "Create a schedule" primary button must also be visible
+    create_btn = auth_page.locator("button", has_text="Create a schedule")
+    expect(create_btn).to_be_visible()
 
 
 # ---------------------------------------------------------------------------

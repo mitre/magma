@@ -66,7 +66,12 @@ def test_login_with_valid_credentials(page: Page, caldera_server: str) -> None:
 
     # Click the login button and wait for navigation to settle
     page.locator('button', has_text='Log In').click()
-    page.wait_for_load_state('networkidle')
+
+    # Wait for the Vue router to navigate away from /login after successful auth
+    try:
+        page.wait_for_url(lambda url: '/login' not in url, timeout=10000)
+    except Exception:
+        page.wait_for_load_state('networkidle')
 
     # After a successful login the URL must no longer be /login
     assert '/login' not in page.url, (
@@ -105,9 +110,13 @@ def test_login_with_invalid_credentials(page: Page, caldera_server: str) -> None
         f"Expected to remain on /login after bad credentials, but URL is {page.url}"
     )
 
-    # Error paragraph must be visible and non-empty
+    # Error paragraph must be visible and non-empty.
+    # LoginView.vue renders: div.has-text-danger > p {{ loginError }}
+    # The <p> always exists in the DOM; after a failed login loginError is non-empty.
     error_paragraph = page.locator('.has-text-danger p')
     expect(error_paragraph).to_be_visible()
+    # Wait briefly for the Vue reactive update to set the error text
+    page.wait_for_timeout(500)
     assert error_paragraph.inner_text().strip() != '', (
         "Expected a non-empty error message after failed login, but got empty text"
     )

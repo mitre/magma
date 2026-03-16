@@ -150,7 +150,7 @@ def caldera_server():
     while time.time() < deadline:
         try:
             r = requests.get(health_url, timeout=2)
-            if r.status_code == 200:
+            if r.status_code in (200, 401):
                 ready = True
                 break
         except requests.RequestException:

@@ -33,12 +33,15 @@ _TEST_PAYLOAD_CONTENT = b'test'
 
 def test_payloads_page_heading(auth_page: Page, base_url: str) -> None:
     """
-    Navigating to /payloads must render an <h2> whose text is "Payloads".
+    Navigating to /payloads must render an <h2> with the text "Payloads".
+    The PayloadsView also renders "Local Payloads" and "Plugin Payloads" h2
+    elements; we check for the top-level "Payloads" heading specifically.
     """
     auth_page.goto(base_url + '/payloads')
     auth_page.wait_for_load_state('networkidle')
 
-    heading = auth_page.locator('h2', has_text='Payloads')
+    # Use get_by_role with exact match to find the exact "Payloads" heading
+    heading = auth_page.get_by_role('heading', name='Payloads', exact=True)
     expect(heading).to_be_visible()
 
 
@@ -49,14 +52,14 @@ def test_payloads_page_heading(auth_page: Page, base_url: str) -> None:
 def test_payloads_description_visible(auth_page: Page, base_url: str) -> None:
     """
     The page must display a descriptive paragraph below the heading that
-    explains the purpose of payloads (text mentions "abilities", matching
-    the copy in the Pug template: "Payloads are files that can be attached
-    to abilities...").
+    explains the purpose of payloads.  The PayloadsView template renders:
+    "Payloads are any files that you can reference in ability executors."
     """
     auth_page.goto(base_url + '/payloads')
     auth_page.wait_for_load_state('networkidle')
 
-    description = auth_page.locator('p', has_text='abilities')
+    # The paragraph text contains "ability executors" (not "abilities")
+    description = auth_page.locator('p', has_text='ability executors')
     expect(description).to_be_visible()
 
 
@@ -83,26 +86,22 @@ def test_payloads_api_count_matches_ui(
     auth_page.goto(base_url + '/payloads')
     auth_page.wait_for_load_state('networkidle')
 
-    # Each payload is rendered as a row in a table or as a list item.
-    # We target <tr> elements inside a <tbody> (table layout) as the primary
-    # selector, falling back to <li> elements if the view uses a list layout.
+    # PayloadsView renders two tables: "Local Payloads" and "Plugin Payloads".
+    # Each payload is a <tr> inside a <tbody>. We count all tbody rows combined.
     tbody_rows = auth_page.locator('tbody tr')
-    list_items = auth_page.locator('ul li, ol li')
 
     if api_count == 0:
-        # Neither selector should produce any visible results
-        assert tbody_rows.count() == 0 or list_items.count() == 0, (
-            'API returned 0 payloads but row/list elements are visible'
+        # The API reports no payloads — but the regex filter in the Vue component
+        # may discard payloads that don't match the expected path format.
+        # Accept zero rows as confirmation of empty state.
+        assert tbody_rows.count() == 0, (
+            f'API returned 0 payloads but {tbody_rows.count()} rows are visible'
         )
         return
 
-    # Prefer tbody rows; fall back to list items
-    if tbody_rows.count() > 0:
-        expect(tbody_rows.first).to_be_visible()
-        ui_count = tbody_rows.count()
-    else:
-        expect(list_items.first).to_be_visible()
-        ui_count = list_items.count()
+    # Wait for Vue to render at least one row
+    expect(tbody_rows.first).to_be_visible()
+    ui_count = tbody_rows.count()
 
     assert ui_count == api_count, (
         f'UI shows {ui_count} payload rows but API returned {api_count} payloads'

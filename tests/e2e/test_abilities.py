@@ -127,10 +127,11 @@ def test_abilities_api_count_matches_ui(
     auth_page: Page, base_url: str, api_session
 ) -> None:
     """
-    The number of ability rows rendered in the right-hand column must equal the
+    The number of ability boxes rendered in the right-hand column must equal the
     number of ability objects returned by GET /api/v2/abilities.
 
-    If the API returns zero abilities the test passes trivially (no rows shown).
+    If the API returns zero abilities the test passes trivially (no boxes shown).
+    Abilities are rendered as .box.ability div elements in the .column.is-10 column.
     """
     # Fetch abilities directly from the API
     resp = api_session.get(base_url + '/api/v2/abilities')
@@ -145,23 +146,20 @@ def test_abilities_api_count_matches_ui(
 
     if api_count == 0:
         # No abilities in the system — the list column should be empty
-        # We verify by confirming no ability-row elements are present.
-        # The right-hand column is .column.is-10; rows are typically <tr> or
-        # list items rendered by v-for.  Accept zero matches gracefully.
-        rows = auth_page.locator('.column.is-10 tbody tr')
-        assert rows.count() == 0, (
-            f'API returned 0 abilities but {rows.count()} rows are visible'
+        boxes = auth_page.locator('.column.is-10 .box.ability')
+        assert boxes.count() == 0, (
+            f'API returned 0 abilities but {boxes.count()} ability boxes are visible'
         )
         return
 
-    # When abilities exist they are rendered as table rows inside the right column
-    rows = auth_page.locator('.column.is-10 tbody tr')
-    # Wait for at least one row to appear (Vue renders after the API call resolves)
-    expect(rows.first).to_be_visible()
-    ui_count = rows.count()
+    # Abilities are rendered as .box.ability elements inside the right-hand .column.is-10
+    boxes = auth_page.locator('.column.is-10 .box.ability')
+    # Wait for at least one box to appear (Vue renders after the API call resolves)
+    expect(boxes.first).to_be_visible()
+    ui_count = boxes.count()
 
     assert ui_count == api_count, (
-        f'UI shows {ui_count} ability rows but API returned {api_count} abilities'
+        f'UI shows {ui_count} ability boxes but API returned {api_count} abilities'
     )
 
 
@@ -200,6 +198,8 @@ def test_search_filters_ability_list(
     auth_page.wait_for_load_state('networkidle')
 
     # The target ability's name must now appear somewhere in the right-hand column
+    # Abilities are rendered as .box.ability boxes; wait for the filter to apply
+    auth_page.wait_for_timeout(400)
     ability_column = auth_page.locator('.column.is-10')
     matching_text = ability_column.locator(f'text={target_name}')
     expect(matching_text.first).to_be_visible()

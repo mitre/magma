@@ -239,9 +239,11 @@ def test_search_filters_adversary_dropdown(
     )
     total_before = all_items.count()
 
-    # Type the search term into the search input inside the dropdown
+    # Type the search term into the search input inside the dropdown.
+    # The search input is in a div.dropdown-item (not an <a>), so we target
+    # the input directly within the dropdown content.
     search_input = auth_page.locator(
-        "#select-adversary .dropdown-menu .dropdown-content .dropdown-item input.input"
+        "#select-adversary .dropdown-menu .dropdown-content input.input"
     )
     expect(search_input).to_be_visible()
     search_input.fill(search_term)

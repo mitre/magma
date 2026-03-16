@@ -36,22 +36,17 @@ def get_operations_from_api(api_session, caldera_server: str) -> list:
     return resp.json()
 
 
-def open_operation_dropdown(page: Page) -> None:
+def get_operation_select(page: Page):
     """
-    Click (or hover) the operation selector dropdown button to expand it.
+    Return the <select> element used to choose an operation.
 
-    The selector button in OperationsView is a Bulma dropdown; a click on the
-    trigger button exposes the dropdown-menu containing the operation list.
+    OperationsView uses a native <select> (not a Bulma dropdown) to list
+    available operations. The select element is inside the .column.is-4
+    center column.
     """
-    # The primary selector button shows "Select an operation" when nothing is chosen
-    selector_btn = page.locator(
-        ".columns .column .is-flex .dropdown button.button.is-primary",
-        has_text="operation",
-    ).first
-    expect(selector_btn).to_be_visible()
-    selector_btn.hover()
-    # Wait for the dropdown menu to appear
-    page.wait_for_selector(".columns .column .is-flex .dropdown .dropdown-menu", state="visible", timeout=5000)
+    select_el = page.locator(".columns .column.is-4 select")
+    expect(select_el.first).to_be_visible()
+    return select_el.first
 
 
 # ---------------------------------------------------------------------------
@@ -83,15 +78,21 @@ def test_new_operation_button_visible(auth_page: Page, base_url: str) -> None:
 
 def test_operation_selector_dropdown_visible(auth_page: Page, base_url: str) -> None:
     """
-    The operation selector dropdown button must be present and visible,
-    initially showing the placeholder text "Select an operation".
+    The operation selector must be present and visible.
+
+    OperationsView uses a native <select> element (not a Bulma dropdown button)
+    to list available operations. The placeholder <option> has the text
+    "Select an operation" and value="".
     """
     navigate_to_operations(auth_page, base_url)
 
-    # The selector is a primary button that contains the placeholder text
-    # when no operation is currently selected.
-    selector_btn = auth_page.locator("button.button.is-primary", has_text="Select an operation")
-    expect(selector_btn).to_be_visible()
+    # The selector is a <select> element in the center column
+    select_el = auth_page.locator(".columns .column.is-4 select")
+    expect(select_el.first).to_be_visible()
+
+    # The placeholder option should be present
+    placeholder = select_el.first.locator('option[value=""]')
+    expect(placeholder).to_be_attached()
 
 
 def test_new_operation_modal_opens(auth_page: Page, base_url: str) -> None:
@@ -125,29 +126,28 @@ def test_operations_api_count_matches_dropdown(
     auth_page: Page, base_url: str, api_session, caldera_server: str
 ) -> None:
     """
-    The number of items shown in the operation selector dropdown must equal
+    The number of items shown in the operation selector <select> must equal
     the count returned by GET /api/v2/operations.
 
     Steps:
       1. Fetch operations from the API to get the expected count.
       2. Navigate to /operations.
-      3. Expand the operation selector dropdown.
-      4. Count the rendered dropdown items and assert equality.
+      3. Count the <option> elements in the <select> (excluding the placeholder).
+      4. Assert equality.
     """
     operations = get_operations_from_api(api_session, caldera_server)
     expected_count = len(operations)
 
     navigate_to_operations(auth_page, base_url)
-    open_operation_dropdown(auth_page)
 
-    # Each operation renders as an <a class="dropdown-item"> inside the menu
-    dropdown_items = auth_page.locator(
-        ".columns .column .is-flex .dropdown .dropdown-menu .dropdown-content a.dropdown-item"
-    )
-    actual_count = dropdown_items.count()
+    # OperationsView uses a native <select>; each operation is an <option>.
+    # Exclude the placeholder option with value="".
+    select_el = auth_page.locator(".columns .column.is-4 select")
+    operation_options = select_el.first.locator('option:not([value=""])')
+    actual_count = operation_options.count()
 
     assert actual_count == expected_count, (
-        f"Dropdown shows {actual_count} operation(s) but API returned {expected_count}"
+        f"Selector shows {actual_count} operation(s) but API returned {expected_count}"
     )
 
 
@@ -156,25 +156,26 @@ def test_operation_names_in_dropdown(
 ) -> None:
     """
     When at least one operation exists, the first operation's name returned by
-    GET /api/v2/operations must appear as a visible item in the dropdown.
+    GET /api/v2/operations must appear as a selectable option in the <select>.
+
+    OperationsView renders operation options as:
+        "name - N decisions | date"
+    so we check that an option containing the operation name is present.
 
     If no operations exist the test is skipped.
     """
     operations = get_operations_from_api(api_session, caldera_server)
     if not operations:
-        pytest.skip("No operations registered — cannot verify dropdown names.")
+        pytest.skip("No operations registered — cannot verify selector names.")
 
     first_name = operations[0]["name"]
 
     navigate_to_operations(auth_page, base_url)
-    open_operation_dropdown(auth_page)
 
-    # The operation's name should appear as a visible dropdown item
-    item = auth_page.locator(
-        ".columns .column .is-flex .dropdown .dropdown-menu .dropdown-content a.dropdown-item",
-        has_text=first_name,
-    )
-    expect(item).to_be_visible()
+    # The operation's name should appear as an option in the <select>
+    select_el = auth_page.locator(".columns .column.is-4 select")
+    option = select_el.first.locator("option", has_text=first_name)
+    expect(option.first).to_be_attached()
 
 
 def test_delete_button_hidden_when_no_operation_selected(

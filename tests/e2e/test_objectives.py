@@ -65,15 +65,20 @@ def test_objectives_page_heading(auth_page: Page, base_url: str) -> None:
 
 def test_objectives_description_visible(auth_page: Page, base_url: str) -> None:
     """
-    A descriptive paragraph explaining what an objective is must be visible
-    below the heading.  The paragraph contains the phrase "objective is a goal"
-    as rendered by the static template copy in ObjectivesView.
+    The ObjectivesView does not have a static description paragraph.
+    Instead it shows an h2 heading and a source selector dropdown.
+    We verify the page loaded correctly by checking the h2 and the
+    <select> element for objectives are visible.
     """
     navigate_to_objectives(auth_page, base_url)
 
-    # The static template paragraph starts with "An objective is a goal"
-    description = auth_page.locator("p", has_text="objective")
-    expect(description).to_be_visible()
+    # The h2 heading must be visible
+    heading = auth_page.locator("h2", has_text="Objectives")
+    expect(heading).to_be_visible()
+
+    # The objective selector <select> must also be present
+    selector = auth_page.locator("select")
+    expect(selector.first).to_be_visible()
 
 
 # ---------------------------------------------------------------------------
@@ -111,21 +116,11 @@ def test_objectives_api_count_matches_ui(
 
     navigate_to_objectives(auth_page, base_url)
 
-    # The objective selector is a <select> or a Bulma dropdown; try <select>
-    # first as it gives the cleanest option-count assertion.
-    select_el = auth_page.locator(".column.is-3 select")
-    if select_el.count() > 0:
-        # Count <option> elements, ignoring any blank/placeholder option.
-        all_options = select_el.locator("option")
-        # Filter out options with empty value (placeholder)
-        non_blank_options = select_el.locator("option[value]:not([value=''])")
-        ui_count = non_blank_options.count()
-    else:
-        # Fallback: Bulma dropdown items rendered as <a> or <button> in the menu
-        dropdown_items = auth_page.locator(
-            ".column.is-3 .dropdown-item, .column.is-3 .dropdown-content a"
-        )
-        ui_count = dropdown_items.count()
+    # The objective selector is a <select> element inside the .column.is-4 column.
+    # Count <option> elements, ignoring the blank placeholder (value="").
+    select_el = auth_page.locator("select")
+    non_blank_options = select_el.locator("option:not([value=''])")
+    ui_count = non_blank_options.count()
 
     assert ui_count == api_count, (
         f"UI shows {ui_count} objective option(s) but API returned {api_count}"
@@ -158,10 +153,10 @@ def test_objective_names_in_selector(
 
     navigate_to_objectives(auth_page, base_url)
 
-    # The name should appear somewhere inside the left selector column.
-    selector_column = auth_page.locator(".column.is-3")
-    name_in_selector = selector_column.locator(f"text={first_name}")
-    expect(name_in_selector.first).to_be_visible()
+    # The name should appear as an <option> inside the <select> element.
+    select_el = auth_page.locator("select")
+    name_option = select_el.locator(f"option", has_text=first_name)
+    expect(name_option.first).to_be_attached()
 
 
 # ---------------------------------------------------------------------------
@@ -243,45 +238,34 @@ def test_selecting_objective_shows_details(
 
     navigate_to_objectives(auth_page, base_url)
 
-    # Locate the selector in the left column and pick the first objective.
-    selector_column = auth_page.locator(".column.is-3")
+    # The objective <select> element is in the .column.is-4 center column.
+    select_el = auth_page.locator("select")
+    expect(select_el.first).to_be_visible()
 
-    # Try <select> element first; fall back to Bulma dropdown trigger + item.
-    select_el = selector_column.locator("select")
-    if select_el.count() > 0:
-        # Select the option whose text matches the first objective's name.
-        if first_name:
-            select_el.select_option(label=first_name)
-        else:
-            # If name is blank, select by index (skip placeholder at 0).
-            select_el.select_option(index=1)
+    # Select the option whose text matches the first objective's name.
+    if first_name:
+        select_el.first.select_option(label=first_name)
     else:
-        # Bulma dropdown: click the trigger to open, then click the first item.
-        dropdown_trigger = selector_column.locator(".dropdown-trigger button").first
-        dropdown_trigger.click()
-        first_item = selector_column.locator(".dropdown-item").first
-        expect(first_item).to_be_visible()
-        first_item.click()
+        # If name is blank, select by index (skip placeholder at 0).
+        select_el.first.select_option(index=1)
 
     # Wait for the Vue reactive update to propagate.
     auth_page.wait_for_load_state("networkidle")
 
-    # The right-hand detail column should now display content.
-    detail_column = auth_page.locator(".column.is-9")
-
-    # Assert the Save button is visible — it is rendered only when an objective
-    # is selected (controlled by Vue's v-if on the selected objective).
-    save_btn = detail_column.locator("button", has_text="Save")
-    expect(save_btn).to_be_visible()
-
-    # If the objective has a name, it must be visible in the detail panel.
+    # After selection the detail section (v-if="selectedObjective.id") should appear.
+    # ObjectivesView renders an h3 with the objective name and a GoalsTable component.
+    # Assert the Save button is visible (only rendered when isEditingNameDesc is true
+    # or via the edit button). Actually, the Save button only appears after clicking edit.
+    # Instead, assert the h3 with the objective name is visible in the detail area.
     if first_name:
-        name_in_detail = detail_column.locator(f"text={first_name}")
-        expect(name_in_detail.first).to_be_visible()
+        name_heading = auth_page.locator("h3", has_text=first_name)
+        expect(name_heading.first).to_be_visible()
+    else:
+        # No name — just check that the detail content section is visible
+        detail_content = auth_page.locator(".content")
+        expect(detail_content.first).to_be_visible()
 
-    # The goals section (table or list) must also be present in the detail panel.
-    # Accept a <table>, a <thead>, or an element labelled "goals".
-    goals_section = detail_column.locator(
-        "table, thead, [class*='goal'], th, td, text=goals"
-    )
+    # The goals section must also be visible (GoalsTable component renders a table).
+    # Accept a <table>, <thead>, or any element within the .mt-5 goals container.
+    goals_section = auth_page.locator(".mt-5")
     expect(goals_section.first).to_be_visible()
