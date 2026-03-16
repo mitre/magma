@@ -22,7 +22,7 @@ let filters = reactive({
 
 let isCreatingAbility = ref(false);
 let showAbilityModal = ref(false);
-let selectedAbility = ref({});
+let selectedAbility = ref(null);
 
 const filteredAbilities = computed(() => {
     return abilities.value.filter((ability) => (
@@ -112,7 +112,16 @@ hr
             p.help.mb-0 {{ ability.description }}   
 
 //- Modals
-CreateEditAbility(:ability="selectedAbility" :active="showAbilityModal" :creating="isCreatingAbility" @close="showAbilityModal = false")
+CreateEditAbility(
+  v-if="showAbilityModal"
+  :ability="selectedAbility"
+  :active="showAbilityModal"
+  :creating="isCreatingAbility"
+  :allow-command-edit="true"
+  :allow-trait-edit="false"
+  delete-mode="ability"
+  @close="showAbilityModal = false"
+)
 </template>
 
 <style scoped>

@@ -1,8 +1,8 @@
 <script setup>
 import { ref, inject } from "vue";
-import { useCoreDisplayStore } from "../../stores/coreDisplayStore";
+import { useCoreDisplayStore } from "@/stores/coreDisplayStore";
 import { storeToRefs } from "pinia";
-import { useAdversaryStore } from "../../stores/adversaryStore";
+import { useAdversaryStore } from "@/stores/adversaryStore";
 
 const $api = inject("$api");
 

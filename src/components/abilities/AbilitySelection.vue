@@ -16,7 +16,7 @@ const $api = inject("$api");
 
 const abilityStore = useAbilityStore();
 const { abilities, tactics, techniqueIds, techniqueNames } = storeToRefs(abilityStore);
-
+const newAbility = ref(null);
 let filters = reactive({
     searchQuery: "",
     tactic: "",
@@ -38,6 +38,10 @@ const filteredAbilities = computed(() => {
 const hasFiltersApplied = computed(() => {
     return filters.searchQuery || filters.tactic || filters.techniqueId || filters.techniqueName;
 });
+function handleAbilitySave(ability) {
+  abilityStore.saveAbility($api, ability, true);
+  showCreateAbilityModal.value = false;
+}
 
 onMounted(async () => {
     await abilityStore.getAbilities($api);
@@ -51,7 +55,12 @@ function clearFilters() {
 }
 
 function createAbility() {
-    showCreateAbilityModal.value = true;
+  newAbility.value = {
+    executors: [],
+    requirements: [],
+    metadata: { executor_facts: {} }
+  };
+  showCreateAbilityModal.value = true;
 }
 </script>
 
@@ -98,7 +107,13 @@ function createAbility() {
             button.button(@click="emit('close')") Close
 
 //- Modals
-CreateEditAbility(v-if="props.canCreate" :ability="{}" :active="showCreateAbilityModal" :creating="true" @close="showCreateAbilityModal = false")
+CreateEditAbility(
+  v-if="showCreateAbilityModal"
+  :ability="newAbility"
+  :creating="true"
+  @save="handleAbilitySave"
+  @close="showCreateAbilityModal = false"
+)
 </template>
 
 <style scoped>
