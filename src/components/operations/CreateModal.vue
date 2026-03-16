@@ -1,5 +1,5 @@
 <script setup>
-import { ref, inject, onMounted } from "vue";
+import { ref, inject, onMounted, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { toast } from 'bulma-toast';
 import { sanitizeInput, validateInput } from "@/utils/sanitize";
@@ -45,14 +45,29 @@ let validation = ref({
     name: "",
 });
 
+async function refreshDropdownData() {
+    await Promise.all([
+        agentStore.getAgents($api),
+        adversaryStore.getAdversaries($api),
+        getSources(),
+        coreStore.getObfuscators($api),
+        getPlanners(),
+    ]);
+}
+
 onMounted(async () => {
-    await agentStore.getAgents($api);
-    agentStore.updateAgentGroups();
-    await adversaryStore.getAdversaries($api);
-    await getSources();
-    await coreStore.getObfuscators($api);
-    await getPlanners();
+    await refreshDropdownData();
 });
+
+// Re-fetch all dropdown data when the modal is opened
+watch(
+    () => modals.value.operations.showCreate,
+    async (newValue) => {
+        if (newValue) {
+            await refreshDropdownData();
+        }
+    }
+);
 
 async function getSources() {
     try {

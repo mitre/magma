@@ -6,8 +6,14 @@ export const useAgentStore = defineStore("agentStore", {
             agents: [],
             agentConfig: {},
             selectedAgent: {},
-            agentGroups: []
         };
+    },
+
+    getters: {
+        agentGroups: (state) => {
+            if (!state.agents) return [];
+            return [...new Set(state.agents.map((agent) => agent.group))];
+        },
     },
 
     actions: {
@@ -64,9 +70,6 @@ export const useAgentStore = defineStore("agentStore", {
                 throw error;
             }
         },
-        updateAgentGroups() {
-            if (!this.agents) return;
-            this.agentGroups = [...new Set(this.agents.map((agent) => agent.group))];
-        }
+        // agentGroups is now a getter derived from agents state
     },
 });
