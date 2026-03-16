@@ -1,4 +1,3 @@
-<!-- CreateEditAbility.vue -->
 <script setup>
 /**
  * CreateEditAbility.vue
@@ -106,7 +105,7 @@ const factSourceFacts = computed(() => {
     (src.facts || []).map(f => ({
       trait: f.trait,
       value: f.value,
-      sourceName: src.name // 👈 HUMAN name
+      sourceName: src.name
     }))
   );
 });
@@ -333,13 +332,13 @@ function initializeUserFacts() {
 
     const platformFacts = executorFacts[executor.platform] || [];
 
-    // ✅ group persisted facts by trait
+    // group persisted facts by trait
     const byTrait = {};
     for (const { trait, value } of platformFacts) {
       (byTrait[trait] ??= []).push(String(value ?? ''));
     }
 
-    // ✅ hydrate into customValue + selected
+    // hydrate into customValue + selected
     for (const [trait, values] of Object.entries(byTrait)) {
       userFactsMap[key][trait] ??= { customValue: '', selected: [] };
 
@@ -363,7 +362,6 @@ function initializeUserFacts() {
  * - Always includes step_uuid in emitted object for stable UI references.
  */
 function validateAndSaveAbility() {
-  console.log('[SAVE] clicked');
   validation.name = abilityToEdit.value.name ? '' : 'Name cannot be empty';
   validation.tactic = abilityToEdit.value.tactic ? '' : 'Tactic cannot be empty';
   validation.techniqueId = abilityToEdit.value.technique_id ? '' : 'Technique ID cannot be empty';
@@ -376,14 +374,9 @@ function validateAndSaveAbility() {
     )
       ? ''
       : 'Executors are invalid or missing.';
-  console.log('[SAVE] validation state', JSON.parse(JSON.stringify(validation)));
-  if (!Object.values(validation).every(v => !v)) {
-    console.log('[SAVE] blocked by validation');
-    return;
-  }
   if (!Object.values(validation).every(v => !v)) return;
 
-  // ✅ Build platform-keyed executor_facts from userFactsMap
+  // Build platform-keyed executor_facts from userFactsMap
   const executorFacts = {};
 
   (abilityToEdit.value.executors || []).forEach((executor) => {
@@ -407,8 +400,6 @@ function validateAndSaveAbility() {
       });
     });
   });
-  console.log('[SAVE] executor_facts', executorFacts);
-
 
   // Update local ability
   abilityToEdit.value.step_uuid = getStepUuid();
@@ -416,7 +407,6 @@ function validateAndSaveAbility() {
     ...(abilityToEdit.value.metadata || {}),
     executor_facts: executorFacts
   };
-  console.log('[SAVE] emitting save');
   // Emit updated object
   emit('save', cloneDeep(abilityToEdit.value));
 }
@@ -425,7 +415,6 @@ function validateAndSaveAbility() {
 function ensureStepUuid() {
   if (!abilityToEdit.value.step_uuid) {
     abilityToEdit.value.step_uuid = uuidv4();
-    console.log('[Ability.vue] Generated UI step_uuid:', abilityToEdit.value.step_uuid);
   }
   return abilityToEdit.value.step_uuid;
 }

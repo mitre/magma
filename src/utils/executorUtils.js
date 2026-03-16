@@ -42,7 +42,6 @@ export function normalizeStepExecutorFacts(step, abilityExecutors) {
   };
 }
 
-    // utils/executorUtils.js
 export function normalizeExecutorFactsForSave(executorFacts = {}) {
   const normalized = {};
 
@@ -69,6 +68,3 @@ export function normalizeExecutorFactsForSave(executorFacts = {}) {
 
   return normalized;
 }
-
-
-

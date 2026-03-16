@@ -39,7 +39,6 @@ const hasFiltersApplied = computed(() => {
     return filters.searchQuery || filters.tactic || filters.techniqueId || filters.techniqueName;
 });
 function handleAbilitySave(ability) {
-  console.log('[AbilityModal] saving ability', ability);
   abilityStore.saveAbility($api, ability, true);
   showCreateAbilityModal.value = false;
 }
@@ -56,7 +55,7 @@ function clearFilters() {
 }
 
 function createAbility() {
-  newAbilityValue.value = {
+  newAbility.value = {
     executors: [],
     requirements: [],
     metadata: { executor_facts: {} }
@@ -110,7 +109,7 @@ function createAbility() {
 //- Modals
 CreateEditAbility(
   v-if="showCreateAbilityModal"
-  :ability="newAbilityValue"
+  :ability="newAbility"
   :creating="true"
   @save="handleAbilitySave"
   @close="showCreateAbilityModal = false"

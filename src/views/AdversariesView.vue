@@ -6,17 +6,14 @@
 
 import { ref, inject, onMounted, computed } from "vue";
 import { storeToRefs } from "pinia";
-import { useRouter } from "vue-router";
 import cloneDeep from "lodash/cloneDeep";
 import { v4 as uuidv4 } from "uuid";
 
 import { useAgentStore } from "@/stores/agentStore";
 import { useAbilityStore } from "@/stores/abilityStore";
-import { useCoreStore } from "@/stores/coreStore";
 import { useCoreDisplayStore } from "@/stores/coreDisplayStore";
 import { useAdversaryStore } from "@/stores/adversaryStore";
 import { useObjectiveStore } from "@/stores/objectiveStore";
-import { buildExecutorsFromFacts } from "@/utils/executorUtils";
 
 import ImportAutomationModal from "@/components/adversaries/ImportModal.vue";
 import DetailsTable from "@/components/adversaries/DetailsTable.vue";
@@ -27,9 +24,7 @@ import EditAbilityModal from "@/components/abilities/CreateEditAbility.vue";
 // Store initialization
 // ────────────────────────────
 const $api = inject("$api");
-const router = useRouter();
 
-const coreStore = useCoreStore();
 const coreDisplayStore = useCoreDisplayStore();
 const agentStore = useAgentStore();
 const abilityStore = useAbilityStore();
@@ -37,11 +32,8 @@ const adversaryStore = useAdversaryStore();
 const objectiveStore = useObjectiveStore();
 
 const { modals } = storeToRefs(coreDisplayStore);
-const { agents } = storeToRefs(agentStore);
-const { abilities } = storeToRefs(abilityStore);
 const { adversaries, selectedAdversary, selectedAdversaryAbilities } = storeToRefs(adversaryStore);
 const { objectives } = storeToRefs(objectiveStore);
-
 
 // ────────────────────────────
 // Local reactive state
@@ -53,7 +45,6 @@ const importedFileContent = ref({});
 const isAdversaryDropdownOpen = ref(false);
 const adversarySearchQuery = ref("");
 const isCreatingNewAdversary = ref(false);
-
 
 // ────────────────────────────
 // Computed values
@@ -177,8 +168,6 @@ function handleAbilityClick(step) {
   showEditModal.value = true;
 }
 
-
-
 /** Close the edit ability modal. */
 function closeEditModal() {
   showEditModal.value = false;
@@ -188,7 +177,7 @@ function closeEditModal() {
 function onUpdateAbility(updatedAbility) {
   adversaryStore.updateAbilityInstance(updatedAbility);
 
-  // ✅ force new array ref so DetailsTable watcher fires
+  // force new array ref so DetailsTable watcher fires
   adversaryStore.selectedAdversaryAbilities = [
     ...adversaryStore.selectedAdversaryAbilities
   ];
@@ -259,9 +248,8 @@ onMounted(async () => {
             v-for="adversary in filteredAdversaries"
             :key="adversary.adversary_id"
             class="dropdown-item"
-            @click="selectAdversary(adversary)"
-            @mousedown.stop.prevent
             @click.stop.prevent="selectAdversary(adversary)"
+            @mousedown.stop.prevent
             :class="{ 'is-active': adversary.adversary_id === selectedAdversary?.adversary_id }"
           >
             {{ adversary.name }}

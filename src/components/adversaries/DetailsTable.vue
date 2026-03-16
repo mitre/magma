@@ -97,21 +97,21 @@ const shouldShowWarningIcon = (ability, executor) => {
     (source?.facts || []).map(f => f.trait)
   );
 
-  // ❌ missing entirely → warning
+  // Missing entirely — show warning
   if (requiredTraits.some(
     trait => !providedTraits.has(trait) && !sourceTraits.has(trait)
   )) {
     return "warning";
   }
 
-  // 🧩 source-backed but not yet satisfied
+  // Source-backed but not yet satisfied
   if (requiredTraits.some(
     trait => !providedTraits.has(trait) && sourceTraits.has(trait)
   )) {
     return "source";
   }
 
-  // ✅ fully satisfied
+  // fully satisfied
   return null;
 };
 
@@ -404,25 +404,7 @@ function selectAbility(ability) {
  * Persist the selected adversary profile via store.
  */
 async function validateAndSaveAdversary() {
-  console.debug(
-    "[DetailsTable] localAbilities → store sync preview",
-    localAbilities.value.map((a, i) => ({
-      index: i,
-      step_uuid: a.step_uuid,
-      ability_id: a.ability_id,
-      executor_facts: a.metadata?.executor_facts,
-    }))
-  );
   adversaryStore.selectedAdversaryAbilities = cloneDeep(localAbilities.value);
-  console.debug(
-    "[DetailsTable] selectedAdversaryAbilities before save",
-    adversaryStore.selectedAdversaryAbilities.map((a, i) => ({
-      index: i,
-      step_uuid: a.step_uuid,
-      ability_id: a.ability_id,
-      executor_facts: a.metadata?.executor_facts,
-    }))
-  );
   await adversaryStore.saveSelectedAdversary($api);
 }
 
@@ -468,13 +450,13 @@ function exportAdversary() {
  * Append a single ability to the local list and notify parent.
  */
 function addAbilityToAdversary(ability) {
-  // ✅ clone so instances never share state
+  // clone so instances never share state
   const inst = cloneDeep(ability);
 
-  // ✅ always new frontend instance id
+  // always new frontend instance id
   inst.step_uuid = uuidv4();
 
-  // ✅ instance-scoped metadata
+  // instance-scoped metadata
   inst.metadata = inst.metadata || {};
   inst.metadata.executor_facts = inst.metadata.executor_facts || {};
 

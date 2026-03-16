@@ -47,7 +47,6 @@ export const useAbilityStore = defineStore("abilityStore", {
             }
         },
         async saveAbility($api, ability, create) {
-            console.log("Saving ability", ability, "create?", create);
             try {
                 const sanitized = {
                     ...ability,
@@ -61,7 +60,6 @@ export const useAbilityStore = defineStore("abilityStore", {
                     payloads: ex.payloads || []
                     }))
                 };
-                console.log("sanitized ability", sanitized);
                 if (create) {
                     const response = await $api.post(`/api/v2/abilities`, sanitized);
                     this.abilities.push(response.data);

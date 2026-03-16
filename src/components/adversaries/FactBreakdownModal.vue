@@ -282,7 +282,7 @@ const breakdown = computed(() => {
                                 v-tooltip="`${exec.platform} / ${exec.name}`"
                             />
 
-                            <!-- 🟡 Required but unsatisfied -->
+                            <!-- Required but unsatisfied -->
                             <font-awesome-icon
                                 v-if="!isTraitSatisfied(use.abilityRef, exec, fact.trait)"
                                 icon="fas fa-exclamation-triangle"
