@@ -1,5 +1,5 @@
 <script setup>
-import { inject, reactive, ref, onMounted, computed } from "vue";
+import { inject, reactive, ref, onMounted, onActivated, computed, watch } from "vue";
 import { storeToRefs } from "pinia";
 
 import { useAdversaryStore } from "@/stores/adversaryStore";
@@ -29,6 +29,23 @@ onMounted(async () => {
     await abilityStore.getAbilities($api);
     await adversaryStore.getAdversaries($api);
     await objectiveStore.getObjectives($api);
+});
+
+// When the view is re-activated via KeepAlive (e.g. switching tabs),
+// refresh all data so new abilities and adversaries appear immediately.
+onActivated(async () => {
+    await abilityStore.getAbilities($api);
+    await adversaryStore.getAdversaries($api);
+    await objectiveStore.getObjectives($api);
+});
+
+// Refresh the adversary list when the dropdown opens so that adversaries
+// created or modified on disk (by plugins, imports, etc.) are visible
+// without leaving and returning to the page.
+watch(isAdversaryDropdownOpen, async (isOpen) => {
+    if (isOpen) {
+        await adversaryStore.getAdversaries($api);
+    }
 });
 
 function selectAdversary(adversary) {
