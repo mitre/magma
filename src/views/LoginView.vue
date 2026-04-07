@@ -37,6 +37,14 @@ async function handleLogin(e) {
             button.button.fancy-button.is-fullwidth(type="submit" @click="handleLogin") Log In
         .has-text-danger
             p {{ loginError }}
+        .feedback-banner.has-text-centered.is-size-7.mt-5.pt-4
+            p.mb-1.has-text-grey
+                | Help us improve Caldera! Let us know what you think.
+                | Send feedback to 
+                a(href="mailto:caldera@mitre.org") caldera@mitre.org
+            p.has-text-grey
+                | For the latest information and support, join our 
+                a(href="https://discord.gg/mJsTuhZ88T" target="_blank" rel="noopener noreferrer") Discord Community
 </template>
 
 <style scoped>
@@ -52,5 +60,20 @@ async function handleLogin(e) {
 .fancy-button:hover {
     background-image: linear-gradient(to right, #8b0000, #191970) !important;
     border-width: 2px;
+}
+
+.feedback-banner {
+    border-top: 1px solid rgba(128, 128, 128, 0.2);
+}
+
+.feedback-banner a {
+    color: #4A90E2;
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+
+.feedback-banner a:hover {
+    opacity: 0.8;
+    text-decoration: underline;
 }
 </style>
