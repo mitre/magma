@@ -68,12 +68,15 @@ async function handleLogin(e) {
 
 .feedback-banner a {
     color: #4A90E2;
-    text-decoration: none;
+    text-decoration: underline;
     transition: opacity 0.2s;
 }
 
-.feedback-banner a:hover {
+.feedback-banner a:hover,
+.feedback-banner a:focus-visible {
     opacity: 0.8;
     text-decoration: underline;
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
 }
 </style>
