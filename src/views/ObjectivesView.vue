@@ -1,5 +1,5 @@
 <script setup>
-import { ref, inject, onMounted } from "vue";
+import { ref, inject, onMounted, onActivated } from "vue";
 import { storeToRefs } from "pinia";
 
 import { useAdversaryStore } from "@/stores/adversaryStore.js";
@@ -15,6 +15,10 @@ let newObjectiveName = ref("");
 let newObjectiveDescription = ref("");
 
 onMounted(async () => {
+    await adversaryStore.getObjectives($api);
+});
+
+onActivated(async () => {
     await adversaryStore.getObjectives($api);
 });
 

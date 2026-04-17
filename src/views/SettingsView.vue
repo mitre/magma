@@ -1,6 +1,6 @@
 <script setup>
 import { storeToRefs } from "pinia";
-import { ref, inject, onMounted, computed, watch } from "vue";
+import { ref, inject, onMounted, onActivated, computed, watch } from "vue";
 import { useCoreStore } from "../stores/coreStore";
 
 const coreStore = useCoreStore();
@@ -17,6 +17,10 @@ watch(mainConfig, () => {
 });
 
 onMounted(async () => {
+    await coreStore.getMainConfig($api);
+});
+
+onActivated(async () => {
     await coreStore.getMainConfig($api);
 });
 

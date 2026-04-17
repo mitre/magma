@@ -1,5 +1,5 @@
 <script setup>
-import { ref, inject, onMounted } from "vue";
+import { ref, inject, onMounted, onActivated } from "vue";
 import { storeToRefs } from "pinia";
 
 import { useSourceStore } from "@/stores/sourceStore.js";
@@ -16,6 +16,10 @@ let isEditingName = ref(false);
 let newSourceName = ref("");
 
 onMounted(() => {
+  sourceStore.getSources($api);
+});
+
+onActivated(() => {
   sourceStore.getSources($api);
 });
 

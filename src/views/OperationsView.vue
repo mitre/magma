@@ -3,7 +3,8 @@ import {
   inject,
   ref,
   onMounted,
-  onBeforeUnmount,
+  onActivated,
+  onDeactivated,
   computed,
   watch,
   reactive,
@@ -179,7 +180,14 @@ onMounted(async () => {
   selectOperation();
 });
 
-onBeforeUnmount(() => {
+onActivated(async () => {
+  await operationStore.getOperations($api);
+  await agentStore.getAgents($api);
+  agentStore.updateAgentGroups();
+  selectOperation();
+});
+
+onDeactivated(() => {
   if (updateInterval) clearInterval(updateInterval);
 });
 
