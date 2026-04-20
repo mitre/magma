@@ -2,13 +2,16 @@
 import { storeToRefs } from "pinia";
 import { reactive, ref, inject, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
+import { useCoreDisplayStore } from "@/stores/coreDisplayStore";
 import { useAbilityStore } from "@/stores/abilityStore";
 import { getAbilityPlatforms } from "@/utils/abilityUtil.js";
 import CreateEditAbility from "@/components/abilities/CreateEditAbility.vue";
+import ImportAbilityModal from "@/components/abilities/ImportAbilityModal.vue";
 
 const $api = inject("$api");
 const route = useRoute();
 
+const coreDisplayStore = useCoreDisplayStore();
 const abilityStore = useAbilityStore();
 const { abilities, tactics, techniques, plugins, platforms } = storeToRefs(abilityStore);
 
@@ -64,6 +67,10 @@ hr
             span.icon
                 font-awesome-icon(icon="fas fa-plus")
             span Create an Ability
+        button.button.is-fullwidth.mb-4(@click="coreDisplayStore.modals.abilities.showImport = true")
+            span.icon
+                font-awesome-icon(icon="fas fa-file-import")
+            span Import
         form
             .field
                 .control.has-icons-left
@@ -113,6 +120,7 @@ hr
 
 //- Modals
 CreateEditAbility(:ability="selectedAbility" :active="showAbilityModal" :creating="isCreatingAbility" @close="showAbilityModal = false")
+ImportAbilityModal
 </template>
 
 <style scoped>
