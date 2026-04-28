@@ -45,21 +45,27 @@ async function saveRelationships() {
 table.table.is-striped.is-fullwidth
     thead
         tr
-            th Source
+            th Source Name
+            th Source Value
             th Edge
-            th Target
+            th Target Name
+            th Target Value
             th
     tbody
         tr(v-for="(relationship, index) of selectedSource.relationships")
-            td 
+            td
                 input.input(v-if="relationshipIndexToEdit === index" v-model="relationship.source.trait" placeholder="Relationship source")
                 span(v-else) {{ relationship.source.trait }}
-            td 
+            td
+                span {{ relationship.source.value }}
+            td
                 input.input(v-if="relationshipIndexToEdit === index" v-model="relationship.edge" placeholder="Relationship edge")
                 span(v-else) {{ relationship.edge }}
-            td 
+            td
                 input.input(v-if="relationshipIndexToEdit === index" v-model="relationship.target.trait" placeholder="Relationship target")
                 span(v-else) {{ relationship.target.trait }}
+            td
+               span {{ relationship.target.value }}
             td
                 .buttons
                     button.button.is-primary(
