@@ -1,5 +1,5 @@
 <script setup>
-import { inject, reactive } from "vue";
+import { inject, reactive, ref, computed, watch } from "vue";
 import { useAgentStore } from "../../stores/agentStore";
 import { useCoreDisplayStore } from "../../stores/coreDisplayStore";
 import { storeToRefs } from "pinia";
@@ -11,11 +11,35 @@ const agentStore = useAgentStore();
 const { selectedAgent } = storeToRefs(agentStore);
 const coreDisplayStore = useCoreDisplayStore();
 const { modals } = storeToRefs(coreDisplayStore);
+const originalAgent = ref(null);
 
 let validation = reactive({
     group: "",
     beaconTimer: "",
     watchdogTimer: ""
+});
+
+function setOriginalAgent() {
+    if (selectedAgent.value) {
+        // Deep clone to remove reactivity from the snapshot
+        originalAgent.value = JSON.parse(JSON.stringify(selectedAgent.value));
+    }
+}
+
+watch(() => selectedAgent.value?.paw, (newPaw) => {
+    if (newPaw) {
+        setOriginalAgent();
+    }
+}, { immediate: true });
+
+function isDirty(field) {
+    if (!originalAgent.value || !selectedAgent.value) return false;
+    return selectedAgent.value[field] !== originalAgent.value[field];
+}
+
+const hasAnyChanges = computed(() => {
+    const fieldsToCheck = ['pending_contact', 'group', 'sleep_min', 'sleep_max', 'watchdog'];
+    return fieldsToCheck.some(field => isDirty(field));
 });
 
 function saveAgent() {
@@ -46,7 +70,17 @@ function saveAgent() {
 
     // If all inputs pass validation, save
     if (!validation.group && !validation.beaconTimer && !validation.watchdogTimer) {
+        if (hasAnyChanges.value) {
+            const confirmed = window.confirm("Changes to agents affect all Caldera users!\n\nAre you sure you want to save these changes?");
+            
+            // Abort the save if they click 'Cancel'
+            if (!confirmed) {
+                return; 
+            }
+        }
         agentStore.saveSelectedAgent($api);
+        // Reset the baseline after a successful save so the yellow boxes go back to normal
+        setOriginalAgent();
     }
 }
 </script>
@@ -66,27 +100,27 @@ function saveAgent() {
                     tr
                         th.has-text-right Contact
                         td
-                            .select.control
+                            .select.control(:class="{ 'is-warning': isDirty('pending_contact') }")
                                 select(v-model="selectedAgent.pending_contact")
                                     option(v-for="contact in selectedAgent.available_contacts" :key="contact" :value="contact") {{ contact }}
                     tr
                         th.has-text-right Group 
                         td
-                            input.input(type="text" v-model="selectedAgent.group" :class="{ 'is-danger': validation.group }")
+                            input.input(type="text" v-model="selectedAgent.group" :class="{ 'is-danger': validation.group, 'is-warning': isDirty('group') }")
                             p.help.has-text-danger(v-if="validation.group") {{ validation.group }}
                     tr 
                         th.has-text-right Sleep Timer
                         td
                             .is-flex.is-align-items-center 
                                 label.mr-3 min
-                                input.input.mr-4(v-model="selectedAgent.sleep_min" type="number" placeholder="30" min="0" :max="selectedAgent.sleep_max" :class="{ 'is-danger': validation.beaconTimer }")
+                                input.input.mr-4(v-model="selectedAgent.sleep_min" type="number" placeholder="30" min="0" :max="selectedAgent.sleep_max" :class="{ 'is-danger': validation.beaconTimer, 'is-warning': isDirty('sleep_min') }")
                                 label.mr-3 max
-                                input.input(v-model="selectedAgent.sleep_max" type="number" placeholder="60" :min="selectedAgent.sleep_min" :class="{ 'is-danger': validation.beaconTimer }")
+                                input.input(v-model="selectedAgent.sleep_max" type="number" placeholder="60" :min="selectedAgent.sleep_min" :class="{ 'is-danger': validation.beaconTimer, 'is-warning': isDirty('sleep_max') }")
                             p.help.has-text-danger(v-if="validation.beaconTimer") {{ validation.beaconTimer }}
                     tr
                         th.has-text-right Watchdog Timer
                         td
-                            input.input(type="number" v-model="selectedAgent.watchdog" min="0" :class="{ 'is-danger': validation.watchdogTimer }")
+                            input.input(type="number" v-model="selectedAgent.watchdog" min="0" :class="{ 'is-danger': validation.watchdogTimer, 'is-warning': isDirty('watchdog') }")
                             p.help.has-text-danger(v-if="validation.watchdogTimer") {{ validation.watchdogTimer }}
             button.button.is-primary.is-fullwidth.mt-4(@click="saveAgent()") Save Settings
             hr
