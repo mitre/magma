@@ -99,6 +99,21 @@ const potentialLinksToAdd = computed(() => {
 
 const canSelectAgent = computed(() => !props.agent || !props.agent.paw);
 
+// When a custom value is typed, deselect all fact checkboxes for that fact name
+function onCustomValueInput(factName) {
+    selectedPotentialLinkFacts.value[factName].facts.forEach((fact) => {
+        fact.selected = false;
+    });
+}
+
+// When a fact checkbox is selected, clear the custom value for that fact name
+function onFactSelected(factName) {
+    const hasSelected = selectedPotentialLinkFacts.value[factName].facts.some((fact) => fact.selected);
+    if (hasSelected) {
+        selectedPotentialLinkFacts.value[factName].customValue = "";
+    }
+}
+
 const operationSourceFacts = computed(() => props.operation?.source?.facts || []);
 
 onMounted(async () => {
@@ -246,10 +261,10 @@ const selectPotentialLink = async (link) => {
                             v-tooltip="`There are currently empty fact templates. You can still add this link but it may not run properly.`")
                             font-awesome-icon(icon="fa-exclamation-triangle")
                     .control
-                        input.input(v-model="selectedPotentialLinkFacts[factName].customValue" type="text" placeholder="Enter a custom value")
+                        input.input(v-model="selectedPotentialLinkFacts[factName].customValue" type="text" placeholder="Enter a custom value" @input="onCustomValueInput(factName)")
                     div(v-for="fact in selectedPotentialLinkFacts[factName].facts")
                         label.checkbox
-                            input.mr-2(type="checkbox" v-model="fact.selected")
+                            input.mr-2(type="checkbox" v-model="fact.selected" @change="onFactSelected(factName)")
                             span.mr-2 {{ fact.value }}
                             span.tag.mr-2 {{ fact.origin }}
     
