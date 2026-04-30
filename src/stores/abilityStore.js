@@ -68,19 +68,14 @@ export const useAbilityStore = defineStore("abilityStore", {
                 console.error("Error fetching abilities", error);
             }
         },
-        async uploadAbility($api, file) {
+        async importAbility($api, ability) {
             try {
-                const formData = new FormData();
-                formData.append('file', file);
-                const response = await $api.post('/api/v2/abilities/upload', formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                });
+                const response = await $api.post("/api/v2/abilities", ability);
                 await this.getAbilities($api);
-                return response;
+                return response.data;
             } catch(error) {
-                console.error("Error uploading ability.", error);
+                console.error("Error importing ability.", error);
+                throw error;
             }
         },
         async getPayloads($api, sort=false, excludePlugins=false, addPath=false) {
