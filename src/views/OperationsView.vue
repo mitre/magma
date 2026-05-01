@@ -45,6 +45,7 @@ const coreStore = useCoreStore();
 const { modals } = storeToRefs(coreDisplayStore);
 
 let updateInterval = ref();
+let operationsListInterval = ref();
 let showPotentialLinkModal = ref(false);
 let selectedOutputLink = ref(null);
 
@@ -175,12 +176,18 @@ onMounted(async () => {
   await operationStore.getOperations($api);
   await coreStore.getObfuscators($api);
   await agentStore.getAgents($api);
-  agentStore.updateAgentGroups();
+  // agentGroups is now a computed getter, no manual update needed
   selectOperation();
+
+  // Periodically refresh the operations list to pick up new/changed operations
+  operationsListInterval.value = setInterval(async () => {
+    await operationStore.getOperations($api);
+  }, 15000);
 });
 
 onBeforeUnmount(() => {
   if (updateInterval) clearInterval(updateInterval);
+  if (operationsListInterval.value) clearInterval(operationsListInterval.value);
 });
 
 const resetFilter = () => {
