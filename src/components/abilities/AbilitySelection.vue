@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, computed, inject, onMounted } from 'vue';
+import { ref, reactive, computed, inject, onMounted, watch } from 'vue';
 import { storeToRefs } from "pinia";
 
 import { useAbilityStore } from "@/stores/abilityStore";
@@ -41,6 +41,15 @@ const hasFiltersApplied = computed(() => {
 
 onMounted(async () => {
     await abilityStore.getAbilities($api);
+});
+
+// Re-fetch abilities every time the modal is opened so newly created
+// abilities (e.g. from another tab or the Abilities view) appear
+// immediately without requiring a page reload.
+watch(() => props.active, async (isActive) => {
+    if (isActive) {
+        await abilityStore.getAbilities($api);
+    }
 });
 
 function clearFilters() {
