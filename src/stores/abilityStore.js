@@ -68,6 +68,16 @@ export const useAbilityStore = defineStore("abilityStore", {
                 console.error("Error fetching abilities", error);
             }
         },
+        async importAbility($api, ability) {
+            try {
+                const response = await $api.post("/api/v2/abilities", ability);
+                await this.getAbilities($api);
+                return response.data;
+            } catch(error) {
+                console.error("Error importing ability.", error);
+                throw error;
+            }
+        },
         async getPayloads($api, sort=false, excludePlugins=false, addPath=false) {
             try {
                 const response = await $api.get("/api/v2/payloads", {params: {sort: sort, exclude_plugins: excludePlugins, add_path: addPath}});
