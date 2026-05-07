@@ -44,9 +44,21 @@ function promptToEnablePlugin(pluginName) {
 async function checkGitHubVersion() {
     try {
         const response = await fetch("https://api.github.com/repos/mitre/caldera/releases/latest");
+
+        if (!response.ok) {
+            console.warn("Failed to fetch Caldera version from GitHub:", response.status, response.statusText);
+            return;
+        }
+
+        const contentType = response.headers.get("content-type") || "";
+        if (!contentType.toLowerCase().includes("application/json")) {
+            console.warn("Unexpected response type when fetching Caldera version from GitHub:", contentType);
+            return;
+        }
+
         const data = await response.json();
-        
-        if (data.tag_name) {
+
+        if (typeof data.tag_name === "string") {
             const githubVersion = data.tag_name.replace('v', '');
             latestVersion.value = githubVersion;
             releaseUrl.value = data.html_url;
