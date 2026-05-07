@@ -1,5 +1,5 @@
 <script setup>
-import { inject } from "vue";
+import { inject, ref, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useRoute, useRouter } from "vue-router";
 import { useCoreStore } from "@/stores/coreStore";
@@ -19,6 +19,10 @@ const router = useRouter();
 
 const $api = inject("$api");
 
+const hasUpdate = ref(false);
+const latestVersion = ref("");
+const releaseUrl = ref("");
+
 try {
   await coreStore.getAvailablePlugins($api);
   await coreStore.getMainConfig($api);
@@ -36,6 +40,41 @@ function promptToEnablePlugin(pluginName) {
   this.modals.core.selectedPlugin = pluginName;
   this.modals.core.showPluginPopup = true;
 }
+
+async function checkGitHubVersion() {
+    try {
+        const response = await fetch("https://api.github.com/repos/mitre/caldera/releases/latest");
+
+        if (!response.ok) {
+            console.warn("Failed to fetch Caldera version from GitHub:", response.status, response.statusText);
+            return;
+        }
+
+        const contentType = response.headers.get("content-type") || "";
+        if (!contentType.toLowerCase().includes("application/json")) {
+            console.warn("Unexpected response type when fetching Caldera version from GitHub:", contentType);
+            return;
+        }
+
+        const data = await response.json();
+
+        if (typeof data.tag_name === "string") {
+            const githubVersion = data.tag_name.replace('v', '');
+            latestVersion.value = githubVersion;
+            releaseUrl.value = data.html_url;
+
+            if (githubVersion !== version.value) {
+                hasUpdate.value = true;
+            }
+        }
+    } catch (error) {
+        console.error("Failed to fetch Caldera version from GitHub:", error);
+    }
+}
+
+onMounted(() => {
+    checkGitHubVersion();
+});
 </script>
 
 <template lang="pug">
@@ -51,7 +90,16 @@ function promptToEnablePlugin(pluginName) {
       div.team-container
         span.icon(:class="{ 'is-red': group === 'RED', 'is-blue': group === 'BLUE'}")
           font-awesome-icon(icon="fas fa-user")
-        span {{ version }}
+          
+        span(v-if="!hasUpdate") {{ version }}
+        
+        a.has-text-warning.has-text-weight-bold(
+          v-else
+          :href="releaseUrl" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          :title="'View release notes for ' + latestVersion"
+        ) {{ version }} (Update)
     aside.menu(v-if="!userSettings.collapseNavigation")
 
         p.menu-label
