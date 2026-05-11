@@ -32,6 +32,12 @@ watch(() => selectedAgent.value?.paw, (newPaw) => {
     }
 }, { immediate: true });
 
+watch(() => modals.value?.agents?.showDetails, (showDetails) => {
+    if (showDetails && selectedAgent.value) {
+        setOriginalAgent();
+    }
+});
+
 function isDirty(field) {
     if (!originalAgent.value || !selectedAgent.value) return false;
     return selectedAgent.value[field] !== originalAgent.value[field];
