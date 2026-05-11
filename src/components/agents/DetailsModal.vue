@@ -40,7 +40,15 @@ watch(() => modals.value?.agents?.showDetails, (showDetails) => {
 
 function isDirty(field) {
     if (!originalAgent.value || !selectedAgent.value) return false;
-    return selectedAgent.value[field] !== originalAgent.value[field];
+
+    const numericFields = new Set(['sleep_min', 'sleep_max', 'watchdog']);
+    const currentValue = selectedAgent.value[field];
+    const originalValue = originalAgent.value[field];
+    if (numericFields.has(field)) {
+        return Number(currentValue) !== Number(originalValue);
+    }
+    
+    return currentValue !== originalValue;
 }
 
 const hasAnyChanges = computed(() => {
@@ -87,6 +95,10 @@ function saveAgent() {
         agentStore.saveSelectedAgent($api);
         // Reset the baseline after a successful save so the yellow boxes go back to normal
         setOriginalAgent();
+        // Close the modal after saving
+        if (modals.value) {
+        modals.value.agents.showDetails = false;
+        }
     }
 }
 </script>
