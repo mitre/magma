@@ -11,14 +11,10 @@ const authStore = useAuthStore();
 const coreDisplayStore = useCoreDisplayStore();
 const coreStore = useCoreStore();
 const { modals } = storeToRefs(coreDisplayStore);
-const { enabledPlugins, availablePlugins, userSettings, hideDisabledPlugins } =
-  storeToRefs(coreStore);
+const { enabledPlugins, availablePlugins, userSettings, hideDisabledPlugins } = storeToRefs(coreStore);
 const { group, version } = storeToRefs(authStore);
-
 const router = useRouter();
-
 const $api = inject("$api");
-
 const hasUpdate = ref(false);
 const latestVersion = ref("");
 const releaseUrl = ref("");
@@ -65,12 +61,10 @@ async function checkGitHubVersion() {
     const cachedUrl = localStorage.getItem(URL_CACHE_KEY);
     const cachedTime = localStorage.getItem(TIME_CACHE_KEY);
 
-    // 1. Avoid Rate Limits: Check cache before making external requests
     if (cachedVersion && cachedUrl && cachedTime && (now - parseInt(cachedTime) < TTL_MS)) {
         latestVersion.value = cachedVersion;
         releaseUrl.value = cachedUrl;
         
-        // 2. Semantic comparison: Only alert if GitHub is strictly newer
         if (isNewerVersion(cachedVersion, version.value)) {
             hasUpdate.value = true;
         }
@@ -102,7 +96,6 @@ async function checkGitHubVersion() {
             localStorage.setItem(URL_CACHE_KEY, data.html_url);
             localStorage.setItem(TIME_CACHE_KEY, now.toString());
 
-            // 2. Semantic comparison: Only alert if GitHub is strictly newer
             if (isNewerVersion(githubVersion, version.value)) {
                 hasUpdate.value = true;
             }
@@ -252,7 +245,6 @@ onMounted(() => {
                         | api docs
                         font-awesome-icon(icon="fas fa-external-link-alt").pl-1.is-size-7
 
-//- Modals
 PluginModal
 </template>
 
