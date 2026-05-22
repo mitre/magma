@@ -41,9 +41,44 @@ function promptToEnablePlugin(pluginName) {
   this.modals.core.showPluginPopup = true;
 }
 
+function isNewerVersion(remote, local) {
+    const rParts = remote.split('.').map(Number);
+    const lParts = local.split('.').map(Number);
+    
+    for (let i = 0; i < Math.max(rParts.length, lParts.length); i++) {
+        const r = rParts[i] || 0;
+        const l = lParts[i] || 0;
+        if (r > l) return true;
+        if (r < l) return false;
+    }
+    return false;
+}
+
 async function checkGitHubVersion() {
+    const CACHE_KEY = "calderaGitHubVersion";
+    const URL_CACHE_KEY = "calderaGitHubReleaseUrl";
+    const TIME_CACHE_KEY = "calderaGitHubVersionTime";
+    const TTL_MS = 1000 * 60 * 60 * 24; // 24 hours in milliseconds
+
+    const now = Date.now();
+    const cachedVersion = localStorage.getItem(CACHE_KEY);
+    const cachedUrl = localStorage.getItem(URL_CACHE_KEY);
+    const cachedTime = localStorage.getItem(TIME_CACHE_KEY);
+
+    // 1. Avoid Rate Limits: Check cache before making external requests
+    if (cachedVersion && cachedUrl && cachedTime && (now - parseInt(cachedTime) < TTL_MS)) {
+        latestVersion.value = cachedVersion;
+        releaseUrl.value = cachedUrl;
+        
+        // 2. Semantic comparison: Only alert if GitHub is strictly newer
+        if (isNewerVersion(cachedVersion, version.value)) {
+            hasUpdate.value = true;
+        }
+        return;
+    }
+
     try {
-        const response = await fetch("https://api.github.com/repos/mitre/caldera/releases/latest");
+        const response = await fetch("https://api.github.com/repos/apache/caldera/releases/latest");
 
         if (!response.ok) {
             console.warn("Failed to fetch Caldera version from GitHub:", response.status, response.statusText);
@@ -55,7 +90,6 @@ async function checkGitHubVersion() {
             console.warn("Unexpected response type when fetching Caldera version from GitHub:", contentType);
             return;
         }
-
         const data = await response.json();
 
         if (typeof data.tag_name === "string") {
@@ -63,7 +97,13 @@ async function checkGitHubVersion() {
             latestVersion.value = githubVersion;
             releaseUrl.value = data.html_url;
 
-            if (githubVersion !== version.value) {
+            // Update localStorage cache
+            localStorage.setItem(CACHE_KEY, githubVersion);
+            localStorage.setItem(URL_CACHE_KEY, data.html_url);
+            localStorage.setItem(TIME_CACHE_KEY, now.toString());
+
+            // 2. Semantic comparison: Only alert if GitHub is strictly newer
+            if (isNewerVersion(githubVersion, version.value)) {
                 hasUpdate.value = true;
             }
         }
