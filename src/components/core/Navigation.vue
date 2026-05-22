@@ -1,5 +1,5 @@
 <script setup>
-import { inject } from "vue";
+import { inject, ref, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useRoute, useRouter } from "vue-router";
 import { useCoreStore } from "@/stores/coreStore";
@@ -11,13 +11,13 @@ const authStore = useAuthStore();
 const coreDisplayStore = useCoreDisplayStore();
 const coreStore = useCoreStore();
 const { modals } = storeToRefs(coreDisplayStore);
-const { enabledPlugins, availablePlugins, userSettings, hideDisabledPlugins } =
-  storeToRefs(coreStore);
+const { enabledPlugins, availablePlugins, userSettings, hideDisabledPlugins } = storeToRefs(coreStore);
 const { group, version } = storeToRefs(authStore);
-
 const router = useRouter();
-
 const $api = inject("$api");
+const hasUpdate = ref(false);
+const latestVersion = ref("");
+const releaseUrl = ref("");
 
 try {
   await coreStore.getAvailablePlugins($api);
@@ -36,6 +36,78 @@ function promptToEnablePlugin(pluginName) {
   this.modals.core.selectedPlugin = pluginName;
   this.modals.core.showPluginPopup = true;
 }
+
+function isNewerVersion(remote, local) {
+    const rParts = remote.split('.').map(Number);
+    const lParts = local.split('.').map(Number);
+    
+    for (let i = 0; i < Math.max(rParts.length, lParts.length); i++) {
+        const r = rParts[i] || 0;
+        const l = lParts[i] || 0;
+        if (r > l) return true;
+        if (r < l) return false;
+    }
+    return false;
+}
+
+async function checkGitHubVersion() {
+    const CACHE_KEY = "calderaGitHubVersion";
+    const URL_CACHE_KEY = "calderaGitHubReleaseUrl";
+    const TIME_CACHE_KEY = "calderaGitHubVersionTime";
+    const TTL_MS = 1000 * 60 * 60 * 24; // 24 hours in milliseconds
+
+    const now = Date.now();
+    const cachedVersion = localStorage.getItem(CACHE_KEY);
+    const cachedUrl = localStorage.getItem(URL_CACHE_KEY);
+    const cachedTime = localStorage.getItem(TIME_CACHE_KEY);
+
+    if (cachedVersion && cachedUrl && cachedTime && (now - parseInt(cachedTime) < TTL_MS)) {
+        latestVersion.value = cachedVersion;
+        releaseUrl.value = cachedUrl;
+        
+        if (isNewerVersion(cachedVersion, version.value)) {
+            hasUpdate.value = true;
+        }
+        return;
+    }
+
+    try {
+        const response = await fetch("https://api.github.com/repos/apache/caldera/releases/latest");
+
+        if (!response.ok) {
+            console.warn("Failed to fetch Caldera version from GitHub:", response.status, response.statusText);
+            return;
+        }
+
+        const contentType = response.headers.get("content-type") || "";
+        if (!contentType.toLowerCase().includes("application/json")) {
+            console.warn("Unexpected response type when fetching Caldera version from GitHub:", contentType);
+            return;
+        }
+        const data = await response.json();
+
+        if (typeof data.tag_name === "string") {
+            const githubVersion = data.tag_name.replace('v', '');
+            latestVersion.value = githubVersion;
+            releaseUrl.value = data.html_url;
+
+            // Update localStorage cache
+            localStorage.setItem(CACHE_KEY, githubVersion);
+            localStorage.setItem(URL_CACHE_KEY, data.html_url);
+            localStorage.setItem(TIME_CACHE_KEY, now.toString());
+
+            if (isNewerVersion(githubVersion, version.value)) {
+                hasUpdate.value = true;
+            }
+        }
+    } catch (error) {
+        console.error("Failed to fetch Caldera version from GitHub:", error);
+    }
+}
+
+onMounted(() => {
+    checkGitHubVersion();
+});
 </script>
 
 <template lang="pug">
@@ -51,7 +123,16 @@ function promptToEnablePlugin(pluginName) {
       div.team-container
         span.icon(:class="{ 'is-red': group === 'RED', 'is-blue': group === 'BLUE'}")
           font-awesome-icon(icon="fas fa-user")
-        span {{ version }}
+          
+        span(v-if="!hasUpdate") {{ version }}
+        
+        a.has-text-warning.has-text-weight-bold(
+          v-else
+          :href="releaseUrl" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          :title="'View release notes for ' + latestVersion"
+        ) {{ version }} (Update)
     aside.menu(v-if="!userSettings.collapseNavigation")
 
         p.menu-label
@@ -164,7 +245,6 @@ function promptToEnablePlugin(pluginName) {
                         | api docs
                         font-awesome-icon(icon="fas fa-external-link-alt").pl-1.is-size-7
 
-//- Modals
 PluginModal
 </template>
 
