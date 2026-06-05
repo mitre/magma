@@ -14,7 +14,8 @@ export default defineConfig({
   build: {
     rollupOptions: {
       external: [
-        /gui/
+        /gui/,
+        /^\/plugin\/range\/static\//
       ]
     }
   },
