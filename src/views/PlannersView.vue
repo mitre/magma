@@ -1,6 +1,6 @@
 <script setup>
 import { storeToRefs } from "pinia";
-import { inject, onMounted } from "vue";
+import { inject, onMounted, onActivated } from "vue";
 import { useCoreStore } from "../stores/coreStore";
 
 const coreStore = useCoreStore();
@@ -9,6 +9,10 @@ const { planners } = storeToRefs(coreStore);
 const $api = inject("$api");
 
 onMounted(async () => {
+    await coreStore.getPlanners($api);
+});
+
+onActivated(async () => {
     await coreStore.getPlanners($api);
 });
 </script>

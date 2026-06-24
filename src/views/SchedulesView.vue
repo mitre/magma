@@ -1,5 +1,5 @@
 <script setup>
-import { computed, inject, onMounted } from 'vue';
+import { computed, inject, onMounted, onActivated } from 'vue';
 import { storeToRefs } from "pinia";
 
 import CreateScheduleModal from "@/components/schedules/CreateScheduleModal.vue";
@@ -29,6 +29,12 @@ const handleClick = (id) => {
 onMounted(async () => {
   await scheduleStore.getSchedules($api);
   await coreStore.getObfuscators($api);
+  await agentStore.getAgents($api);
+  agentStore.updateAgentGroups();
+});
+
+onActivated(async () => {
+  await scheduleStore.getSchedules($api);
   await agentStore.getAgents($api);
   agentStore.updateAgentGroups();
 });

@@ -1,6 +1,6 @@
 <script setup>
 import { storeToRefs } from "pinia";
-import { reactive, ref, inject, onMounted, computed } from "vue";
+import { reactive, ref, inject, onMounted, onActivated, computed } from "vue";
 import { useRoute } from "vue-router";
 import { useAbilityStore } from "@/stores/abilityStore";
 import { getAbilityPlatforms } from "@/utils/abilityUtil.js";
@@ -37,6 +37,10 @@ const filteredAbilities = computed(() => {
 onMounted(async () => {
     await abilityStore.getAbilities($api);
     filters.plugin = route.query.plugin || "";
+});
+
+onActivated(async () => {
+    await abilityStore.getAbilities($api);
 });
 
 function clearFilters() {

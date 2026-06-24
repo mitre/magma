@@ -1,5 +1,5 @@
 <script setup>
-import { inject, onMounted } from "vue";
+import { inject, onMounted, onActivated } from "vue";
 import { useCoreStore } from "../stores/coreStore";
 import { storeToRefs } from "pinia";
 
@@ -10,6 +10,11 @@ const { contacts } = storeToRefs(coreStore);
 const { availableContacts } = storeToRefs(coreStore);
 
 onMounted(async () => {
+  await coreStore.getContacts($api);
+  await coreStore.getAvailableContacts($api);
+});
+
+onActivated(async () => {
   await coreStore.getContacts($api);
   await coreStore.getAvailableContacts($api);
 });

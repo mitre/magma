@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, ref, inject, onMounted, watch } from "vue";
+import { reactive, ref, inject, onMounted, onActivated, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { useCoreStore } from "@/stores/coreStore";
 import { useOperationStore } from "@/stores/operationStore";
@@ -27,6 +27,11 @@ onMounted(async () => {
   Object.keys(files).forEach((agentName) => {
     folderState[agentName] = false;
   });
+});
+
+onActivated(async () => {
+  await operationStore.getOperations($api);
+  exfilStore.loadFiles($api, selectedOperationId.value);
 });
 
 function toggleAllFiles() {

@@ -6,11 +6,19 @@ import AdversaryChartStatus from "@/components/adversaries/AdversaryChartStatus.
 import CodeEditor from "@/components/core/CodeEditor.vue";
 import { useCoreStore } from "@/stores/coreStore";
 import { storeToRefs } from "pinia";
-import { onMounted, inject } from "vue";
+import { onMounted, onActivated, inject } from "vue";
 
 const coreStore = useCoreStore();
 const $api = inject("$api");
 onMounted(async () => {
+  try {
+    await coreStore.getMainConfig($api);
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+onActivated(async () => {
   try {
     await coreStore.getMainConfig($api);
   } catch (error) {
